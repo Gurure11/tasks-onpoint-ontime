@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+</head>
+<body>
+
+<h2>OnPoint Task System</h2>
+
+<div id="login">
+  <input id="email" placeholder="Email"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="app" style="display:none;">
+  <h3 id="user"></h3>
+
+  <div id="tasks"></div>
+
+  <h4>Create Task (Executive)</h4>
+  <input id="title" placeholder="Title">
+  <input id="desc" placeholder="Description">
+  <input id="assigned" placeholder="Manager ID">
+  <input id="deadline" type="date">
+  <button onclick="createTask()">Create</button>
+</div>
+
+<script>
+let currentUser;
+
+function login(){
+  google.script.run.withSuccessHandler(function(res){
+    if(res){
+      currentUser = res;
+      document.getElementById("login").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("user").innerText = res.name + " ("+res.role+")";
+      loadTasks();
+    } else {
+      alert("Invalid login");
+    }
+  }).login(
+    document.getElementById("email").value,
+    document.getElementById("password").value
+  );
+}
+
+function loadTasks(){
+  google.script.run.withSuccessHandler(function(tasks){
+    let html="";
+    tasks.forEach(t=>{
+      html += `
+        <div>
+          <b>${t.title}</b><br>
+          Progress: ${t.progress}%<br>
+          Status: ${t.status}<br>
+          <input placeholder="Update %" id="p${t.id}">
+          <button onclick="update(${t.id})">Update</button>
+        </div><hr>`;
+    });
+    document.getElementById("tasks").innerHTML = html;
+  }).getTasks(currentUser);
+}
+
+function update(id){
+  let val = document.getElementById("p"+id).value;
+  google.script.run.updateProgress(id, val);
+  loadTasks();
+}
+
+function createTask(){
+  let task = {
+    title: document.getElementById("title").value,
+    description: document.getElementById("desc").value,
+    assigned_to: document.getElementById("assigned").value,
+    created_by: currentUser.id,
+    deadline: document.getElementById("deadline").value
+  };
+  google.script.run.createTask(task);
+  alert("Task Created");
+}
+</script>
+
+</body>
+</html>
