@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
+  <meta charset="UTF-8">
+  <title>OnPoint Task System</title>
 </head>
 <body>
 
-<h2>OnPoint Task System</h2>
+<h2>OnPoint Task System (External)</h2>
 
 <div id="login">
   <input id="email" placeholder="Email"><br>
@@ -15,39 +16,39 @@
 
 <div id="app" style="display:none;">
   <h3 id="user"></h3>
-
   <div id="tasks"></div>
-
-  <h4>Create Task (Executive)</h4>
-  <input id="title" placeholder="Title">
-  <input id="desc" placeholder="Description">
-  <input id="assigned" placeholder="Manager ID">
-  <input id="deadline" type="date">
-  <button onclick="createTask()">Create</button>
 </div>
 
 <script>
-let currentUser;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw86ri-48g-DQF_e_cJTG8hlgURI1jtsW690M4_kBGri-syrcaU2QvQDpNBQk3O4de2SQ/exec";
 
+let currentUser = null;
+
+// LOGIN
 function login(){
-  google.script.run.withSuccessHandler(function(res){
-    if(res){
-      currentUser = res;
+  fetch(SCRIPT_URL + "?action=login&email=" 
+    + document.getElementById("email").value 
+    + "&password=" 
+    + document.getElementById("password").value)
+  .then(res => res.json())
+  .then(data => {
+    if(data){
+      currentUser = data;
       document.getElementById("login").style.display="none";
       document.getElementById("app").style.display="block";
-      document.getElementById("user").innerText = res.name + " ("+res.role+")";
+      document.getElementById("user").innerText = data.name + " ("+data.role+")";
       loadTasks();
     } else {
       alert("Invalid login");
     }
-  }).login(
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  );
+  });
 }
 
+// LOAD TASKS
 function loadTasks(){
-  google.script.run.withSuccessHandler(function(tasks){
+  fetch(SCRIPT_URL + "?action=getTasks&userId=" + currentUser.id + "&role=" + currentUser.role)
+  .then(res => res.json())
+  .then(tasks => {
     let html="";
     tasks.forEach(t=>{
       html += `
@@ -55,30 +56,10 @@ function loadTasks(){
           <b>${t.title}</b><br>
           Progress: ${t.progress}%<br>
           Status: ${t.status}<br>
-          <input placeholder="Update %" id="p${t.id}">
-          <button onclick="update(${t.id})">Update</button>
         </div><hr>`;
     });
     document.getElementById("tasks").innerHTML = html;
-  }).getTasks(currentUser);
-}
-
-function update(id){
-  let val = document.getElementById("p"+id).value;
-  google.script.run.updateProgress(id, val);
-  loadTasks();
-}
-
-function createTask(){
-  let task = {
-    title: document.getElementById("title").value,
-    description: document.getElementById("desc").value,
-    assigned_to: document.getElementById("assigned").value,
-    created_by: currentUser.id,
-    deadline: document.getElementById("deadline").value
-  };
-  google.script.run.createTask(task);
-  alert("Task Created");
+  });
 }
 </script>
 
