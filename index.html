@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>task | OnPoint Group HQ</title>
+  <title>Tasks | OnPoint Group HQ</title>
   <style>
     :root {
       --primary: #0f172a;
@@ -360,7 +360,7 @@
       </div>
 
       <div class="brand-content">
-        <h1>task</h1>
+        <h1>Tasks</h1>
         <p>
           Executive task control, manager dashboards, deadline tracking,
           extension requests, and final task closure remarks.
@@ -374,14 +374,14 @@
       </div>
 
       <div style="z-index:1; color:#94a3b8; font-size:13px;">
-        Connected to Google Sheet database: task
+        Connected to Google Sheet database: Tasks
       </div>
     </aside>
 
     <main class="login-panel">
       <div class="login-card">
         <h2>Welcome back</h2>
-        <p class="subtitle">Sign in to access the OnPoint Group HQ task dashboard.</p>
+        <p class="subtitle">Sign in to access the OnPoint Group HQ Tasks dashboard.</p>
 
         <div class="field">
           <label>Email address</label>
@@ -405,7 +405,7 @@
 
   <section id="app" class="app">
     <header class="topbar">
-      <strong>task | OnPoint Group HQ</strong>
+      <strong>Tasks | OnPoint Group HQ</strong>
       <div>
         <span id="userPill" class="user-pill"></span>
         <button class="btn-small" onclick="logout()" style="margin-left:10px;">Logout</button>
@@ -463,7 +463,7 @@
   </section>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_eSPLRoLsn-8y1teH_4RghvBXwkzK1Q2XxW3humcoHk1Ep86tOZbn7zbypSw1MSTtiA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAz_bauZDJ9eXtyApcSE0szN8kkRZCdq-9cBEihIIvXmOriL8zjpkmA3yRzdkRXiEcyQ/exec";
     let currentUser = null;
 
     function showMessage(id, text, type) {
@@ -528,7 +528,7 @@
 
         if (data && data.success && data.user) {
           currentUser = data.user;
-          sessionStorage.setItem("onpointTaskUser", JSON.stringify(currentUser));
+          sessionStorage.setItem("onpointTasksUser", JSON.stringify(currentUser));
           showApp();
           await loadInitialData();
         } else {
@@ -557,7 +557,7 @@
     }
 
     function logout() {
-      sessionStorage.removeItem("onpointTaskUser");
+      sessionStorage.removeItem("onpointTasksUser");
       currentUser = null;
       document.getElementById("app").style.display = "none";
       document.getElementById("loginPage").style.display = "grid";
@@ -746,7 +746,7 @@
     });
 
     window.addEventListener("load", function() {
-      const saved = sessionStorage.getItem("onpointTaskUser");
+      const saved = sessionStorage.getItem("onpointTasksUser");
       if (saved) {
         currentUser = JSON.parse(saved);
         showApp();
