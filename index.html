@@ -341,6 +341,36 @@
     .span-2 { grid-column: span 2; }
     .hidden { display: none !important; }
 
+    .proof-section {
+      margin-top: 14px;
+      border-top: 1px dashed var(--border);
+      padding-top: 12px;
+    }
+
+    .proof-links {
+      margin-top: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .proof-links a {
+      color: #1d4ed8;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .proof-links a:hover {
+      text-decoration: underline;
+    }
+
+    .share-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     @media (max-width: 860px) {
       .login-page { grid-template-columns: 1fr; }
       .brand-panel { padding: 34px; }
@@ -463,7 +493,7 @@
   </section>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAz_bauZDJ9eXtyApcSE0szN8kkRZCdq-9cBEihIIvXmOriL8zjpkmA3yRzdkRXiEcyQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxukAdJejjRpVJFtIE5zsncroMUCTJYlpMk2nmGINMcqlMNb0jpZ4K_xLHn9aRpJNw_Rw/exec";
     let currentUser = null;
 
     function showMessage(id, text, type) {
@@ -606,7 +636,7 @@
       try {
         const data = await api("createTask", payload);
         if (data.success) {
-          showMessage("taskMessage", "Task created successfully.", "success");
+          showMessage("taskMessage", "Task created successfully. You can share it from the task card by WhatsApp or email.", "success");
           document.getElementById("taskTitle").value = "";
           document.getElementById("taskDescription").value = "";
           document.getElementById("taskDeadline").value = "";
@@ -628,6 +658,7 @@
       }
 
       const tasks = data.tasks || [];
+      window.latestTasks = tasks;
       renderStats(tasks);
       renderTasks(tasks);
     }
@@ -670,6 +701,28 @@
               <div class="task-meta" style="margin-top:6px;">Progress: ${progress}%</div>
             </div>
 
+            <div class="share-actions">
+              <button class="btn-small" onclick="shareTaskWhatsApp('${t.task_id}')">Share WhatsApp</button>
+              <button class="btn-small" onclick="shareTaskEmail('${t.task_id}')">Share Email</button>
+            </div>
+
+            <div class="proof-section">
+              <div class="task-meta"><strong>Proof documents / pictures:</strong></div>
+              <div class="proof-links">
+                ${(t.proof_files || []).length ? (t.proof_files || []).map((f, index) => `
+                  <a href="${escapeHtml(f.url)}" target="_blank" download>Proof ${index + 1}: ${escapeHtml(f.comment || "Download / view file")}</a>
+                `).join("") : `<span class="task-meta">No proof uploaded yet.</span>`}
+              </div>
+
+              ${currentUser.role === "MANAGER" && t.status !== "CLOSED" ? `
+                <div class="task-actions" style="grid-template-columns:1fr 1fr auto;">
+                  <input id="proof_${t.task_id}" type="file">
+                  <input id="proof_comment_${t.task_id}" placeholder="Proof note, e.g. signed document or completed photo">
+                  <button class="btn-small" onclick="uploadProof('${t.task_id}')">Upload Proof</button>
+                </div>
+              ` : ""}
+            </div>
+
             ${currentUser.role === "MANAGER" && t.status !== "CLOSED" ? `
               <div class="task-actions">
                 <input id="progress_${t.task_id}" type="number" min="0" max="100" placeholder="%">
@@ -700,6 +753,101 @@
       alert(data.message || (data.success ? "Updated" : "Failed"));
       await loadTasks();
     }
+
+
+    function getTaskById(taskId) {
+      return (window.latestTasks || []).find(t => String(t.task_id) === String(taskId));
+    }
+
+    function buildTaskShareText(taskId) {
+      const task = getTaskById(taskId);
+      if (!task) return "Task link: " + SCRIPT_URL + "?action=viewTask&taskId=" + encodeURIComponent(taskId);
+
+      const link = task.share_link || (SCRIPT_URL + "?action=viewTask&taskId=" + encodeURIComponent(taskId));
+
+      return [
+        "OnPoint Group HQ Task",
+        "Task: " + task.title,
+        "Task ID: " + task.task_id,
+        "Assigned to: " + (task.assigned_to_name || ""),
+        "Deadline: " + (task.deadline || ""),
+        "Status: " + (task.status || ""),
+        "Link: " + link
+      ].join("\\n");
+    }
+
+    function shareTaskWhatsApp(taskId) {
+      const text = buildTaskShareText(taskId);
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
+      window.open(url, "_blank");
+    }
+
+    function shareTaskEmail(taskId) {
+      const task = getTaskById(taskId);
+      const subject = task ? "Task: " + task.title : "OnPoint Group HQ Task";
+      const body = buildTaskShareText(taskId);
+      window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    }
+
+    async function uploadProof(taskId) {
+      const fileInput = document.getElementById("proof_" + taskId);
+      const commentInput = document.getElementById("proof_comment_" + taskId);
+
+      if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+        alert("Please select a document, file, or picture to upload.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const comment = commentInput ? commentInput.value : "";
+
+      const base64 = await readFileAsBase64(file);
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "uploadProof",
+            taskId: taskId,
+            userId: currentUser.id,
+            fileName: file.name,
+            mimeType: file.type || "application/octet-stream",
+            base64: base64,
+            comment: comment
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert("Proof uploaded successfully.");
+          await loadTasks();
+        } else {
+          alert(data.message || "Could not upload proof.");
+        }
+      } catch (err) {
+        alert("Upload failed. If this is blocked by the browser, open the app from the deployed Apps Script URL or check deployment permissions. " + err.message);
+      }
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = function() {
+          const result = String(reader.result || "");
+          resolve(result.split(",")[1] || "");
+        };
+
+        reader.onerror = function() {
+          reject(new Error("Could not read selected file."));
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
 
     async function requestMoreTime(taskId) {
       const newDate = prompt("Enter new deadline date as YYYY-MM-DD:");
