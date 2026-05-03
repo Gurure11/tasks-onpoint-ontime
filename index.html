@@ -371,6 +371,41 @@
       margin-top: 12px;
     }
 
+    .filter-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .filter-actions .field {
+      margin-bottom: 0;
+      min-width: 240px;
+      flex: 1;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .topbar,
+      .stats,
+      #executiveCreateCard,
+      #taskFilters,
+      .share-actions,
+      .task-actions,
+      .login-page,
+      button,
+      input,
+      textarea,
+      select {
+        display: none !important;
+      }
+      .app { display: block !important; }
+      .main { max-width: none; padding: 0; }
+      .card, .task { box-shadow: none; border: 1px solid #ddd; }
+      .task { page-break-inside: avoid; }
+    }
+
     @media (max-width: 860px) {
       .login-page { grid-template-columns: 1fr; }
       .brand-panel { padding: 34px; }
@@ -458,7 +493,7 @@
             <input id="taskTitle" placeholder="Enter task title" />
           </div>
           <div>
-            <label>Assign to Manager</label>
+            <label>Assign to Manager / Executive</label>
             <select id="taskManager"></select>
           </div>
           <div>
@@ -485,7 +520,20 @@
         <div id="taskMessage" class="message"></div>
       </div>
 
-      <div class="card">
+      <div id="taskFilters" class="card hidden" style="margin-bottom:18px;">
+        <h3>Task Filter & Reports</h3>
+        <div class="filter-actions">
+          <div class="field">
+            <label>Filter by Manager / Executive</label>
+            <select id="managerFilter" onchange="applyTaskFilter()">
+              <option value="">All Managers / Executives</option>
+            </select>
+          </div>
+          <button class="btn-small" onclick="downloadTasksPdf()">Download / Print PDF</button>
+        </div>
+      </div>
+
+      <div class="card" id="printArea">
         <h3 id="taskHeading">My Tasks</h3>
         <div id="tasks" class="task-list"></div>
       </div>
@@ -493,7 +541,7 @@
   </section>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxukAdJejjRpVJFtIE5zsncroMUCTJYlpMk2nmGINMcqlMNb0jpZ4K_xLHn9aRpJNw_Rw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwk5fZAOXKTPP1Jl5sIv-plvKfYEG4lhL30VR-XKOtr5uvHkvM5DPRjV_jaTuM-XVgp/exec";
     let currentUser = null;
 
     function showMessage(id, text, type) {
@@ -581,8 +629,10 @@
 
       if (currentUser.role === "EXECUTIVE") {
         document.getElementById("executiveCreateCard").classList.remove("hidden");
+        document.getElementById("taskFilters").classList.remove("hidden");
       } else {
         document.getElementById("executiveCreateCard").classList.add("hidden");
+        document.getElementById("taskFilters").classList.add("hidden");
       }
     }
 
@@ -600,19 +650,31 @@
     }
 
     async function loadManagers() {
-      const data = await api("getManagers");
+      const data = await api("getAssignees");
       const select = document.getElementById("taskManager");
+      const filter = document.getElementById("managerFilter");
       select.innerHTML = "";
 
-      if (data.success && data.managers.length) {
-        data.managers.forEach(m => {
+      if (filter) {
+        filter.innerHTML = '<option value="">All Managers / Executives</option>';
+      }
+
+      if (data.success && data.assignees.length) {
+        data.assignees.forEach(m => {
           const opt = document.createElement("option");
           opt.value = m.id;
-          opt.textContent = m.name + " — " + (m.department || "No department");
+          opt.textContent = m.name + " — " + m.role + " — " + (m.department || "No department");
           select.appendChild(opt);
+
+          if (filter) {
+            const fopt = document.createElement("option");
+            fopt.value = m.id;
+            fopt.textContent = m.name + " — " + m.role + " — " + (m.department || "No department");
+            filter.appendChild(fopt);
+          }
         });
       } else {
-        select.innerHTML = '<option value="">No managers found</option>';
+        select.innerHTML = '<option value="">No Managers / Executives found</option>';
       }
     }
 
@@ -659,8 +721,89 @@
 
       const tasks = data.tasks || [];
       window.latestTasks = tasks;
+      applyTaskFilter();
+    }
+
+    function applyTaskFilter() {
+      const filter = document.getElementById("managerFilter");
+      let tasks = window.latestTasks || [];
+
+      if (filter && filter.value) {
+        tasks = tasks.filter(t => String(t.assigned_to) === String(filter.value));
+      }
+
+      window.visibleTasks = tasks;
       renderStats(tasks);
       renderTasks(tasks);
+    }
+
+    function downloadTasksPdf() {
+      const tasks = window.visibleTasks || window.latestTasks || [];
+      const selectedFilter = document.getElementById("managerFilter");
+      const filterLabel = selectedFilter && selectedFilter.value
+        ? selectedFilter.options[selectedFilter.selectedIndex].text
+        : "All Managers / Executives";
+
+      const rows = tasks.map(t => `
+        <tr>
+          <td>${escapeHtml(t.task_id || "")}</td>
+          <td>${escapeHtml(t.title || "")}</td>
+          <td>${escapeHtml(t.assigned_to_name || "")}</td>
+          <td>${escapeHtml(t.deadline || "")}</td>
+          <td>${escapeHtml(t.status || "")}</td>
+          <td>${escapeHtml(String(t.progress || 0))}%</td>
+          <td>${escapeHtml(String(t.performance_score || 0))}%</td>
+          <td>${escapeHtml(t.schedule_health || "")}</td>
+        </tr>
+      `).join("");
+
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>OnPoint Group HQ Tasks Report</title>
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; color:#111827; padding:24px; }
+            h1 { margin-bottom: 4px; }
+            .meta { color:#6b7280; margin-bottom: 18px; }
+            table { width:100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border:1px solid #d1d5db; padding:8px; text-align:left; vertical-align:top; }
+            th { background:#f3f4f6; }
+            @media print { button { display:none; } }
+          </style>
+        </head>
+        <body>
+          <button onclick="window.print()">Print / Save as PDF</button>
+          <h1>OnPoint Group HQ Tasks Report</h1>
+          <div class="meta">
+            Filter: ${escapeHtml(filterLabel)}<br>
+            Generated: ${new Date().toLocaleString()}<br>
+            Total Tasks: ${tasks.length}
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Task ID</th>
+                <th>Title</th>
+                <th>Assigned To</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Performance</th>
+                <th>Health</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows || '<tr><td colspan="8">No tasks found.</td></tr>'}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
     }
 
     function renderStats(tasks) {
