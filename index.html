@@ -267,6 +267,54 @@
       padding: 20px;
     }
 
+    .task-summary-dashboard {
+      margin-bottom: 18px;
+    }
+
+    .task-summary-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .task-summary-item {
+      border: 1px solid var(--border);
+      border-left: 7px solid var(--success);
+      border-radius: 14px;
+      padding: 13px 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .task-summary-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .task-summary-item.green {
+      border-left-color: var(--success);
+    }
+
+    .task-summary-item.yellow {
+      border-left-color: var(--warning);
+    }
+
+    .task-summary-item.red {
+      border-left-color: var(--danger);
+    }
+
+    .task-summary-title {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .task-summary-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
     .stat span { color: var(--muted); font-size: 13px; display: block; margin-bottom: 8px; }
     .stat strong { font-size: 28px; }
     .card h3 { margin: 0 0 16px; }
@@ -478,6 +526,13 @@
     </header>
 
     <main class="main">
+      <div id="taskSummaryDashboard" class="card task-summary-dashboard">
+        <h3>Task Summary</h3>
+        <div id="taskSummaryList" class="task-summary-grid">
+          <p class="task-meta">No task summary available yet.</p>
+        </div>
+      </div>
+
       <div class="stats">
         <div class="stat"><span>Total Tasks</span><strong id="statTotal">0</strong></div>
         <div class="stat"><span>Open</span><strong id="statOpen">0</strong></div>
@@ -733,6 +788,7 @@
       }
 
       window.visibleTasks = tasks;
+      renderTaskSummary(tasks);
       renderStats(tasks);
       renderTasks(tasks);
     }
@@ -806,6 +862,56 @@
       printWindow.print();
     }
 
+    function renderTaskSummary(tasks) {
+      const box = document.getElementById("taskSummaryList");
+
+      if (!box) return;
+
+      if (!tasks.length) {
+        box.innerHTML = '<p class="task-meta">No task summary available yet.</p>';
+        return;
+      }
+
+      box.innerHTML = tasks.map(t => {
+        const color = getTimelineColor(t);
+        const issuedDate = t.start_date || "Not set";
+        const fromName = t.created_by_name || "Executive";
+        const toName = t.assigned_to_name || "";
+
+        return `
+          <div class="task-summary-item ${color}" onclick="openTaskFromSummary('${t.task_id}')">
+            <div class="task-summary-title">${escapeHtml(t.title || "Untitled Task")}</div>
+            <div class="task-summary-meta">
+              Date: ${escapeHtml(issuedDate)} • From: ${escapeHtml(fromName)} • To: ${escapeHtml(toName)}<br>
+              Deadline: ${escapeHtml(t.deadline || "")} • Progress: ${escapeHtml(String(t.progress || 0))}% • Status: ${escapeHtml(t.status || "")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function getTimelineColor(task) {
+      if (String(task.status || "").toUpperCase() === "CLOSED") return "green";
+
+      const timeElapsed = Number(task.time_elapsed_percent || 0);
+      const progress = Number(task.progress || 0);
+
+      if (timeElapsed >= 100 && progress < 100) return "red";
+      if (timeElapsed >= 70 && progress < 100) return "yellow";
+      return "green";
+    }
+
+    function openTaskFromSummary(taskId) {
+      const target = document.getElementById("task_" + taskId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        target.style.boxShadow = "0 0 0 4px rgba(37, 99, 235, 0.18)";
+        setTimeout(() => {
+          target.style.boxShadow = "";
+        }, 1800);
+      }
+    }
+
     function renderStats(tasks) {
       document.getElementById("statTotal").textContent = tasks.length;
       document.getElementById("statOpen").textContent = tasks.filter(t => t.status === "OPEN").length;
@@ -826,7 +932,7 @@
         const progress = Number(t.progress || 0);
 
         return `
-          <div class="task">
+          <div class="task" id="task_${t.task_id}">
             <div class="task-head">
               <div>
                 <div class="task-title">${escapeHtml(t.title)}</div>
