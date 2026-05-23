@@ -1,187 +1,1322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tasks | OnPoint Group HQ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>QuickBase | On Point Group Operations Management</title>
   <style>
-    :root{--primary:#0f172a;--primary-light:#1e293b;--accent:#2563eb;--accent-dark:#1d4ed8;--bg:#f4f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--success:#16a34a;--warning:#f59e0b;--danger:#dc2626;--orange:#f97316;--shadow:0 20px 45px rgba(15,23,42,.12);--radius:18px}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top left,rgba(37,99,235,.14),transparent 35%),linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);color:var(--text);min-height:100vh}.login-page{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr}.brand-panel{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.brand-panel:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.08);right:-140px;bottom:-120px}.logo{display:inline-flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.3px;font-size:22px;z-index:1;position:relative}.logo-mark{width:42px;height:42px;border-radius:12px;background:#fff;color:var(--primary);display:grid;place-items:center;font-weight:900}.brand-content{z-index:1;position:relative;max-width:620px}.brand-content h1{font-size:48px;line-height:1.05;margin:0 0 20px}.brand-content p{font-size:18px;color:#cbd5e1;line-height:1.65;margin:0}.feature-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:34px}.feature{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);padding:18px;border-radius:16px}.feature strong{display:block;font-size:15px;margin-bottom:6px}.feature span{color:#cbd5e1;font-size:13px}.login-panel{display:grid;place-items:center;padding:34px}.login-card{width:100%;max-width:440px;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.65);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow)}.login-card h2{margin:0 0 8px;font-size:28px}.subtitle,.hint,.task-meta{color:var(--muted)}.subtitle{margin:0 0 28px;line-height:1.5}.hint{font-size:13px;margin-top:18px;line-height:1.5}label{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:8px}.field{margin-bottom:18px}input,textarea,select{width:100%;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:15px;outline:none;background:#fff}input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,99,235,.12)}button{border:0;border-radius:12px;padding:13px 16px;font-weight:800;cursor:pointer;transition:transform .15s,background .15s,opacity .15s}button:hover{transform:translateY(-1px)}button:disabled{opacity:.65;cursor:not-allowed;transform:none}.btn-primary{width:100%;background:var(--accent);color:#fff;font-size:15px}.btn-primary:hover{background:var(--accent-dark)}.btn-small{background:#e0ecff;color:#1d4ed8;padding:9px 12px;font-size:13px;width:auto}.btn-danger{background:#fee2e2;color:var(--danger)}.btn-success{background:#dcfce7;color:#166534}.message{margin-top:14px;padding:12px;border-radius:12px;font-size:14px;display:none}.message.error{display:block;color:#991b1b;background:#fee2e2;border:1px solid #fecaca}.message.success{display:block;color:#166534;background:#dcfce7;border:1px solid #bbf7d0}.app{display:none;min-height:100vh}.topbar{background:var(--primary);color:#fff;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar strong{font-size:18px}.user-pill{background:rgba(255,255,255,.12);padding:9px 12px;border-radius:999px;font-size:14px}.main{max-width:1280px;margin:0 auto;padding:28px 330px 28px 28px}.stats,.summary-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.stat,.card,.side-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 28px rgba(15,23,42,.06);padding:20px}.summary-stats .stat{color:#fff}.stat.green{background:var(--success)}.stat.red{background:var(--danger)}.stat.orange{background:var(--orange)}.stat.dark{background:var(--primary)}.stat span{font-size:13px;display:block;margin-bottom:8px;opacity:.85}.stat strong{font-size:28px}.card h3,.side-card h3{margin:0 0 16px}.task-summary-dashboard{margin-bottom:18px}.task-summary-grid{display:grid;gap:10px;margin-top:12px}.task-summary-item{border:1px solid var(--border);border-left:7px solid var(--success);border-radius:14px;padding:13px 14px;background:#fff;cursor:pointer}.task-summary-item:hover{box-shadow:0 8px 22px rgba(15,23,42,.08)}.task-summary-item.green{border-left-color:var(--success)}.task-summary-item.orange,.task-summary-item.yellow{border-left-color:var(--orange)}.task-summary-item.red{border-left-color:var(--danger)}.task-summary-title{font-weight:800;margin-bottom:5px}.task-summary-meta{color:var(--muted);font-size:13px;line-height:1.45}.task-board{display:grid;grid-template-columns:1fr 1fr;gap:16px}.task-column{display:grid;gap:12px;align-content:start}.task-column h3{margin:0 0 4px}.task-list{display:grid;gap:12px}.task{border:1px solid var(--border);border-radius:14px;padding:16px;background:#fff}.task.card-green{border-left:7px solid var(--success)}.task.card-orange{border-left:7px solid var(--orange)}.task.card-red{border-left:7px solid var(--danger)}.task-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.ticket-number{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;margin-bottom:6px}.task-title{font-weight:800;font-size:16px;margin-bottom:6px}.task-meta{font-size:13px;line-height:1.55}.badge{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}.badge.open{background:#dbeafe;color:#1d4ed8}.badge.in_progress{background:#fef3c7;color:#92400e}.badge.submitted{background:#ede9fe;color:#6d28d9}.badge.closed{background:#dcfce7;color:#166534}.progress-wrap{margin-top:14px}.progress-bar{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progress-fill{height:100%;background:var(--accent);width:0}.time-fill{height:100%;background:#94a3b8;width:0}.score-pill{display:inline-block;background:#f1f5f9;color:#0f172a;border-radius:999px;padding:4px 8px;font-weight:800}.syncing{position:relative;pointer-events:none;opacity:.75}.syncing:after{content:"";display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;margin-left:8px;vertical-align:-2px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.task-actions{display:grid;grid-template-columns:120px 1fr auto auto;gap:8px;margin-top:14px;align-items:center}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.span-2{grid-column:span 2}.hidden{display:none!important}.proof-section,.comments-section{margin-top:14px;border-top:1px dashed var(--border);padding-top:12px}.proof-links,.comment-list{margin-top:8px;display:grid;gap:6px}.proof-links a{color:#1d4ed8;font-weight:700;text-decoration:none;font-size:13px}.comment{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px}.share-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.filter-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:14px}.filter-actions .field{margin-bottom:0;min-width:240px;flex:1}.side-card{position:fixed;right:18px;top:88px;width:290px;max-height:calc(100vh - 110px);overflow:auto}.closed-ticket{border:1px solid var(--border);border-left:5px solid var(--success);border-radius:12px;padding:10px;margin-bottom:8px;cursor:pointer;background:#fff}.closed-ticket.late{border-left-color:var(--danger)}.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.tab-btn{background:#e5e7eb;color:#111827}.tab-btn.active{background:var(--accent);color:#fff}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #d1d5db;padding:9px;text-align:left;vertical-align:top}th{background:#f3f4f6}.executive-jump-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.jump-btn{background:#0f172a;color:#fff}.notice-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:999px;background:#dc2626;color:#fff;font-size:12px;font-weight:900;margin-left:6px;padding:0 7px}.stat-mini-list{margin-top:8px;font-size:12px;line-height:1.45;max-height:70px;overflow:auto}.metric-link{cursor:pointer;font-weight:900;text-decoration:underline;text-underline-offset:2px;transition:opacity .15s,transform .15s}.metric-link:hover,.clickable-stat:hover,.task-summary-item:hover,.closed-ticket:hover,.jump-btn:hover{opacity:.78;cursor:pointer}.clickable-stat{cursor:pointer;transition:opacity .15s,transform .15s}.clickable-stat:hover{transform:translateY(-1px)}.metric-green{color:#16a34a}.metric-red{color:#dc2626}.metric-blue{color:#2563eb}.stars{color:#f59e0b;font-size:16px;letter-spacing:1px}.row-highlight{animation:rowFlash 1.8s ease}@keyframes rowFlash{0%{box-shadow:0 0 0 4px rgba(37,99,235,.25)}100%{box-shadow:none}}@media print{body{background:#fff}.topbar,.stats,.summary-stats,#executiveCreateCard,#taskFilters,.share-actions,.task-actions,.login-page,button,input,textarea,select,.side-card,.tabs{display:none!important}.app{display:block!important}.main{max-width:none;padding:0}.card,.task{box-shadow:none;border:1px solid #ddd}.task{page-break-inside:avoid}}@media(max-width:1100px){.main{padding:22px}.side-card{position:static;width:auto;max-height:none;margin:0 22px 22px}.task-board{grid-template-columns:1fr}}@media(max-width:860px){.login-page{grid-template-columns:1fr}.brand-panel{padding:34px}.brand-content h1{font-size:34px}.feature-row,.stats,.summary-stats,.form-grid{grid-template-columns:1fr}.span-2{grid-column:span 1}.task-actions{grid-template-columns:1fr}}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, sans-serif;
+    }
+
+    body {
+      background: #f0f4f8;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .brand {
+      padding: 28px 24px 20px 24px;
+      font-size: 26px;
+      font-weight: 700;
+      border-bottom: 1px solid #1e293b;
+      color: white;
+    }
+
+    .brand span {
+      background: #3b82f6;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 20px;
+      margin-left: 6px;
+    }
+
+    .org-name {
+      padding: 12px 24px;
+      font-size: 12px;
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .nav {
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-section {
+      padding: 8px 16px 4px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .nav-link {
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-link:hover {
+      background: #1e293b;
+      color: white;
+    }
+
+    .nav-link.active {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .page-title p {
+      color: #475569;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .refresh-btn {
+      background: white;
+      border: 1px solid #cbd5e1;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .refresh-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: #3b82f6;
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 38px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+    }
+
+    .chart-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .chart-card p {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+
+    canvas {
+      max-height: 260px;
+      width: 100%;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #eef2ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .panel-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #1e40af;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 0 0 12px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 14px 16px;
+      background: #f8fafc;
+      color: #1e293b;
+      font-weight: 700;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 40px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #dcfce7; color: #166534; }
+    .badge-critical { background: #fecaca; color: #7f1d1d; }
+    .badge-open { background: #dbeafe; color: #1e3a8a; }
+    .badge-overdue { background: #fee2e2; color: #991b1b; }
+    .badge-closed-late { background: #fef3c7; color: #92400e; }
+
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #64748b;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .bsc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 24px;
+    }
+
+    .bsc-card {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid #e2e8f0;
+      transition: 0.2s;
+    }
+
+    .bsc-card:hover {
+      border-color: #3b82f6;
+    }
+
+    .bsc-card h4 {
+      font-size: 16px;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .bsc-card p {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    .bsc-metrics {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .metric-pill {
+      background: white;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #3b82f6;
+    }
+
+    .user-chip {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .error-banner {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      color: #991b1b;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+    }
+
+    input, select, textarea {
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .message-bar {
+      margin: 12px 0 0 0;
+      padding: 10px 16px;
+      border-radius: 14px;
+      display: none;
+    }
+
+    .message-success { background: #dcfce7; color: #166534; border-left: 3px solid #22c55e; }
+    .message-error { background: #fee2e2; color: #991b1b; border-left: 3px solid #ef4444; }
+    .message-info { background: #dbeafe; color: #1e3a8a; border-left: 3px solid #3b82f6; }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .sync-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulseSync 0.8s infinite alternate;
+    }
+
+    @keyframes pulseSync {
+      from { opacity: 0.35; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.1); }
+    }
+
+    .task-status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .status-stat-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .status-stat-card:hover {
+      transform: translateY(-2px);
+      border-color: #3b82f6;
+    }
+
+    .status-stat-card h3 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .status-stat-card p {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .auto-task-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 40px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .auto-daily { background: #e0f2fe; color: #075985; }
+    .auto-weekly { background: #ede9fe; color: #5b21b6; }
+    .auto-monthly { background: #fce7f3; color: #9d174d; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 80px; }
+      .nav-link span:not(.emoji) { display: none; }
+      .main { padding: 16px; }
+      .chart-grid { grid-template-columns: 1fr; }
+      .task-status-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <section id="loginPage" class="login-page">
-    <aside class="brand-panel">
-      <div class="logo"><div class="logo-mark">OP</div><span>OnPoint Group HQ</span></div>
-      <div class="brand-content"><h1>Tasks & Tickets</h1><p>Executive task control, manager dashboards, HR approvals, uploads, comments, timeline tracking, and performance scoring.</p><div class="feature-row"><div class="feature"><strong>Executive View</strong><span>Create, monitor, approve and close tickets.</span></div><div class="feature"><strong>Manager View</strong><span>Update progress, upload proof and request more time.</span></div><div class="feature"><strong>Performance</strong><span>Track monthly manager scores.</span></div></div></div>
-      <div style="z-index:1;color:#94a3b8;font-size:13px">Connected to Google Sheet database: Tasks</div>
-    </aside>
-    <main class="login-panel"><div class="login-card"><h2>Welcome back</h2><p class="subtitle">Sign in to access the OnPoint Group HQ dashboard.</p><div class="field"><label>Email address</label><input id="email" type="email" placeholder="executive@onpointgroup.co.za" autocomplete="username" /></div><div class="field"><label>Password</label><input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" /></div><button id="loginBtn" class="btn-primary" onclick="login()">Sign in</button><div id="loginMessage" class="message"></div><p class="hint">Login(email & password).</p></div></main>
-  </section>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Quick<span>Base</span></div>
+    <div class="org-name">🏢 On Point Group<br>Operations Management</div>
+    <div class="nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-link active" data-section="dashboard">📊 App home</div>
+      <div class="nav-link" data-section="users">👥 Users</div>
+      <div class="nav-link" data-section="settings">⚙️ App settings</div>
+      
+      <div class="nav-section" style="margin-top: 16px;">Data</div>
+      <div class="nav-link" data-section="departments">🏢 Departments</div>
+      <div class="nav-link" data-section="employees">👔 Employees</div>
+      <div class="nav-link" data-section="tickets">🎫 Tickets</div>
+      <div class="nav-link" data-section="kpis">📊 KPIs</div>
+      <div class="nav-link" data-section="sla">⏱️ SLA</div>
+      <div class="nav-link" data-section="bsc">🎯 BSC Metrics</div>
+      <div class="nav-link" data-section="divisions">🏭 Divisions</div>
+      <div class="nav-link" data-section="automatedTasks">🔄 Auto Tasks</div>
+    </div>
+  </aside>
+  <main class="main" id="mainContent">
+    <div class="loading"><div class="spinner"></div><p>Loading dashboard...</p></div>
+  </main>
+</div>
 
-  <section id="app" class="app">
-    <header class="topbar"><strong>Tasks | OnPoint Group HQ</strong><div><span id="userPill" class="user-pill"></span><button class="btn-small" onclick="logout()" style="margin-left:10px">Logout</button></div></header>
-    <aside class="side-card"><h3>Closed Tickets</h3><button class="btn-small" onclick="toggleClosedHistory()" style="margin-bottom:10px">History</button><div id="closedHistory" class="hidden" style="margin-bottom:12px"></div><div id="closedTickets"><p class="task-meta">No closed tickets yet.</p></div></aside>
-    <main class="main">
-      <div class="tabs"><button class="tab-btn active" id="tabTasks" onclick="showTab('tasksView')">Tasks</button><button class="tab-btn" id="tabHiring" onclick="showTab('hiringView')">Hiring Requests <span id="hiringBadge" class="notice-badge">0</span></button><button class="tab-btn" id="tabPerformance" onclick="showTab('performanceView')">Performance</button></div>
 
-      <section id="tasksView">
-        <div id="executiveJumpActions" class="executive-jump-actions hidden"><button class="btn-small jump-btn" onclick="scrollToArea('executiveCreateCard')">New Tasks</button><button class="btn-small jump-btn" onclick="scrollToArea('extensionApprovalCard')">More Time Approvals <span id="moreTimeBadge" class="notice-badge">0</span></button><button class="btn-small jump-btn" onclick="showTab('hiringView');setTimeout(()=>scrollToArea('hiringApprovalArea'),50)">Hiring Approvals <span id="hiringApprovalBadge" class="notice-badge">0</span></button></div>
-        <div id="taskFilters" class="card hidden" style="margin-bottom:18px"><h3>Task Filter & Reports</h3><div class="filter-actions"><div class="field"><label>Filter by Manager / Executive</label><select id="managerFilter" onchange="applyTaskFilter()"><option value="">All Managers / Executives</option></select></div><button class="btn-small" onclick="downloadTasksPdf()">Download / Print PDF</button></div></div>
-        <div class="summary-stats"><div class="stat green clickable-stat" onclick="jumpToStatTasks('open_pending')" title="Click to view open pending tasks"><span>Open Pending</span><strong id="statPending">0</strong></div><div class="stat red clickable-stat" onclick="jumpToStatTasks('open_late')" title="Click to view open late tasks"><span>Open Late</span><strong id="statOpenLate">0</strong><div id="openLateNames" class="stat-mini-list"></div></div><div class="stat orange clickable-stat" onclick="jumpToStatTasks('warning')" title="Click to view warning tasks"><span>Warning</span><strong id="statWarning">0</strong></div><div class="stat dark clickable-stat" onclick="jumpToStatTasks('closed_late')" title="Click to view closed late tasks"><span>Closed Late</span><strong id="statClosedLate">0</strong></div></div>
-        <div id="taskSummaryDashboard" class="card task-summary-dashboard"><h3>Task Summary - Descending Ticket Numbers</h3><div id="taskSummaryList" class="task-summary-grid"><p class="task-meta">No task summary available yet.</p></div></div>
-        <div class="stats"><div class="stat"><span>Total Tasks</span><strong id="statTotal">0</strong></div><div class="stat"><span>Open</span><strong id="statOpen">0</strong></div><div class="stat"><span>In Progress</span><strong id="statProgress">0</strong></div><div class="stat"><span>Closed</span><strong id="statClosed">0</strong></div></div>
-        <div id="executiveCreateCard" class="card hidden" style="margin-bottom:18px"><h3>Create New Ticket</h3><div class="form-grid"><div><label>Task Title</label><input id="taskTitle" placeholder="Enter task title" /></div><div><label>Assign to Manager / Executive / HR</label><select id="taskManager"></select></div><div><label>Deadline</label><input id="taskDeadline" type="date" /></div><div><label>Priority</label><select id="taskPriority"><option>NORMAL</option><option>HIGH</option><option>URGENT</option><option>LOW</option></select></div><div><label>Message Type</label><select id="taskType"><option value="KPI">KPI</option><option value="ADHOC">ADHOC</option></select></div><div class="span-2"><label>Description / Message</label><textarea id="taskDescription" rows="3" placeholder="Explain the task"></textarea></div><div class="span-2"><button class="btn-primary" onclick="createTask()">Create Ticket</button></div></div><div id="taskMessage" class="message"></div></div>
-        <div id="monthlyAutomatedTaskCard" class="card hidden" style="margin-bottom:18px"><h3>Monthly Automated Task Sender</h3><p class="task-meta" style="margin-top:-8px">Create a task once and save the recipient. The system will send this task automatically every month.</p><div class="form-grid"><div><label>Monthly Task Title</label><input id="monthlyTaskTitle" placeholder="Example: Monthly Stock Report" /></div><div><label>Saved Recipient</label><select id="monthlyTaskRecipient"></select></div><div><label>Send Every Month On Day</label><input id="monthlyTaskDay" type="number" min="1" max="28" value="1" /></div><div><label>Deadline Days After Sending</label><input id="monthlyTaskDeadlineDays" type="number" min="1" max="31" value="7" /></div><div><label>Priority</label><select id="monthlyTaskPriority"><option>NORMAL</option><option>HIGH</option><option>URGENT</option><option>LOW</option></select></div><div><label>Message Type</label><select id="monthlyTaskType"><option value="KPI">KPI</option><option value="ADHOC">ADHOC</option></select></div><div class="span-2"><label>Description / Message</label><textarea id="monthlyTaskDescription" rows="3" placeholder="Explain the task that must be sent monthly"></textarea></div><div class="span-2"><button class="btn-primary" onclick="saveMonthlyAutomatedTask()">Save Monthly Automated Task</button></div></div><div id="monthlyTaskMessage" class="message"></div><div style="margin-top:14px"><h3 style="font-size:16px;margin-bottom:10px">Saved Monthly Automated Tasks</h3><div id="monthlyAutomatedTasksList" class="task-list"><p class="task-meta">No monthly automated tasks loaded yet.</p></div></div></div>
-        <div id="extensionApprovalCard" class="card hidden" style="margin-bottom:18px"><h3>More Time Approval Requests</h3><div id="extensionRequests" class="task-list"><p class="task-meta">No pending more-time requests.</p></div></div>
-        <div class="card" id="printArea"><h3 id="taskHeading">My Tasks</h3><div class="task-board"><div><h3>Green Open / On Track</h3><div id="tasksLeft" class="task-column"></div></div><div><h3>Red Open Late / Warning</h3><div id="tasksRight" class="task-column"></div></div></div><div style="margin-top:18px"><h3>Closed / Submitted</h3><div id="tasksBottom" class="task-list"></div></div></div>
-      </section>
+<script>
+  // ==================== CONFIGURATION ====================
+  const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsd8UIeYojJWv5e9SoeGeBQ0BR6rnB-uoKN5an6CcNAuoCdDZ_6MiAqQfdv3dSwDfs/exec';
+  const SHEET_ID = '1KWYWSUmwGYcBVIuDzh7yo86eTrfnMZX35DuGnRAVNv8';
 
-      <section id="hiringView" class="hidden">
-        <div id="hrRequestCard" class="card" style="margin-bottom:18px"><h3>Hiring Request</h3><div class="form-grid"><div><label>Position</label><input id="hirePosition" placeholder="Example: Operations Supervisor" /></div><div><label>Department</label><input id="hireDepartment" placeholder="Example: Operations" /></div><div class="span-2"><label>Reason</label><textarea id="hireReason" rows="3" placeholder="Why is this hire needed?"></textarea></div><div class="span-2"><button class="btn-primary" onclick="submitHiringRequest()">Submit Approval Request</button></div></div><div id="hireMessage" class="message"></div></div>
-        <div id="hiringApprovalArea" class="card"><h3>Hiring Request Approvals <span id="hiringApprovalCount" class="notice-badge">0</span></h3><div id="hiringRequests" class="task-list"><p class="task-meta">No hiring requests yet.</p></div></div>
-      </section>
+  const SHEET_ROUTES = {
+    departments: { action: 'departments', saveAction: 'addDepartment', sheetTab: 'Department', displayTab: 'Departments', columns: ['Department ID', 'Department Name', 'Manager', 'Budget', 'Status', 'Created Date'] },
+    employees: { action: 'employees', saveAction: 'addEmployee', sheetTab: 'Employees', displayTab: 'Employees', columns: ['Employee ID', 'Employee Name', 'Department', 'Role', 'Status', 'Created Date'] },
+    kpis: { action: 'kpis', saveAction: 'addKpi', sheetTab: 'KPIs', displayTab: 'KPIs', columns: ['KPIName', 'Target Value', 'Actual Value', 'Related Department', 'Frequency'] },
+    sla: { action: 'sla', saveAction: 'addSla', sheetTab: 'SLA', displayTab: 'SLA', columns: ['SLA Name', 'Description', 'Priority', 'First Response', 'Resolution Target', 'Status'] },
+    bsc: { action: 'bscMetrics', saveAction: 'addBscMetrics', sheetTab: 'BSC', displayTab: 'BSC Metrics', columns: ['BSC Name', 'BSC Description', 'Target Score', 'Actual Score', 'Related Department', 'Frequency'] },
+    divisions: { action: 'divisions', saveAction: 'addDivision', sheetTab: 'divisions', displayTab: 'Divisions', columns: ['Division ID', 'Division Name', 'Head', 'Region', 'Status'] },
+    automatedTasks: { action: 'automatedTasks', saveAction: 'addAutomatedTask', sheetTab: 'Automated Tasks', displayTab: 'Automated Tasks', columns: ['Task ID', 'Task Name', 'Description', 'Frequency', 'Assigned To', 'Assigned Email', 'Department', 'Next Run', 'Status'] }
+  };
 
-      <section id="performanceView" class="hidden"><div class="card"><h3>Manager Performance Summary</h3><p class="task-meta">Final % uses task score %, closed on time %, closed late %, priority early bonus %, and priority late penalty %. Click colored figures to jump to the matching task area.</p><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Total Tasks</th><th>Closed On Time</th><th>Closed Late</th><th>Priority Early Bonus</th><th>Priority Late Penalty</th><th>Open</th><th>Task Score %</th><th>Closed Early %</th><th>Closed Late %</th><th>Priority Early %</th><th>Priority Late %</th><th>Final Performance %</th><th>Stars</th></tr></thead><tbody id="performanceBody"><tr><td colspan="14">No performance data yet.</td></tr></tbody></table></div></div></section>
-    </main>
-  </section>
+  function getRouteByAction(action) {
+    return Object.values(SHEET_ROUTES).find(route => route.action === action || route.saveAction === action) || null;
+  }
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz75_Jx6FvEKvD3gyxKyCYH_15RYjCLnHBviBQ-6KKtGCijGN18YPr8tocgmy6SIV-s0w/exec";
-    let currentUser = null;
-    const RESTORED_USER_NAMES = ["Executive", "HR", "Moses", "Johan", "Siyanda", "Dave", "James", "Rayman", "Timothy", "Roads Site Agent COT", "Stanley(Aqua)", "Civil Site Agent", "Roads Site Agent CPT", "Brian", "EL CM", "Tony", "Govern", "Graham", "Ronald", "Petros", "Elroy", "Mesh", "Vusi", "Tinotenda", "Sydney", "Andrew", "Phillip", "Moeti"];
-    function restoredEmailForName(name){return String(name||"user").toLowerCase().replace(/[^a-z0-9]+/g,".").replace(/^\.|\.$/g,"")+"@onpointgroup.co.za"}
-    function restoredUserList(){return RESTORED_USER_NAMES.map(function(name,index){return {id:String(name),name:name,email:restoredEmailForName(name),role:index<2?name.toUpperCase():"MANAGER",department:"OnPoint"}})}
-    function mergeRestoredUsers(users){const source=[].concat(users||[],restoredUserList());const seen={};const merged=[];source.forEach(function(u){const display=u.name||u.full_name||u.user_name||u.email||u.user_email||u.id||u.user_id||"";if(!display)return;const key=String(display).trim().toLowerCase();if(seen[key])return;seen[key]=true;merged.push({id:u.id||u.user_id||u.email||u.user_email||display,name:display,email:u.email||u.user_email||restoredEmailForName(display),role:u.role||u.user_role||"MANAGER",department:u.department||u.dept||"OnPoint"})});return merged}
 
-    function showMessage(id,text,type){const el=document.getElementById(id);if(!el)return;el.textContent=text||"";el.className="message "+(type||"error");if(!text)el.className="message"}
-    function api(action,params={}){return new Promise((resolve,reject)=>{const callbackName="jsonp_"+Date.now()+"_"+Math.floor(Math.random()*100000);const query=new URLSearchParams({action,callback:callbackName,_ts:Date.now()});Object.keys(params).forEach(key=>{if(params[key]!==undefined&&params[key]!==null)query.append(key,params[key])});const script=document.createElement("script");window[callbackName]=function(data){resolve(data);delete window[callbackName];script.remove()};script.onerror=function(){reject(new Error("Could not connect to Apps Script. Check Web App deployment and access permissions."));delete window[callbackName];script.remove()};script.src=SCRIPT_URL+"?"+query.toString();document.body.appendChild(script);setTimeout(()=>{if(window[callbackName]){reject(new Error("Connection timed out. Deploy Apps Script as Web App with access set to Anyone."));delete window[callbackName];script.remove()}},30000)})}
-    function postApi(payload){return fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)}).then(r=>r.json())}
-    function beginSync(btn,text){if(!btn)return false;if(btn.dataset.syncing==="1")return true;btn.dataset.syncing="1";btn.dataset.oldText=btn.textContent;btn.disabled=true;btn.textContent=text||"Synchronising";btn.classList.add("syncing");return false}
-    function endSync(btn){if(!btn)return;btn.dataset.syncing="0";btn.disabled=false;btn.textContent=btn.dataset.oldText||btn.textContent;btn.classList.remove("syncing")}
+  let SCRIPT_URL = localStorage.getItem('quickbase_api_url') || DEFAULT_SCRIPT_URL;
+  let SEND_EMAIL_NOTIFICATIONS = localStorage.getItem('quickbase_send_email_notifications') !== 'false';
+  let API_POST_MODE = localStorage.getItem('quickbase_api_post_mode') || 'text';
+  let currentUser = null;
+  let currentSection = 'dashboard';
+  let charts = {};
+  let cachedPeopleRows = [];
 
-    async function login(){const email=document.getElementById("email").value.trim();const password=document.getElementById("password").value;const btn=document.getElementById("loginBtn");if(!email||!password){showMessage("loginMessage","Please enter both email and password.","error");return}btn.disabled=true;btn.textContent="Signing in...";showMessage("loginMessage","Connecting to server...","success");try{const data=await api("login",{email,password});if(data&&data.success&&data.user){currentUser=data.user;sessionStorage.setItem("onpointTasksUser",JSON.stringify(currentUser));btn.disabled=false;btn.textContent="Sign in";showApp();loadInitialData().catch(err=>{alert("Signed in, but some dashboard data could not load: "+err.message);});return}else{showMessage("loginMessage",(data&&data.message)||"Invalid login details.","error")}}catch(err){showMessage("loginMessage","Sign in failed: "+err.message,"error")}finally{btn.disabled=false;btn.textContent="Sign in"}}
-    function showApp(){document.getElementById("loginPage").style.display="none";document.getElementById("app").style.display="block";document.getElementById("userPill").textContent=currentUser.name+" • "+currentUser.role;document.getElementById("taskHeading").textContent=isExecutive()?"All Issued Tickets":"My Assigned Tickets";if(canIssueTasks()){document.getElementById("executiveCreateCard").classList.remove("hidden");if(document.getElementById("monthlyAutomatedTaskCard"))document.getElementById("monthlyAutomatedTaskCard").classList.remove("hidden")}else{document.getElementById("executiveCreateCard").classList.add("hidden");if(document.getElementById("monthlyAutomatedTaskCard"))document.getElementById("monthlyAutomatedTaskCard").classList.add("hidden")}if(isExecutive()){document.getElementById("taskFilters").classList.remove("hidden");document.getElementById("extensionApprovalCard").classList.remove("hidden");document.getElementById("executiveJumpActions").classList.remove("hidden")}else{document.getElementById("taskFilters").classList.add("hidden");document.getElementById("extensionApprovalCard").classList.add("hidden");document.getElementById("executiveJumpActions").classList.add("hidden")}if(document.getElementById("hrRequestCard")){document.getElementById("hrRequestCard").classList.toggle("hidden",!canRequestHiring())}}
-    function logout(){sessionStorage.removeItem("onpointTasksUser");currentUser=null;document.getElementById("app").style.display="none";document.getElementById("loginPage").style.display="grid";document.getElementById("password").value=""}
-    function isExecutive(){return ["EXECUTIVE","EXECUTIVE MANAGER","DIRECTOR","ADMIN"].includes(String(currentUser&&currentUser.role||"").toUpperCase())}
-    function canIssueTasks(){return ["EXECUTIVE","ADMIN","MANAGER"].includes(String(currentUser&&currentUser.role||"").toUpperCase())}
-    function canRequestHiring(){return true}
-    function isHR(){return canRequestHiring()}
-    async function loadInitialData(){loadCachedDashboardData();const jobs=[];if(canIssueTasks()){jobs.push(loadManagers());jobs.push(loadMonthlyAutomatedTasks())}jobs.push(loadTasks());if(isExecutive())jobs.push(loadExtensionRequests());jobs.push(loadHiringRequests());const results=await Promise.allSettled(jobs);const failed=results.find(r=>r.status==="rejected");if(failed)throw failed.reason;}
-    async function loadManagers(){const data=await api("getAssignees",{userId:currentUser.id,role:currentUser.role});const select=document.getElementById("taskManager");const monthlySelect=document.getElementById("monthlyTaskRecipient");const filter=document.getElementById("managerFilter");select.innerHTML="";if(monthlySelect)monthlySelect.innerHTML="";if(filter)filter.innerHTML='<option value="">All Managers / Executives</option>';const assignees=mergeRestoredUsers((data&&data.success&&data.assignees)?data.assignees:[]);window.latestAssignees=assignees;assignees.forEach(m=>{const opt=document.createElement("option");opt.value=m.id;opt.dataset.email=m.email||m.user_email||"";opt.dataset.name=m.name||"";opt.textContent=m.name+" - "+m.role+" - "+(m.department||"No department");select.appendChild(opt);if(filter){const fopt=document.createElement("option");fopt.value=m.id;fopt.textContent=opt.textContent;filter.appendChild(fopt)}});populateMonthlyRecipientOptions(assignees);loadMonthlyRecipientsFromUserSheet().catch(()=>{})}
-    function populateMonthlyRecipientOptions(users){const monthlySelect=document.getElementById("monthlyTaskRecipient");const taskSelect=document.getElementById("taskManager");if(!monthlySelect&&!taskSelect)return;if(monthlySelect)monthlySelect.innerHTML="";if(taskSelect)taskSelect.innerHTML="";const list=mergeRestoredUsers(users||[]);if(!list.length){if(monthlySelect)monthlySelect.innerHTML='<option value="">No users found</option>';if(taskSelect)taskSelect.innerHTML='<option value="">No users found</option>';return}list.forEach(u=>{const value=u.id||u.user_id||u.email||u.user_email||u.name||"";const email=u.email||u.user_email||"";const name=u.name||u.full_name||u.user_name||"";const displayName=u.name||u.full_name||u.user_name||u.email||u.user_email||"User";const role=u.role||u.user_role||"User";const department=u.department||u.dept||"No department";const text=displayName+" - "+role+" - "+department;if(monthlySelect){const opt=document.createElement("option");opt.value=value;opt.dataset.email=email;opt.dataset.name=name;opt.textContent=text;monthlySelect.appendChild(opt)}if(taskSelect){const opt2=document.createElement("option");opt2.value=value;opt2.dataset.email=email;opt2.dataset.name=name;opt2.textContent=text;taskSelect.appendChild(opt2)}})}
-    async function loadMonthlyRecipientsFromUserSheet(){const monthlySelect=document.getElementById("monthlyTaskRecipient");if(!monthlySelect)return;const actionList=["getUsers","getUserSheetUsers","getAssignees"];for(const action of actionList){try{const data=await api(action,{userId:currentUser.id,role:currentUser.role,source:"Users"});const users=(data&&data.users)||(data&&data.assignees)||(data&&data.data)||[];if(data&&data.success&&users.length){const merged=mergeRestoredUsers(users);window.latestAssignees=merged;populateMonthlyRecipientOptions(merged);return}}catch(err){}}populateMonthlyRecipientOptions(window.latestAssignees||[])}
-        async function createTask(){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;showMessage("taskMessage","","");const managerSelect=document.getElementById("taskManager");const selectedAssignee=managerSelect&&managerSelect.selectedOptions&&managerSelect.selectedOptions[0]?managerSelect.selectedOptions[0]:null;const payload={title:document.getElementById("taskTitle").value.trim(),description:document.getElementById("taskDescription").value.trim(),assigned_to:managerSelect.value,assigned_to_name:selectedAssignee?(selectedAssignee.dataset.name||selectedAssignee.textContent||""):"",assigned_to_email:selectedAssignee?(selectedAssignee.dataset.email||""):"",created_by:currentUser.id,created_by_name:currentUser.name,deadline:document.getElementById("taskDeadline").value,priority:document.getElementById("taskPriority").value,task_type:document.getElementById("taskType").value,auto_send_email:"YES",auto_send_task:"YES"};if(!payload.title||!payload.assigned_to||!payload.deadline){showMessage("taskMessage","Please complete task title, assigned person, and deadline.","error");return}try{const data=await api("createTask",payload);if(data.success){await sendAutomatedTaskNotification(data,payload);showMessage("taskMessage","Ticket created and automatically sent successfully: "+(data.task_id||""),"success");["taskTitle","taskDescription","taskDeadline"].forEach(id=>document.getElementById(id).value="");await loadTasks()}else showMessage("taskMessage",data.message||"Could not create task.","error") }catch(err){showMessage("taskMessage",err.message,"error")}finally{endSync(btn)}}
-    async function sendAutomatedTaskNotification(taskData,payload){try{const taskId=(taskData&&taskData.task_id)||payload.task_id||"";const notifyPayload={taskId:taskId,task_id:taskId,title:payload.title,description:payload.description,assigned_to:payload.assigned_to,assigned_to_name:payload.assigned_to_name,assigned_to_email:payload.assigned_to_email,created_by:payload.created_by,created_by_name:payload.created_by_name,deadline:payload.deadline,priority:payload.priority,task_type:payload.task_type};let result=await api("sendTaskNotification",notifyPayload);if(!result||result.success===false){result=await api("sendTaskEmail",notifyPayload)}return result}catch(err){console.warn("Automatic task email notification could not be sent by the frontend. Confirm Apps Script supports sendTaskNotification/sendTaskEmail.",err);return {success:false,message:err.message}}}
-    async function saveMonthlyAutomatedTask(){const btn=event&&event.currentTarget;if(beginSync(btn,"Saving"))return;showMessage("monthlyTaskMessage","","");const recipientSelect=document.getElementById("monthlyTaskRecipient");const selectedRecipient=recipientSelect&&recipientSelect.selectedOptions&&recipientSelect.selectedOptions[0]?recipientSelect.selectedOptions[0]:null;const payload={title:document.getElementById("monthlyTaskTitle").value.trim(),description:document.getElementById("monthlyTaskDescription").value.trim(),assigned_to:recipientSelect?recipientSelect.value:"",assigned_to_name:selectedRecipient?(selectedRecipient.dataset.name||selectedRecipient.textContent||""):"",assigned_to_email:selectedRecipient?(selectedRecipient.dataset.email||""):"",created_by:currentUser.id,created_by_name:currentUser.name,send_day:document.getElementById("monthlyTaskDay").value,deadline_days:document.getElementById("monthlyTaskDeadlineDays").value,priority:document.getElementById("monthlyTaskPriority").value,task_type:document.getElementById("monthlyTaskType").value,frequency:"MONTHLY",auto_send_email:"YES",auto_send_task:"YES",status:"ACTIVE"};if(!payload.title||!payload.assigned_to||!payload.send_day||!payload.deadline_days){showMessage("monthlyTaskMessage","Please complete monthly task title, saved recipient, send day, and deadline days.","error");endSync(btn);return}try{const data=await api("saveMonthlyAutomatedTask",payload);if(data&&data.success){showMessage("monthlyTaskMessage",data.message||"Monthly automated task saved successfully.","success");["monthlyTaskTitle","monthlyTaskDescription"].forEach(id=>document.getElementById(id).value="");await loadMonthlyAutomatedTasks()}else{showMessage("monthlyTaskMessage",(data&&data.message)||"Could not save monthly automated task. Please confirm the Apps Script action saveMonthlyAutomatedTask is added.","error")}}catch(err){showMessage("monthlyTaskMessage","Could not save monthly automated task: "+err.message,"error")}finally{endSync(btn)}}
-    async function loadMonthlyAutomatedTasks(){if(!currentUser||!canIssueTasks())return;try{const data=await api("getMonthlyAutomatedTasks",{userId:currentUser.id,role:currentUser.role});if(data&&data.success){window.latestMonthlyAutomatedTasks=data.tasks||data.templates||[];renderMonthlyAutomatedTasks(window.latestMonthlyAutomatedTasks)}else{renderMonthlyAutomatedTasks(window.latestMonthlyAutomatedTasks||[])}}catch(err){renderMonthlyAutomatedTasks(window.latestMonthlyAutomatedTasks||[])}}
-    function renderMonthlyAutomatedTasks(items){const box=document.getElementById("monthlyAutomatedTasksList");if(!box)return;if(!items||!items.length){box.innerHTML='<p class="task-meta">No monthly automated tasks saved yet.</p>';return}box.innerHTML=items.map(t=>`<div class="task"><div class="task-head"><div><span class="ticket-number">${escapeHtml(t.template_id||t.automation_id||t.task_id||"MONTHLY")}</span><div class="task-title">${escapeHtml(t.title||"Untitled Monthly Task")}</div><div class="task-meta">Recipient: ${escapeHtml(t.assigned_to_name||t.recipient_name||"")}<br>Send day: ${escapeHtml(t.send_day||t.day_of_month||"")} monthly • Deadline after: ${escapeHtml(t.deadline_days||t.deadline_after_days||"")} days<br>Priority: ${escapeHtml(t.priority||"NORMAL")} • Type: ${escapeHtml(t.task_type||"ADHOC")} • Status: ${escapeHtml(t.status||"ACTIVE")}</div></div><span class="badge open">MONTHLY</span></div></div>`).join("")}
-    async function loadTasks(){const data=await api("getTasks",{userId:currentUser.id,role:currentUser.role});if(!data.success){document.getElementById("tasksLeft").innerHTML="<p>"+(data.message||"Could not load tasks.")+"</p>";return}window.latestTasks=data.tasks||[];window.latestPerformance=data.performance||[];cacheDashboardData();applyTaskFilter()}
-    function applyTaskFilter(){const filter=document.getElementById("managerFilter");let tasks=window.latestTasks||[];if(filter&&filter.value)tasks=tasks.filter(t=>String(t.assigned_to)===String(filter.value));window.visibleTasks=tasks;renderTaskSummary(tasks);renderStats(tasks);renderTasks(tasks);renderClosedTickets(tasks);renderPerformance(window.latestPerformance||calculatePerformance(tasks))}
-    function getTaskNumber(t){const match=String(t.task_id||"").match(/(\d+)$/);return Number(match?match[1]:0)}
-    function parseTaskDate(value,endOfDay){if(!value)return null;const raw=String(value).slice(0,10);const d=new Date(raw+(endOfDay?"T23:59:59":"T00:00:00"));return isNaN(d.getTime())?null:d}
-    function getTaskTimelineScore(t){
-      const status=String(t.status||"").toUpperCase();
-      const fallback=Number(t.performance_score||0)||0;
-      const start=parseTaskDate(t.start_date||t.created_at||t.created_date,false);
-      const deadline=parseTaskDate(t.deadline||t.revised_deadline||t.end_date,true);
-      const closed=parseTaskDate(t.closed_at||t.closed_date||t.completed_at,true);
-      if(status!=="CLOSED")return fallback;
-      if(!start||!deadline||!closed||deadline<=start)return fallback||100;
-      const timeGiven=deadline-start;
-      const timeUsed=Math.max(1,closed-start);
-      const score=Math.round((timeGiven/timeUsed)*100);
-      return Math.max(0,Math.min(200,score));
+  const SYSTEM_USER_EMAILS = {
+    'Lameck Chindove': 'lameck.chindove@onpointontime.co.za',
+    'Tafadzwa Magejo': 'tafadzwa.magejo@onpointontime.co.za',
+    'Bothwell Gurure': 'bothwell.gurure@onpointontime.co.za',
+    'System Admin': 'admin@onpointgroup.co.za',
+    'Stanley Vangiwa': 'stanley.vangiwa@onpointontime.co.za',
+    'Timothy Wamedza': 'timothy.wamedza@onpointontime.co.za',
+    'George Rusere': 'george.rusere@onpointontime.co.za',
+    'Kudakwashe Madzikangava': 'kudakwashe.madzikangava@onpointontime.co.za',
+    'Dickens Magwaza': 'dickens.magwaza@dinfrasolutions.co.za',
+    'Brighton Mhande': 'brighton.mhande@onpointontime.co.za',
+    'Tawanda Mashanda': 'tawanda.mashanda@onpointontime.co.za',
+    'Leah Phiri': 'leah.phiri@onpointontime.co.za',
+    'Andrew Moloisane': 'andrew@aquatelecoms.co.za',
+    'Johan Hendriks': 'johan.hendriks@onpointontime.co.za',
+    'Phillip Shambare': 'phillip.shambare@onpointontime.co.za',
+    'Siyanda Dlamini': 'siyanda.dlamini@onpointontime.co.za',
+    'Moses Magutse': 'moses.magutse@onpointontime.co.za',
+    'Rayman Mugaramanja': 'rayman.mugaramanja@onpointontime.co.za',
+    'Petros M': 'petrosm@aquatelecoms.co.za',
+    'HR Manager': 'hr@onpointontime.co.za',
+    'Retselisitsoe Mohapi': 'retselisitsoe.mohapi@dinfrasolutions.co.za',
+    'Ronald Musengwa': 'ronald@aquatelecom.co.za',
+    'Yvette van Rooyen': 'yvette.vanrooyen@onpointontime.co.za',
+    'Brian': 'brian@onpointgroup.co.za',
+    'Innocent Shongwe': 'innocent.shongwe@onpointontime.co.za'
+  };
+
+  const FALLBACK_USERS = Object.keys(SYSTEM_USER_EMAILS);
+  let SYSTEM_USERS = [...FALLBACK_USERS];
+
+  function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  }
+
+  function normalizeName(str) {
+    return String(str || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  }
+
+  function getCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem('quickbase_user') || sessionStorage.getItem('quickbase_user') || 'null');
+    } catch(e) { return null; }
+  }
+
+  function requireLogin() {
+    currentUser = getCurrentUser();
+    if (!currentUser || !currentUser.Email) {
+      currentUser = { Email: 'admin@onpoint.com', Role: 'Executive', 'Full Name': 'Admin User', Department: 'Executive' };
     }
-    function getPriorityEarlyBonusPercent(t){const priority=String(t.priority||"").toUpperCase();if(!["HIGH","URGENT"].includes(priority))return 0;if(String(t.status||"").toUpperCase()!=="CLOSED")return 0;if(isPastDue(t))return 0;return Math.max(0,getTaskTimelineScore(t)-100)}
+    return true;
+  }
 
-    function isPastDue(t){const status=String(t.status||"").toUpperCase();const deadlineRaw=t.deadline||t.revised_deadline||t.end_date||"";if(!deadlineRaw)return false;const deadline=new Date(String(deadlineRaw).slice(0,10)+"T23:59:59");if(isNaN(deadline.getTime()))return false;if(status==="CLOSED"){const closedRaw=t.closed_at||t.closed_date||"";if(!closedRaw)return String(t.timeline_category||"")==="closed_late";const closed=new Date(String(closedRaw).slice(0,10)+"T23:59:59");return !isNaN(closed.getTime())&&closed>deadline}return new Date()>deadline}function getTaskColor(t){return isPastDue(t)?"red":"green"}
-    function renderTaskSummary(tasks){const box=document.getElementById("taskSummaryList");const openTasks=(tasks||[]).filter(t=>String(t.status||"").toUpperCase()!=="CLOSED");if(!openTasks.length){box.innerHTML='<p class="task-meta">No open task summary available. Closed tickets are on the right side bar.</p>';return}const sorted=[...openTasks].sort((a,b)=>getTaskNumber(b)-getTaskNumber(a));box.innerHTML=sorted.map(t=>{const color=getTaskColor(t);const latest=(t.comments||[]).filter(c=>c.comment).slice(-1)[0];const latestText=latest?`<br><strong>Latest comment:</strong> ${escapeHtml(latest.user_name||"User")} - ${escapeHtml(latest.comment||"")}`:"";return `<div class="task-summary-item ${color}" onclick="openTaskFromSummary('${escapeAttr(t.task_id)}')"><div class="task-summary-title">${escapeHtml(t.task_id)} - ${escapeHtml(t.title||"Untitled Task")} <span class="task-meta">(${escapeHtml(t.task_type||"ADHOC")})</span></div><div class="task-summary-meta">Start: ${escapeHtml(t.start_date||"Not set")} • End: ${escapeHtml(t.deadline||"")} • From: ${escapeHtml(t.created_by_name||"Executive")} • To: ${escapeHtml(t.assigned_to_name||"")}<br>Progress: ${escapeHtml(String(t.progress||0))}% • Time used: ${escapeHtml(String(t.time_elapsed_percent||0))}% • Score: ${escapeHtml(String(getTaskTimelineScore(t)))}% • Status: ${escapeHtml(t.status||"")} • ${escapeHtml(t.schedule_health||"")}${latestText}</div></div>`}).join("")}
-    function renderStats(tasks){document.getElementById("statTotal").textContent=tasks.length;document.getElementById("statOpen").textContent=tasks.filter(t=>t.status==="OPEN").length;document.getElementById("statProgress").textContent=tasks.filter(t=>t.status==="IN_PROGRESS").length;document.getElementById("statClosed").textContent=tasks.filter(t=>t.status==="CLOSED").length;document.getElementById("statPending").textContent=tasks.filter(t=>String(t.status||"").toUpperCase()!=="CLOSED"&&!isPastDue(t)).length;const openLate=tasks.filter(t=>String(t.status||"").toUpperCase()!=="CLOSED"&&isPastDue(t));document.getElementById("statOpenLate").textContent=openLate.length;const names=[...new Set(openLate.map(t=>t.assigned_to_name||"Unassigned").filter(Boolean))];const openLateNames=document.getElementById("openLateNames");if(openLateNames)openLateNames.innerHTML=names.length?names.map(n=>`<div>${escapeHtml(n)}</div>`).join(""):"";const warningTasks=tasks.filter(t=>String(t.status||"").toUpperCase()!=="CLOSED"&&!isPastDue(t)&&/(warning|yellow|orange)/i.test(String(t.schedule_health||t.timeline_category||"")));document.getElementById("statWarning").textContent=warningTasks.length;const cl=document.getElementById("statClosedLate");if(cl)cl.textContent=tasks.filter(t=>String(t.status||"").toUpperCase()==="CLOSED"&&isPastDue(t)).length}
-    function renderTasks(tasks){const left=document.getElementById("tasksLeft"),right=document.getElementById("tasksRight"),bottom=document.getElementById("tasksBottom");left.innerHTML=right.innerHTML=bottom.innerHTML="";if(!tasks.length){left.innerHTML="<p style='color:#6b7280'>No tasks found.</p>";return}tasks.forEach(t=>{const html=taskCard(t);if(String(t.status).toUpperCase()==="CLOSED"||String(t.status).toUpperCase()==="SUBMITTED")bottom.innerHTML+=html;else if(getTaskColor(t)==="green")left.innerHTML+=html;else right.innerHTML+=html});if(!left.innerHTML)left.innerHTML='<p class="task-meta">No green open tickets.</p>';if(!right.innerHTML)right.innerHTML='<p class="task-meta">No red/orange open tickets.</p>';if(!bottom.innerHTML)bottom.innerHTML='<p class="task-meta">No closed or submitted tickets.</p>'}
-    function taskCard(t){const statusClass=String(t.status||"").toLowerCase().replace(/[^a-z_]/g,"");const progress=Number(t.progress||0);const color=getTaskColor(t);const comments=(t.comments||[]).filter(c=>c.comment).map(c=>`<div class="comment"><strong>${escapeHtml(c.user_name||"User")}</strong> <span class="task-meta">${escapeHtml(c.created_at||"")}</span><br>${escapeHtml(c.comment||"")}${c.attachment_url?`<br><a href="${escapeAttr(c.attachment_url)}" target="_blank">${escapeHtml(c.attachment_name||"Attachment")}</a>`:""}</div>`).join("")||'<span class="task-meta">No comments yet.</span>';const files=(t.proof_files||[]).map((f,i)=>`<a href="${escapeAttr(f.url)}" target="_blank">Proof ${i+1}: ${escapeHtml(f.name||f.comment||"View file")}</a>`).join("")||'<span class="task-meta">No proof uploaded yet.</span>';return `<div class="task card-${color}" id="task_${escapeAttr(t.task_id)}"><div class="task-head"><div><span class="ticket-number">${escapeHtml(t.task_id)}</span><div class="task-title">${escapeHtml(t.title||"")}</div><div class="task-meta">Assigned to: ${escapeHtml(t.assigned_to_name||"")}<br>Start: ${escapeHtml(t.start_date||"")} • End: ${escapeHtml(t.deadline||"")} • Priority: ${escapeHtml(t.priority||"NORMAL")} • Type: ${escapeHtml(t.task_type||"ADHOC")}<br>Time elapsed: ${escapeHtml(String(t.time_elapsed_percent||0))}% • Task Score: ${escapeHtml(String(getTaskTimelineScore(t)))}% • ${escapeHtml(t.schedule_health||"")}</div></div><span class="badge ${statusClass}">${escapeHtml(t.status||"")}</span></div><div class="progress-wrap"><div class="task-meta"><strong>Work progress:</strong> ${progress}%</div><div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div><div class="task-meta" style="margin-top:8px"><strong>Time used:</strong> ${escapeHtml(String(t.time_elapsed_percent||0))}% <span class="score-pill">Task Score ${escapeHtml(String(getTaskTimelineScore(t)))}%</span></div><div class="progress-bar" style="margin-top:5px"><div class="time-fill" style="width:${Number(t.time_elapsed_percent||0)}%"></div></div></div><div class="share-actions"><button class="btn-small" onclick="shareTaskWhatsApp('${escapeAttr(t.task_id)}')">Share WhatsApp</button><button class="btn-small" onclick="shareTaskEmail('${escapeAttr(t.task_id)}')">Share Email</button></div><div class="proof-section"><div class="task-meta"><strong>Proof documents / pictures:</strong></div><div class="proof-links">${files}</div>${currentUser&&String(t.status).toUpperCase()!=="CLOSED"?`<div class="task-actions" style="grid-template-columns:1fr 1fr auto"><input id="proof_${escapeAttr(t.task_id)}" type="file"><input id="proof_comment_${escapeAttr(t.task_id)}" placeholder="Proof note"><button class="btn-small" onclick="uploadProof('${escapeAttr(t.task_id)}')">Upload Proof</button></div>`:""}</div><div class="comments-section"><div class="task-meta"><strong>Task Messages / Comments:</strong></div><div class="comment-list">${comments}</div>${currentUser&&String(t.status).toUpperCase()!=="CLOSED"?`<div class="task-actions" style="grid-template-columns:1fr auto"><input id="new_comment_${escapeAttr(t.task_id)}" placeholder="Add comment"><button class="btn-small" onclick="addTaskComment('${escapeAttr(t.task_id)}')">Comment</button></div>`:""}</div>${currentUser&&String(t.status).toUpperCase()!=="CLOSED"?`<div class="task-actions"><input id="progress_${escapeAttr(t.task_id)}" type="number" min="0" max="100" placeholder="%"><input id="comment_${escapeAttr(t.task_id)}" placeholder="Progress comment"><button class="btn-small" onclick="updateProgress('${escapeAttr(t.task_id)}')">Update</button><button class="btn-small" onclick="requestMoreTime('${escapeAttr(t.task_id)}')">More Time</button></div>`:""}${isExecutive()&&String(t.status).toUpperCase()!=="CLOSED"?`<div class="task-actions" style="grid-template-columns:1fr auto"><input id="remark_${escapeAttr(t.task_id)}" placeholder="Closing remark"><button class="btn-small btn-danger" onclick="closeTask('${escapeAttr(t.task_id)}')">Close Ticket</button></div>`:""}${t.close_remark?`<div class="task-meta" style="margin-top:10px"><strong>Executive remark:</strong> ${escapeHtml(t.close_remark)}</div>`:""}</div>`}
-    function renderClosedTickets(tasks){const box=document.getElementById("closedTickets");const history=document.getElementById("closedHistory");const closed=tasks.filter(t=>String(t.status).toUpperCase()==="CLOSED").sort((a,b)=>getTaskNumber(b)-getTaskNumber(a));if(!closed.length){box.innerHTML='<p class="task-meta">No closed tickets yet.</p>';if(history)history.innerHTML='';return}box.innerHTML=closed.map(t=>`<div class="closed-ticket ${t.timeline_category==='closed_late'?'late':''}" onclick="openTaskFromSummary('${escapeAttr(t.task_id)}')"><strong>${escapeHtml(t.task_id)}</strong><br>${escapeHtml(t.title||"")}<br><span class="task-meta">${escapeHtml(t.schedule_health||"")} • ${escapeHtml(t.closed_at||"")}</span></div>`).join("");if(history){const months={};closed.forEach(t=>{const key=String(t.closed_at||t.deadline||"").slice(0,7)||"No date";if(!months[key])months[key]={total:0,late:0};months[key].total++;if(t.timeline_category==='closed_late')months[key].late++});history.innerHTML='<div class="comment"><strong>Monthly Closed History</strong><br>'+Object.keys(months).sort().reverse().map(m=>`${escapeHtml(m)}: ${months[m].total} closed, ${months[m].late} late`).join('<br>')+'</div>'}}
-    function toggleClosedHistory(){const el=document.getElementById("closedHistory");if(el)el.classList.toggle("hidden")}
-    async function updateProgress(taskId){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;const progress=document.getElementById("progress_"+taskId).value;const comment=document.getElementById("comment_"+taskId).value;const data=await api("updateProgress",{taskId,progress,comment,userId:currentUser.id});alert(data.message||(data.success?"Updated":"Failed"));await loadTasks();endSync(btn)}
-    async function addTaskComment(taskId){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{const el=document.getElementById("new_comment_"+taskId);const comment=el.value.trim();if(!comment){alert("Please enter a comment.");return}const data=await api("addComment",{taskId,userId:currentUser.id,comment});alert(data.message||(data.success?"Comment added":"Failed"));await loadTasks()}finally{endSync(btn)}}
-    async function uploadProof(taskId){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;const fileInput=document.getElementById("proof_"+taskId);const commentInput=document.getElementById("proof_comment_"+taskId);if(!fileInput||!fileInput.files||!fileInput.files[0]){alert("Please select a document, file, or picture to upload.");return}const file=fileInput.files[0];const base64=await readFileAsBase64(file);try{const data=await postApi({action:"uploadProof",taskId,userId:currentUser.id,fileName:file.name,mimeType:file.type||"application/octet-stream",base64,comment:commentInput?commentInput.value:""});alert(data.message||(data.success?"Proof uploaded successfully.":"Could not upload proof."));await loadTasks()}catch(err){alert("Upload failed. Check deployment permissions. "+err.message)}finally{endSync(btn)}}
-    function readFileAsBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||"").split(",")[1]||"");reader.onerror=()=>reject(new Error("Could not read selected file."));reader.readAsDataURL(file)})}
-    async function requestMoreTime(taskId){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{const newDate=prompt("Enter new deadline date as YYYY-MM-DD:");if(!newDate)return;const reason=prompt("Reason for requesting more time:");if(!reason)return;const data=await api("requestExtension",{task_id:taskId,requested_by:currentUser.id,new_deadline:newDate,reason});alert(data.message||(data.success?"Request submitted":"Failed"));await loadTasks()}finally{endSync(btn)}}
-    async function closeTask(taskId){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{const remarkEl=document.getElementById("remark_"+taskId);const remark=remarkEl?remarkEl.value.trim():"";if(!remark){alert("Please enter a closing remark.");return}const data=await api("closeTask",{taskId,executiveId:currentUser.id,remark});alert(data.message||(data.success?"Closed":"Failed"));await loadTasks()}finally{endSync(btn)}}
-    function getTaskById(taskId){return(window.latestTasks||[]).find(t=>String(t.task_id)===String(taskId))}
-    function buildTaskShareText(taskId){const task=getTaskById(taskId);if(!task)return"Task link: "+SCRIPT_URL+"?action=viewTask&taskId="+encodeURIComponent(taskId);return["OnPoint Group HQ Ticket","Ticket: "+task.task_id,"Task: "+task.title,"Assigned to: "+(task.assigned_to_name||""),"Start: "+(task.start_date||""),"End: "+(task.deadline||""),"Status: "+(task.status||""),"Link: "+(task.share_link||SCRIPT_URL+"?action=viewTask&taskId="+encodeURIComponent(taskId))].join("\n")}
-    function shareTaskWhatsApp(taskId){window.open("https://wa.me/?text="+encodeURIComponent(buildTaskShareText(taskId)),"_blank")}
-    function shareTaskEmail(taskId){const task=getTaskById(taskId);window.location.href="mailto:?subject="+encodeURIComponent(task?"Ticket: "+task.task_id+" - "+task.title:"OnPoint Ticket")+"&body="+encodeURIComponent(buildTaskShareText(taskId))}
-    function openTaskFromSummary(taskId){showTab('tasksView');const target=document.getElementById("task_"+taskId);if(target){target.scrollIntoView({behavior:"smooth",block:"start"});target.style.boxShadow="0 0 0 4px rgba(37,99,235,.18)";setTimeout(()=>target.style.boxShadow="",1800)}}
-    function downloadTasksPdf(){const tasks=window.visibleTasks||window.latestTasks||[];const rows=tasks.map(t=>`<tr><td>${escapeHtml(t.task_id||"")}</td><td>${escapeHtml(t.title||"")}</td><td>${escapeHtml(t.assigned_to_name||"")}</td><td>${escapeHtml(t.start_date||"")}</td><td>${escapeHtml(t.deadline||"")}</td><td>${escapeHtml(t.status||"")}</td><td>${escapeHtml(String(t.progress||0))}%</td><td>${escapeHtml(String(t.performance_score||0))}%</td><td>${escapeHtml(t.schedule_health||"")}</td></tr>`).join("");const w=window.open("","_blank");w.document.write(`<!DOCTYPE html><html><head><title>Tasks Report</title><style>body{font-family:Arial;padding:24px;color:#111827}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #d1d5db;padding:8px;text-align:left}th{background:#f3f4f6}.executive-jump-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.jump-btn{background:#0f172a;color:#fff}.notice-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:999px;background:#dc2626;color:#fff;font-size:12px;font-weight:900;margin-left:6px;padding:0 7px}.stat-mini-list{margin-top:8px;font-size:12px;line-height:1.45;max-height:70px;overflow:auto}.metric-link{cursor:pointer;font-weight:900;text-decoration:underline;text-underline-offset:2px;transition:opacity .15s,transform .15s}.metric-link:hover,.clickable-stat:hover,.task-summary-item:hover,.closed-ticket:hover,.jump-btn:hover{opacity:.78;cursor:pointer}.clickable-stat{cursor:pointer;transition:opacity .15s,transform .15s}.clickable-stat:hover{transform:translateY(-1px)}.metric-green{color:#16a34a}.metric-red{color:#dc2626}.metric-blue{color:#2563eb}.stars{color:#f59e0b;font-size:16px;letter-spacing:1px}.row-highlight{animation:rowFlash 1.8s ease}@keyframes rowFlash{0%{box-shadow:0 0 0 4px rgba(37,99,235,.25)}100%{box-shadow:none}}@media print{button{display:none}}</style></head><body><button onclick="window.print()">Print / Save as PDF</button><h1>OnPoint Group HQ Tasks Report</h1><div>Generated: ${new Date().toLocaleString()}<br>Total Tasks: ${tasks.length}</div><table><thead><tr><th>Ticket</th><th>Title</th><th>Assigned To</th><th>Start</th><th>End</th><th>Status</th><th>Progress</th><th>Performance</th><th>Health</th></tr></thead><tbody>${rows||'<tr><td colspan="9">No tasks found.</td></tr>'}</tbody></table></body></html>`);w.document.close();w.focus();w.print()}
-    
-    async function loadExtensionRequests(){if(!isExecutive())return;const data=await api("getExtensionRequests",{role:currentUser.role,userId:currentUser.id});if(data.success){window.latestExtensionRequests=data.requests||[];updateNotificationBadges();renderExtensionRequests(data.requests||[])}}
-    function renderExtensionRequests(requests){const box=document.getElementById("extensionRequests");if(!box)return;const pending=(requests||[]).filter(r=>String(r.status||"").toUpperCase()==="PENDING");if(!pending.length){box.innerHTML='<p class="task-meta">No pending more-time requests.</p>';return}box.innerHTML=pending.map(r=>`<div class="task"><div class="task-head"><div><span class="ticket-number">${escapeHtml(r.extension_id)}</span><div class="task-title">More time request: ${escapeHtml(r.task_id)}</div><div class="task-meta">Requested by: ${escapeHtml(r.requested_by_name||r.requested_by||"")}<br>Current deadline: ${escapeHtml(r.current_deadline||"")} • New deadline: ${escapeHtml(r.new_deadline||"")}<br>Reason: ${escapeHtml(r.reason||"")}</div></div><span class="badge open">${escapeHtml(r.status||"")}</span></div><div class="task-actions" style="grid-template-columns:1fr auto auto"><input id="ext_remark_${escapeAttr(r.extension_id)}" placeholder="Executive comment"><button class="btn-small btn-success" onclick="decideExtensionRequest('${escapeAttr(r.extension_id)}','APPROVED')">Approve</button><button class="btn-small btn-danger" onclick="decideExtensionRequest('${escapeAttr(r.extension_id)}','REJECTED')">Reject</button></div></div>`).join("")}
-    async function decideExtensionRequest(extensionId,decision){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{const el=document.getElementById("ext_remark_"+extensionId);const remark=el?el.value:"";const data=await api("decideExtension",{extension_id:extensionId,executive_id:currentUser.id,decision,remark});alert(data.message||(data.success?"Updated":"Failed"));await loadExtensionRequests();await loadTasks()}finally{endSync(btn)}}
-    async function submitHiringRequest(){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{if(!canRequestHiring()){alert("You do not have permission to request hiring approval.");return}showMessage("hireMessage","","");const position=document.getElementById("hirePosition").value.trim();const department=document.getElementById("hireDepartment").value.trim();const reason=document.getElementById("hireReason").value.trim();if(!position||!department||!reason){showMessage("hireMessage","Please complete position, department and reason.","error");return}const data=await api("requestHiringApproval",{userId:currentUser.id,position,department,reason});if(data.success){showMessage("hireMessage",data.message,"success");document.getElementById("hirePosition").value="";document.getElementById("hireDepartment").value="";document.getElementById("hireReason").value="";await loadHiringRequests()}else showMessage("hireMessage",data.message||"Could not submit request.","error")}finally{endSync(btn)}}
-    async function loadHiringRequests(){if(!currentUser)return;const data=await api("getHiringRequests",{role:currentUser.role,userId:currentUser.id});if(data.success){window.latestHiringRequests=data.requests||[];cacheDashboardData();updateNotificationBadges();renderHiringRequests(data.requests||[])}}
-    function renderHiringRequests(requests){const box=document.getElementById("hiringRequests");updateNotificationBadges();if(!requests.length){box.innerHTML='<p class="task-meta">No hiring requests yet.</p>';return}box.innerHTML=requests.map(r=>{const status=String(r.status||"").toUpperCase();const first=r.approved_by_1_name||r.approved_by_1||r.first_approved_by_name||"Pending";const second=r.approved_by_2_name||r.approved_by_2||r.second_approved_by_name||"Pending";const canApprove=isExecutive()&&(status==="PENDING"||status==="LEVEL1_APPROVED"||status==="FIRST_APPROVED");return `<div class="task"><div class="task-head"><div><span class="ticket-number">${escapeHtml(r.approval_id)}</span><div class="task-title">${escapeHtml(r.position)}</div><div class="task-meta">Department: ${escapeHtml(r.department)}<br>Requested by: ${escapeHtml(r.requested_by_name||"")} • ${escapeHtml(r.created_at||"")}<br>Reason: ${escapeHtml(r.reason||"")}<br><strong>Approval 1:</strong> ${escapeHtml(first)} • <strong>Approval 2:</strong> ${escapeHtml(second)}</div></div><span class="badge ${String(r.status||'').toLowerCase()}">${escapeHtml(r.status||"")}</span></div>${canApprove?`<div class="task-actions" style="grid-template-columns:1fr auto auto"><input id="hire_remark_${escapeAttr(r.approval_id)}" placeholder="Executive comment"><button class="btn-small btn-success" onclick="decideHiring('${escapeAttr(r.approval_id)}','APPROVED')">Approve</button><button class="btn-small btn-danger" onclick="decideHiring('${escapeAttr(r.approval_id)}','REJECTED')">Reject</button></div>`:""}${r.executive_remark?`<div class="task-meta" style="margin-top:10px"><strong>Executive remark:</strong> ${escapeHtml(r.executive_remark)}</div>`:""}</div>`}).join("")}
-    async function decideHiring(approvalId,decision){const btn=event&&event.currentTarget;if(beginSync(btn,"Synchronising"))return;try{const el=document.getElementById("hire_remark_"+approvalId);const remark=el?el.value:"";const data=await api("decideHiringRequest",{approvalId,executiveId:currentUser.id,decision,remark,approvalMode:"TWO_EXECUTIVE_APPROVAL"});alert(data.message||(data.success?"Updated":"Failed"));await loadHiringRequests()}finally{endSync(btn)}}
-    function calculatePerformance(tasks){
-      const map={};
-      const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
-      const isClosedOnTimeOrEarly=t=>String(t.status||"").toUpperCase()==="CLOSED"&&!isPastDue(t);
-      const isClosedLateTask=t=>String(t.status||"").toUpperCase()==="CLOSED"&&isPastDue(t);
-      tasks.forEach(t=>{
-        const n=t.assigned_to_name||"Unassigned";
-        if(!map[n])map[n]={manager:n,total_tasks:0,closed_on_time:0,closed_late:0,priority_early:0,priority_late:0,open:0,task_score_total:0,task_score_count:0,priority_early_bonus_total:0,priority_early_bonus_count:0,final_score:0};
-        const m=map[n];
-        m.total_tasks++;
-        const timelineScore=Number(getTaskTimelineScore(t)||0);
-        if(!isNaN(timelineScore)){m.task_score_total+=timelineScore;m.task_score_count++;}
-        const status=String(t.status||"").toUpperCase();
-        const priority=String(t.priority||"").toUpperCase();
-        const isPriority=["HIGH","URGENT"].includes(priority);
-        if(status!=="CLOSED"){
-          m.open++;
-          return;
-        }
-        if(isClosedOnTimeOrEarly(t)){
-          m.closed_on_time++;
-          if(isPriority){
-            m.priority_early++;
-            const bonus=getPriorityEarlyBonusPercent(t);
-            m.priority_early_bonus_total+=bonus;
-            m.priority_early_bonus_count++;
-          }
-        }else if(isClosedLateTask(t)){
-          m.closed_late++;
-          if(isPriority)m.priority_late++;
-        }
+  function showMessage(msg, type, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.textContent = msg;
+    container.className = `message-bar message-${type}`;
+    container.style.display = 'block';
+    if (type !== 'info') setTimeout(() => { if(container) container.style.display = 'none'; }, 6000);
+  }
+
+  function setButtonLoading(buttonId, isLoading, loadingText = 'Synchronising...') {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    if (isLoading) {
+      btn.dataset.originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="sync-dot"></span>${loadingText}`;
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+    }
+  }
+
+  async function apiGet(action) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
+    try {
+      const route = getRouteByAction(action);
+      const sheetTabParam = route ? `&sheetTab=${encodeURIComponent(route.sheetTab)}` : '';
+      const url = `${SCRIPT_URL}?action=${encodeURIComponent(action)}&sheetId=${encodeURIComponent(SHEET_ID)}${sheetTabParam}&_=${Date.now()}`;
+      const res = await fetch(url, { method: 'GET', signal: controller.signal, cache: 'no-store', redirect: 'follow' });
+      clearTimeout(timeout);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const json = text ? JSON.parse(text) : [];
+      if (Array.isArray(json)) return json;
+      if (json && Array.isArray(json.data)) return json.data;
+      if (json && Array.isArray(json.rows)) return json.rows;
+      if (json && json.success === false) throw new Error(json.message || json.error || 'API returned an error');
+      return [];
+    } catch(e) {
+      clearTimeout(timeout);
+      console.error(`API error (${action}):`, e);
+      throw e;
+    }
+  }
+
+  async function apiPost(action, payload) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const route = getRouteByAction(action);
+      const routedPayload = route ? Object.assign({}, payload, { sheetTab: route.sheetTab, sheetName: route.sheetTab, tabName: route.sheetTab }) : payload;
+      const requestBody = { action, payload: routedPayload, user: currentUser, sheetId: SHEET_ID, sheetTab: route ? route.sheetTab : (payload && payload.sheetTab), sheetName: route ? route.sheetTab : (payload && payload.sheetTab), tabName: route ? route.sheetTab : (payload && payload.sheetTab), sendEmail: SEND_EMAIL_NOTIFICATIONS };
+      const fetchOptions = {
+        method: 'POST',
+        headers: API_POST_MODE === 'form' ? { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' } : { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: API_POST_MODE === 'form' ? new URLSearchParams({ data: JSON.stringify(requestBody) }) : JSON.stringify(requestBody),
+        signal: controller.signal,
+        redirect: 'follow'
+      };
+      const res = await fetch(SCRIPT_URL, fetchOptions);
+      clearTimeout(timeout);
+      const text = await res.text();
+      let json = {};
+      try { json = text ? JSON.parse(text) : {}; }
+      catch(parseErr) { json = { success: res.ok, message: text || 'Saved, but server did not return JSON.' }; }
+      if (!res.ok) throw new Error(json.message || json.error || `HTTP ${res.status}`);
+      if (json && json.success === false) throw new Error(json.message || json.error || 'Save failed');
+      return json;
+    } catch(e) {
+      clearTimeout(timeout);
+      if (e.name === 'AbortError') throw new Error('Request timed out. Check the Apps Script deployment URL and access permissions.');
+      throw e;
+    }
+  }
+
+  async function saveWithSync(buttonId, messageId, action, payload, successMessage, options = {}) {
+    setButtonLoading(buttonId, true);
+    showMessage('Synchronising with Google Sheets...', 'info', messageId);
+    try {
+      const res = await apiPost(action, payload);
+      showMessage(successMessage, 'success', messageId);
+      alert(successMessage);
+      if (typeof options.afterSuccess === 'function') options.afterSuccess(res);
+      return res;
+    } catch(e) {
+      const errorMessage = e.message || 'Fetch failed. Check API deployment and access.';
+      showMessage(errorMessage, 'error', messageId);
+      alert(`Save failed: ${errorMessage}`);
+      return { success: false, message: errorMessage };
+    } finally {
+      setButtonLoading(buttonId, false);
+    }
+  }
+
+  function userOptionsHtml(selected = '') {
+    const names = [...new Set([...SYSTEM_USERS, ...FALLBACK_USERS])].filter(Boolean);
+    return `<option value="">Select assignee</option>` + names.map(name => `<option value="${escapeHtml(name)}" ${name === selected ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('');
+  }
+
+  function findEmailForUser(name) {
+    const wanted = normalizeName(name);
+    if (!wanted) return '';
+    const exactKey = Object.keys(SYSTEM_USER_EMAILS).find(k => normalizeName(k) === wanted);
+    if (exactKey) return SYSTEM_USER_EMAILS[exactKey];
+    const match = cachedPeopleRows.find(row => normalizeName(row['Full Name'] || row['Employee Name'] || row.Name || row.User) === wanted);
+    return (match && (match.Email || match['Email Address'] || match.WorkEmail || match['Work Email'])) || '';
+  }
+
+  function wireAssigneeEmail(selectId, emailId) {
+    const select = document.getElementById(selectId);
+    const email = document.getElementById(emailId);
+    if (!select || !email) return;
+    const sync = () => { email.value = findEmailForUser(select.value); };
+    select.addEventListener('change', sync);
+    sync();
+  }
+
+  async function refreshPeopleCache() {
+    try {
+      const employees = await apiGet('employees');
+      cachedPeopleRows = Array.isArray(employees) ? employees : [];
+      const sheetNames = cachedPeopleRows.map(row => row['Employee Name'] || row['Full Name'] || row.Name || '').filter(Boolean);
+      SYSTEM_USERS = [...new Set([...sheetNames, ...FALLBACK_USERS])];
+    } catch(e) {
+      cachedPeopleRows = [];
+      SYSTEM_USERS = [...FALLBACK_USERS];
+      console.warn('Employee fetch failed, using built-in assignee list:', e.message);
+    }
+  }
+
+  function getCellValue(row, column) {
+    if (!row) return '-';
+    const aliases = {
+      'Ticket ID': ['Ticket ID', 'Task ID', 'ID'],
+      'Title': ['Title', 'Task Name', 'Name'],
+      'Task Name': ['Task Name', 'Title', 'Name'],
+      'Due Date': ['Due Date', 'DueDate', 'Next Run'],
+      'Completion Date': ['Completion Date', 'CompletionDate', 'Closed Date'],
+      'Employee ID': ['Employee ID', 'ID'],
+      'Employee Name': ['Employee Name', 'Full Name', 'Name'],
+      'Created Date': ['Created Date', 'Date Created', 'CreatedAt'],
+      'SLA Name': ['SLA Name', 'Name', 'SLA'],
+      'First Response': ['First Response', 'First Response Target', 'SLA Rule - First Response Target'],
+      'Resolution Target': ['Resolution Target', 'Resolution', 'SLA Rule - Resolution Target'],
+      'BSC Name': ['BSC Name', 'Name'],
+      'BSC Description': ['BSC Description', 'Description'],
+      'Target Score': ['Target Score', 'Target'],
+      'Actual Score': ['Actual Score', 'Actual'],
+      'Related Department': ['Related Department', 'Department'],
+      'Division ID': ['Division ID', 'ID'],
+      'Division Name': ['Division Name', 'Name'],
+      'Head': ['Head', 'Division Head', 'Manager'],
+      'Region': ['Region', 'Area'],
+      'Department ID': ['Department ID', 'ID'],
+      'Department Name': ['Department Name', 'Department', 'Name'],
+      'Budget': ['Budget'],
+      'Status': ['Status']
+    };
+    const keys = aliases[column] || [column];
+    for (const key of keys) {
+      if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
+    }
+    return '-';
+  }
+
+  function destroyChart(name) {
+    if (charts[name]) {
+      charts[name].destroy();
+      charts[name] = null;
+    }
+  }
+
+  async function renderDashboard() {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading dashboard data...</p></div>';
+
+    try {
+      await refreshPeopleCache();
+      const [tickets, departments, bscMetrics, kpis, sla, employees, automatedTasks] = await Promise.all([
+        apiGet('tickets').catch(() => []), apiGet('departments').catch(() => []), apiGet('bscMetrics').catch(() => []),
+        apiGet('kpis').catch(() => []), apiGet('sla').catch(() => []), apiGet('employees').catch(() => []), apiGet('automatedTasks').catch(() => [])
+      ]);
+
+      const ticketsArray = Array.isArray(tickets) ? tickets : [];
+      const bsc = Array.isArray(bscMetrics) ? bscMetrics : [];
+      const kpiArray = Array.isArray(kpis) ? kpis : [];
+      const slaArray = Array.isArray(sla) ? sla : [];
+
+      const ticketStats = calculateTicketStats(ticketsArray);
+      const priorityCounts = groupCount(ticketsArray, t => getPriority(t));
+      const deptTicketCount = groupCount(ticketsArray, t => getDepartment(t));
+      const submittedByDept = groupCount(ticketsArray, t => String(t['Requester Department'] || t['Submitted By Dept'] || t.Department || 'Unknown'));
+      const deptScores = {};
+      bsc.forEach(b => {
+        const dept = b['Related Department'] || b.Department || 'General';
+        deptScores[dept] = (deptScores[dept] || 0) + (parseFloat(b['Actual Score'] || b.Actual) || 0);
       });
-      return Object.values(map).map(m=>{
-        const total=m.total_tasks||1;
-        m.task_score_percent=Math.round(m.task_score_count?m.task_score_total/m.task_score_count:0);
-        m.closed_early_percent=Math.round((m.closed_on_time/total)*100);
-        m.closed_late_percent=Math.round((m.closed_late/total)*100);
-        m.priority_early_percent=Math.round(m.priority_early_bonus_count?m.priority_early_bonus_total/m.priority_early_bonus_count:0);
-        m.priority_late_percent=Math.round((m.priority_late/total)*100);
-        m.priority_early_bonus_percent=m.priority_early_percent;
-        const positiveAverage=(m.task_score_percent+m.closed_early_percent+m.priority_early_percent)/3;
-        const penaltyAverage=(m.closed_late_percent+m.priority_late_percent)/2;
-        m.final_score=Math.round(clamp(positiveAverage-penaltyAverage,0,100));
-        const starCount=Math.min(5,Math.floor(clamp(m.final_score,0,100)/20));
-        m.stars="★".repeat(starCount)+"☆".repeat(5-starCount);
-        return m;
-      })
+
+      main.innerHTML = `
+        <div class="top-bar">
+          <div class="page-title">
+            <h1>Operations Dashboard</h1>
+            <p>On Point Group · 📊 ${ticketsArray.length} tickets loaded</p>
+          </div>
+          <div class="user-chip">👤 ${escapeHtml(currentUser?.['Full Name'] || 'Admin')} · ${escapeHtml(currentUser?.Role || 'Executive')}</div>
+        </div>
+
+        <div class="task-status-grid">
+          <div class="status-stat-card" onclick="currentSection='tickets';window.taskFilter='open';loadCurrentSection()" style="border-top:4px solid #3b82f6"><h3 style="color:#3b82f6">${ticketStats.open.length}</h3><p>📋 Tickets Open</p></div>
+          <div class="status-stat-card" onclick="currentSection='tickets';window.taskFilter='closed';loadCurrentSection()" style="border-top:4px solid #22c55e"><h3 style="color:#22c55e">${ticketStats.closed.length}</h3><p>✅ Tickets Closed</p></div>
+          <div class="status-stat-card" onclick="currentSection='tickets';window.taskFilter='overdue';loadCurrentSection()" style="border-top:4px solid #ef4444"><h3 style="color:#ef4444">${ticketStats.openLate.length}</h3><p>⚠️ Open Tickets But Late</p></div>
+          <div class="status-stat-card" onclick="currentSection='tickets';window.taskFilter='closed-on-time';loadCurrentSection()" style="border-top:4px solid #10b981"><h3 style="color:#10b981">${ticketStats.closedOnTime.length}</h3><p>🟢 Closed On Time</p></div>
+        </div>
+
+        <div class="task-status-grid">
+          <div class="status-stat-card" onclick="currentSection='tickets';window.taskFilter='closed-late';loadCurrentSection()" style="border-top:4px solid #f59e0b"><h3 style="color:#f59e0b">${ticketStats.closedLate.length}</h3><p>🟠 Closed But Late</p></div>
+          <div class="status-stat-card" onclick="currentSection='tickets';loadCurrentSection()" style="border-top:4px solid #8b5cf6"><h3 style="color:#8b5cf6">${ticketsArray.length}</h3><p>🎫 Total Tickets</p></div>
+          <div class="status-stat-card" style="border-top:4px solid #0ea5e9"><h3 style="color:#0ea5e9">${Object.keys(priorityCounts).length}</h3><p>🏷️ Tickets by Priority</p></div>
+          <div class="status-stat-card" style="border-top:4px solid #6366f1"><h3 style="color:#6366f1">${Object.keys(deptTicketCount).length}</h3><p>🏢 Tickets by Department</p></div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="chart-card"><h3>Tickets by Priority</h3><canvas id="priorityChart"></canvas></div>
+          <div class="chart-card"><h3>Tickets Assigned by Department</h3><canvas id="assignedChart"></canvas></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card"><h3>Tickets Submitted by Department</h3><canvas id="submittedChart"></canvas></div>
+          <div class="chart-card"><h3>BSC Metrics Overview</h3><canvas id="bscChart"></canvas></div>
+        </div>
+
+        ${renderNewTicketForm()}
+        ${renderAutomatedTaskForm()}
+
+        <div class="panel"><div class="panel-header"><h2>🎯 BSC Metrics by Department</h2><button class="btn-primary" onclick="currentSection='bsc';loadCurrentSection()">View All →</button></div>
+          <div class="bsc-grid">${bsc.map(b => `<div class="bsc-card"><h4>${escapeHtml(getCellValue(b, 'BSC Name'))}</h4><p>${escapeHtml(getCellValue(b, 'BSC Description'))}</p><div class="bsc-metrics"><span class="metric-pill">🎯 Target: ${escapeHtml(getCellValue(b, 'Target Score'))}</span><span class="metric-pill">📊 Actual: ${escapeHtml(getCellValue(b, 'Actual Score'))}</span></div><div style="font-size:12px;color:#64748b">${escapeHtml(getCellValue(b, 'Related Department'))} · ${escapeHtml(b.Frequency || 'Monthly')}</div></div>`).join('') || '<div style="padding:20px;text-align:center">No BSC metrics found</div>'}</div>
+        </div>
+
+        <div class="panel"><div class="panel-header"><h2>📊 KPI Performance</h2><button class="btn-primary" onclick="currentSection='kpis';loadCurrentSection()">View All →</button></div>
+          <div class="table-wrapper"><table><thead><tr><th>KPI Name</th><th>Target</th><th>Actual</th><th>Department</th><th>Status</th></tr></thead><tbody>${kpiArray.slice(0,5).map(k => `<tr><td><strong>${escapeHtml(k.KPIName || k.Name || '')}</strong></td><td>${escapeHtml(k['Target Value'] || k.Target || '')}</td><td>${escapeHtml(k['Actual Value'] || k.Actual || '')}</td><td>${escapeHtml(k['Related Department'] || k.Department || '')}</td><td><span class="badge ${(parseFloat(k['Actual Value'] || k.Actual) >= parseFloat(k['Target Value'] || k.Target)) ? 'badge-low' : 'badge-high'}">${(parseFloat(k['Actual Value'] || k.Actual) >= parseFloat(k['Target Value'] || k.Target)) ? '✓ On Track' : '⚠️ Behind'}</span></td></tr>`).join('') || '<tr><td colspan="5">No KPI data</td></tr>'}</tbody></table></div>
+        </div>
+
+        <div class="panel"><div class="panel-header"><h2>⏱️ SLA Management</h2><button class="btn-primary" onclick="currentSection='sla';loadCurrentSection()">View All →</button></div>
+          <div class="table-wrapper"><table><thead><tr><th>SLA Name</th><th>Priority</th><th>First Response</th><th>Resolution Target</th><th>Status</th></tr></thead><tbody>${slaArray.slice(0,5).map(s => `<tr><td><strong>${escapeHtml(getCellValue(s, 'SLA Name'))}</strong></td><td><span class="badge badge-high">${escapeHtml(s.Priority || '')}</span></td><td>${escapeHtml(getCellValue(s, 'First Response'))}</td><td>${escapeHtml(getCellValue(s, 'Resolution Target'))}</td><td><span class="badge badge-low">${escapeHtml(s.Status || 'Active')}</span></td></tr>`).join('') || '<tr><td colspan="5">No SLA records</td></tr>'}</tbody></table></div>
+        </div>`;
+
+      wireDashboardForms();
+      renderDashboardCharts(priorityCounts, deptTicketCount, submittedByDept, deptScores);
+    } catch (err) {
+      main.innerHTML = `<div class="panel" style="padding:40px;text-align:center;color:#ef4444"><h2>⚠️ Error Loading Dashboard</h2><p>${escapeHtml(err.message)}</p><button class="refresh-btn" onclick="loadCurrentSection()">Try Again</button></div>`;
     }
-    function renderPerformance(performance){const body=document.getElementById("performanceBody");const perf=(performance&&performance.length&&performance[0].total_tasks!==undefined)?performance:calculatePerformance(window.visibleTasks||window.latestTasks||[]);if(!perf.length){body.innerHTML='<tr><td colspan="14">No performance data yet.</td></tr>';return}body.innerHTML=perf.map(p=>`<tr><td>${escapeHtml(p.manager)}</td><td>${p.total_tasks||0}</td><td class="metric-link metric-green" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','closed_on_time')">${p.closed_on_time||0}</td><td class="metric-link metric-red" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','closed_late')">${p.closed_late||0}</td><td class="metric-link metric-blue" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','priority_early')">${p.priority_early||0} <span class="task-meta">(${p.priority_early_bonus_percent||p.priority_early_percent||0}%)</span></td><td class="metric-link metric-red" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','priority_late')">${p.priority_late||0}</td><td class="metric-link metric-green" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','open')">${p.open||0}</td><td class="metric-link" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','all')">${p.task_score_percent||0}%</td><td class="metric-link metric-green" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','closed_on_time')">${p.closed_early_percent||0}%</td><td class="metric-link metric-red" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','closed_late')">${p.closed_late_percent||0}%</td><td class="metric-link metric-blue" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','priority_early')">${p.priority_early_percent||0}%</td><td class="metric-link metric-red" onclick="jumpToPerformanceTasks('${escapeAttr(p.manager)}','priority_late')">${p.priority_late_percent||0}%</td><td><strong>${p.final_score||0}%</strong></td><td><span class="stars">${escapeHtml(p.stars||"")}</span></td></tr>`).join("")}
+  }
 
-    function updateNotificationBadges(){const hiring=window.latestHiringRequests||[];const exts=window.latestExtensionRequests||[];const pendingHiring=hiring.filter(r=>["PENDING","LEVEL1_APPROVED","FIRST_APPROVED"].includes(String(r.status||"").toUpperCase())).length;const pendingMoreTime=exts.filter(r=>String(r.status||"PENDING").toUpperCase()==="PENDING").length;["hiringBadge","hiringApprovalBadge","hiringApprovalCount"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=pendingHiring});["moreTimeBadge"].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=pendingMoreTime})}
-    function scrollToArea(id){const el=document.getElementById(id);if(el){el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.add("row-highlight");setTimeout(()=>el.classList.remove("row-highlight"),1800)}}
-    function cacheDashboardData(){try{sessionStorage.setItem("onpointCachedTasks",JSON.stringify(window.latestTasks||[]));sessionStorage.setItem("onpointCachedPerformance",JSON.stringify(window.latestPerformance||[]));sessionStorage.setItem("onpointCachedHiring",JSON.stringify(window.latestHiringRequests||[]))}catch(e){}}
-    function loadCachedDashboardData(){try{const cachedTasks=JSON.parse(sessionStorage.getItem("onpointCachedTasks")||"[]");const cachedPerf=JSON.parse(sessionStorage.getItem("onpointCachedPerformance")||"[]");const cachedHiring=JSON.parse(sessionStorage.getItem("onpointCachedHiring")||"[]");if(cachedTasks.length){window.latestTasks=cachedTasks;window.latestPerformance=cachedPerf;applyTaskFilter()}if(cachedHiring.length){window.latestHiringRequests=cachedHiring;renderHiringRequests(cachedHiring)}}catch(e){}}
-    function jumpToPerformanceTasks(manager,metric){showTab("tasksView");const tasks=(window.visibleTasks||window.latestTasks||[]).filter(t=>String(t.assigned_to_name||"Unassigned")===String(manager));const priority=t=>["HIGH","URGENT"].includes(String(t.priority||"").toUpperCase());let match=tasks.filter(t=>{const closed=String(t.status||"").toUpperCase()==="CLOSED";const late=t.timeline_category==="closed_late"||isPastDue(t)||Number(t.performance_score)<100;if(metric==="all")return true;if(metric==="open")return !closed;if(metric==="closed_late")return closed&&late;if(metric==="closed_on_time")return closed&&!late;if(metric==="priority_early")return closed&&!late&&priority(t);if(metric==="priority_late")return closed&&late&&priority(t);return false});const first=match[0];if(first){openTaskFromSummary(first.task_id)}else{alert("No matching tasks found for "+manager)}}
-    function jumpToStatTasks(metric){showTab("tasksView");const tasks=window.visibleTasks||window.latestTasks||[];let match=tasks.filter(t=>{const status=String(t.status||"").toUpperCase();const late=isPastDue(t);if(metric==="open_pending")return status!=="CLOSED"&&!late;if(metric==="open_late")return status!=="CLOSED"&&late;if(metric==="warning")return status!=="CLOSED"&&!late&&/(warning|yellow|orange)/i.test(String(t.schedule_health||t.timeline_category||""));if(metric==="closed_late")return status==="CLOSED"&&late;return false});const first=match[0];if(first){openTaskFromSummary(first.task_id);return}if(metric==="open_pending")scrollToArea("tasksLeft");else if(metric==="open_late"||metric==="warning")scrollToArea("tasksRight");else if(metric==="closed_late")scrollToArea("tasksBottom")}
+  function renderNewTicketForm() {
+    return `<div class="panel">
+      <div class="panel-header"><h2>➕ New Task / Ticket</h2><button class="btn-secondary" onclick="document.getElementById('newTicketForm').style.display='block'">Show Form</button></div>
+      <div id="newTicketForm" style="padding:20px; display:block">
+        <div class="form-row">
+          <div class="form-field"><label>Title *</label><input id="ticketTitle" placeholder="Task/Ticket title"></div>
+          <div class="form-field"><label>Priority</label><select id="ticketPriority"><option>Medium</option><option>Low</option><option>High</option><option>Critical</option></select></div>
+          <div class="form-field"><label>Status</label><select id="ticketStatus"><option>Open</option><option>In Progress</option><option>Pending</option><option>Closed</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Department</label><input id="ticketDept" placeholder="Department"></div>
+          <div class="form-field"><label>Assigned To</label><select id="ticketAssignee">${userOptionsHtml()}</select></div>
+          <div class="form-field"><label>Assignee Email</label><input id="ticketAssigneeEmail" readonly placeholder="Auto-filled email"></div>
+          <div class="form-field"><label>Due Date</label><input type="date" id="ticketDueDate"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Description</label><textarea id="ticketDesc" rows="2" placeholder="Detailed description"></textarea></div>
+          <div class="form-field"><label>Comments</label><textarea id="ticketComments" rows="2" placeholder="Optional comments"></textarea></div>
+          <div class="form-field"><label>Attachment Link</label><input id="ticketAttachment" placeholder="https://..."></div>
+        </div>
+        <button class="btn-primary" id="createTicketBtn">✨ Create Ticket</button>
+        <div id="ticketFormMessage" class="message-bar"></div>
+      </div>
+    </div>`;
+  }
 
-    function showTab(id){["tasksView","hiringView","performanceView"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));if(id==="tasksView")document.getElementById("tabTasks").classList.add("active");if(id==="hiringView"){document.getElementById("tabHiring").classList.add("active");loadHiringRequests()}if(id==="performanceView"){document.getElementById("tabPerformance").classList.add("active");renderPerformance(calculatePerformance(window.visibleTasks||window.latestTasks||[]))}}
-    function escapeHtml(value){return String(value??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-    function escapeAttr(value){return escapeHtml(value).replaceAll("`","&#096;")}
-    window.addEventListener("error",function(e){const loginPage=document.getElementById("loginPage");if(loginPage&&loginPage.style.display!=="none"){showMessage("loginMessage","Page script error: "+(e.message||"Unknown error"),"error");}});document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginPage").style.display!=="none")login()});window.addEventListener("load",()=>{const saved=sessionStorage.getItem("onpointTasksUser");if(saved){try{currentUser=JSON.parse(saved);showApp();loadInitialData().catch(err=>alert("Some dashboard data could not load: "+err.message));}catch(err){sessionStorage.removeItem("onpointTasksUser");}}})
-  </script>
+  function renderAutomatedTaskForm() {
+    return `<div class="panel">
+      <div class="panel-header"><h2>🔄 Automated Recurring Task</h2><button class="btn-secondary" onclick="document.getElementById('autoTaskForm').style.display='block'">Show Form</button></div>
+      <div id="autoTaskForm" style="padding:20px; display:block">
+        <div class="form-row">
+          <div class="form-field"><label>Task Name *</label><input id="autoTaskName" placeholder="e.g., Weekly Report"></div>
+          <div class="form-field"><label>Frequency</label><select id="autoFrequency"><option>Daily</option><option>Weekly</option><option>Monthly</option></select></div>
+          <div class="form-field"><label>Assigned To</label><select id="autoAssignee">${userOptionsHtml()}</select></div>
+          <div class="form-field"><label>Assignee Email</label><input id="autoAssigneeEmail" readonly placeholder="Auto-filled email"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Department</label><input id="autoDept" placeholder="Department"></div>
+          <div class="form-field"><label>Next Run Date</label><input type="date" id="autoNextRun"></div>
+          <div class="form-field"><label>Status</label><select id="autoStatus"><option>Active</option><option>Paused</option></select></div>
+        </div>
+        <div class="form-field"><label>Description</label><textarea id="autoDesc" rows="2" placeholder="Task description"></textarea></div>
+        <button class="btn-primary" id="createAutoTaskBtn">✨ Create Automated Task</button>
+        <div id="autoTaskMessage" class="message-bar"></div>
+      </div>
+    </div>`;
+  }
+
+
+  function buildTaskEmailPayload(type, data) {
+    const isAuto = type === 'automated';
+    const title = data.taskName || data.title || 'New task';
+    const assignee = data.assignedTo || 'Assignee';
+    const dueText = data.dueDate || data.nextRun || 'Not set';
+    const description = data.description || 'No description provided.';
+    return {
+      notifyAssignee: SEND_EMAIL_NOTIFICATIONS,
+      emailService: 'gmail',
+      emailTo: data.assignedEmail || '',
+      emailSubject: `${isAuto ? 'Automated recurring task' : 'New task'} assigned: ${title}`,
+      emailBody: `Hi ${assignee},
+
+A ${isAuto ? 'recurring automated task' : 'task/ticket'} has been assigned to you.
+
+Task: ${title}
+Department: ${data.department || 'Not set'}
+Priority/Frequency: ${data.priority || data.frequency || 'Not set'}
+Due/Next run: ${dueText}
+
+Description:
+${description}
+
+Created by: ${currentUser?.['Full Name'] || currentUser?.Email || 'QuickBase'}
+
+Please log in to QuickBase to review and update this item.`
+    };
+  }
+
+  function wireDashboardForms() {
+    wireAssigneeEmail('ticketAssignee', 'ticketAssigneeEmail');
+    wireAssigneeEmail('autoAssignee', 'autoAssigneeEmail');
+
+    document.getElementById('createTicketBtn')?.addEventListener('click', async () => {
+      const payload = {
+        title: document.getElementById('ticketTitle').value,
+        taskName: document.getElementById('ticketTitle').value,
+        priority: document.getElementById('ticketPriority').value,
+        status: document.getElementById('ticketStatus').value,
+        department: document.getElementById('ticketDept').value,
+        assignedTo: document.getElementById('ticketAssignee').value,
+        assignedEmail: document.getElementById('ticketAssigneeEmail').value,
+        dueDate: document.getElementById('ticketDueDate').value,
+        description: document.getElementById('ticketDesc').value,
+        comments: document.getElementById('ticketComments').value,
+        attachmentLink: document.getElementById('ticketAttachment').value,
+        sheetTab: 'Tasks'
+      };
+      Object.assign(payload, buildTaskEmailPayload('ticket', payload));
+      if (!payload.title) return showMessage('Title required', 'error', 'ticketFormMessage');
+      if (SEND_EMAIL_NOTIFICATIONS && !payload.emailTo) return showMessage('Assignee email is required for Gmail notification. Select an assignee with an email address.', 'error', 'ticketFormMessage');
+      await saveWithSync('createTicketBtn', 'ticketFormMessage', 'addTicket', payload, 'Ticket saved, synchronised and assignee notified.', { afterSuccess: () => setTimeout(() => renderDashboard(), 1000) });
+    });
+
+    document.getElementById('createAutoTaskBtn')?.addEventListener('click', async () => {
+      const payload = {
+        taskName: document.getElementById('autoTaskName').value,
+        title: document.getElementById('autoTaskName').value,
+        frequency: document.getElementById('autoFrequency').value,
+        assignedTo: document.getElementById('autoAssignee').value,
+        assignedEmail: document.getElementById('autoAssigneeEmail').value,
+        department: document.getElementById('autoDept').value,
+        nextRun: document.getElementById('autoNextRun').value,
+        status: document.getElementById('autoStatus').value,
+        description: document.getElementById('autoDesc').value,
+        sheetTab: 'Automated Tasks'
+      };
+      Object.assign(payload, buildTaskEmailPayload('automated', payload));
+      if (!payload.taskName) return showMessage('Task name required', 'error', 'autoTaskMessage');
+      if (SEND_EMAIL_NOTIFICATIONS && !payload.emailTo) return showMessage('Assignee email is required for Gmail notification. Select an assignee with an email address.', 'error', 'autoTaskMessage');
+      await saveWithSync('createAutoTaskBtn', 'autoTaskMessage', 'addAutomatedTask', payload, 'Automated task saved, synchronised and assignee notified.', { afterSuccess: () => setTimeout(() => renderDashboard(), 1000) });
+    });
+  }
+
+  function renderDashboardCharts(priorityCounts, deptTicketCount, submittedByDept, deptScores) {
+    if (typeof Chart === 'undefined') return;
+    const pCtx = document.getElementById('priorityChart')?.getContext('2d');
+    if (pCtx) {
+      destroyChart('priority');
+      charts.priority = new Chart(pCtx, { type: 'doughnut', data: { labels: Object.keys(priorityCounts), datasets: [{ data: Object.values(priorityCounts), backgroundColor: ['#ef4444','#f97316','#3b82f6','#22c55e','#8b5cf6'] }] }, options: { responsive: true } });
+    }
+    const aCtx = document.getElementById('assignedChart')?.getContext('2d');
+    if (aCtx) {
+      destroyChart('assigned');
+      charts.assigned = new Chart(aCtx, { type: 'bar', data: { labels: Object.keys(deptTicketCount), datasets: [{ label: 'Tickets Assigned', data: Object.values(deptTicketCount), backgroundColor: '#3b82f6' }] }, options: { responsive: true } });
+    }
+    const sCtx = document.getElementById('submittedChart')?.getContext('2d');
+    if (sCtx) {
+      destroyChart('submitted');
+      charts.submitted = new Chart(sCtx, { type: 'bar', data: { labels: Object.keys(submittedByDept), datasets: [{ label: 'Tickets Submitted', data: Object.values(submittedByDept), backgroundColor: '#8b5cf6' }] }, options: { responsive: true } });
+    }
+    const bCtx = document.getElementById('bscChart')?.getContext('2d');
+    if (bCtx) {
+      destroyChart('bsc');
+      charts.bsc = new Chart(bCtx, { type: 'pie', data: { labels: Object.keys(deptScores), datasets: [{ data: Object.values(deptScores), backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6'] }] }, options: { responsive: true } });
+    }
+  }
+
+  function groupCount(rows, getter) {
+    const result = {};
+    rows.forEach(row => {
+      const key = String(getter(row) || 'Unassigned');
+      result[key] = (result[key] || 0) + 1;
+    });
+    return result;
+  }
+
+  function getStatus(t) { return String(t.Status || t.status || '').trim().toLowerCase(); }
+  function getPriority(t) { return String(t.Priority || t.priority || 'Medium').trim() || 'Medium'; }
+  function getDepartment(t) { return String(t.Department || t['Assigned Department'] || t.department || 'Unassigned').trim() || 'Unassigned'; }
+  function getDueDate(t) { return t['Due Date'] || t.DueDate || t.dueDate || ''; }
+  function getCompletionDate(t) { return t['Completion Date'] || t.CompletionDate || t['Closed Date'] || t.closedDate || ''; }
+
+  function isClosedTicket(t) {
+    const status = getStatus(t);
+    return ['closed', 'resolved', 'done', 'completed', 'complete'].some(s => status === s || status.includes(s));
+  }
+
+  function calculateTicketStats(rows) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isLateOpen = t => {
+      if (isClosedTicket(t)) return false;
+      const due = new Date(getDueDate(t));
+      if (isNaN(due)) return false;
+      due.setHours(0, 0, 0, 0);
+      return due < today;
+    };
+    const isClosedLate = t => {
+      if (!isClosedTicket(t)) return false;
+      const due = new Date(getDueDate(t));
+      if (isNaN(due)) return false;
+      due.setHours(0, 0, 0, 0);
+      const completedRaw = getCompletionDate(t);
+      if (completedRaw) {
+        const completed = new Date(completedRaw);
+        if (!isNaN(completed)) {
+          completed.setHours(0, 0, 0, 0);
+          return completed > due;
+        }
+      }
+      return due < today;
+    };
+    const closed = rows.filter(isClosedTicket);
+    const closedLate = rows.filter(isClosedLate);
+    return {
+      open: rows.filter(t => !isClosedTicket(t)),
+      closed,
+      openLate: rows.filter(isLateOpen),
+      closedLate,
+      closedOnTime: closed.filter(t => !isClosedLate(t))
+    };
+  }
+
+  async function renderUsers() { const data = await safeGet('users'); renderSimpleTable('Users', data, ['Employee ID', 'Employee Name', 'Department', 'Role', 'Status', 'Created Date']); }
+
+  async function renderSettings() {
+    document.getElementById('mainContent').innerHTML = `
+      <div class="top-bar"><div class="page-title"><h1>App Settings</h1><p>API connection and Google Sheet configuration</p></div></div>
+      <div class="panel">
+        <div class="panel-header"><h2>🔌 API Connection</h2></div>
+        <div style="padding:20px">
+          <div class="form-field" style="margin-bottom:16px">
+            <label>Google Apps Script Web App URL</label>
+            <input id="apiUrlInput" value="${escapeHtml(SCRIPT_URL)}" placeholder="Paste your /exec Web App URL here">
+          </div>
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px"><strong>Sheet ID:</strong> ${SHEET_ID}</p>
+          <div class="form-row">
+            <div class="form-field"><label>POST / Fetch Body Type</label><select id="apiPostModeInput"><option value="text" ${API_POST_MODE === 'text' ? 'selected' : ''}>JSON text/plain</option><option value="form" ${API_POST_MODE === 'form' ? 'selected' : ''}>Form URL Encoded</option></select></div>
+            <div class="form-field"><label>Gmail Notifications</label><select id="emailNotifyInput"><option value="true" ${SEND_EMAIL_NOTIFICATIONS ? 'selected' : ''}>Enabled - backend sends Gmail</option><option value="false" ${!SEND_EMAIL_NOTIFICATIONS ? 'selected' : ''}>Disabled</option></select></div>
+          </div>
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px">Gmail is sent by the connected Google Apps Script backend, not directly by the browser.</p>
+          <button class="btn-primary" id="saveApiBtn">💾 Save API Settings</button>
+          <button class="btn-secondary" id="testApiBtn">🔄 Test Connection</button>
+          <button class="btn-secondary" id="resetApiBtn">↩ Reset Default</button>
+          <div id="apiSettingsMessage" class="message-bar"></div>
+        </div>
+      </div>`;
+
+    document.getElementById('saveApiBtn').addEventListener('click', () => {
+      const value = document.getElementById('apiUrlInput').value.trim();
+      if (!value) return showMessage('API URL is required', 'error', 'apiSettingsMessage');
+      SCRIPT_URL = value;
+      API_POST_MODE = document.getElementById('apiPostModeInput').value;
+      SEND_EMAIL_NOTIFICATIONS = document.getElementById('emailNotifyInput').value === 'true';
+      localStorage.setItem('quickbase_api_url', value);
+      localStorage.setItem('quickbase_api_post_mode', API_POST_MODE);
+      localStorage.setItem('quickbase_send_email_notifications', String(SEND_EMAIL_NOTIFICATIONS));
+      showMessage('API settings saved.', 'success', 'apiSettingsMessage');
+    });
+
+    document.getElementById('resetApiBtn').addEventListener('click', () => {
+      SCRIPT_URL = DEFAULT_SCRIPT_URL;
+      localStorage.removeItem('quickbase_api_url');
+      localStorage.removeItem('quickbase_api_post_mode');
+      localStorage.removeItem('quickbase_send_email_notifications');
+      API_POST_MODE = 'text';
+      SEND_EMAIL_NOTIFICATIONS = true;
+      document.getElementById('apiUrlInput').value = SCRIPT_URL;
+      document.getElementById('apiPostModeInput').value = API_POST_MODE;
+      document.getElementById('emailNotifyInput').value = 'true';
+      showMessage('API URL reset to default.', 'success', 'apiSettingsMessage');
+    });
+
+    document.getElementById('testApiBtn').addEventListener('click', async () => {
+      setButtonLoading('testApiBtn', true, 'Testing...');
+      showMessage('Testing API connection...', 'info', 'apiSettingsMessage');
+      try {
+        const data = await apiGet('employees');
+        showMessage(`Connected successfully. Employees fetched: ${data.length}`, 'success', 'apiSettingsMessage');
+      } catch(e) {
+        showMessage(`Connection failed: ${e.message}`, 'error', 'apiSettingsMessage');
+      } finally {
+        setButtonLoading('testApiBtn', false);
+      }
+    });
+  }
+
+  async function safeGet(action) {
+    try { return await apiGet(action); }
+    catch(e) { return []; }
+  }
+
+  async function renderDepartments() { const route = SHEET_ROUTES.departments; const data = await safeGet(route.action); renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab); }
+
+  async function renderEmployees() {
+    const route = SHEET_ROUTES.employees;
+    const data = await safeGet(route.action);
+    renderSimpleTable('Employees', data, ['Employee ID', 'Employee Name', 'Department', 'Role', 'Status', 'Created Date']);
+    const main = document.getElementById('mainContent');
+    main.insertAdjacentHTML('afterbegin', `
+      <div class="panel">
+        <div class="panel-header"><h2>➕ Enter New Employee</h2></div>
+        <div style="padding:20px">
+          <div class="form-row">
+            <div class="form-field"><label>Employee ID</label><input id="empId" placeholder="Employee ID"></div>
+            <div class="form-field"><label>Employee Name *</label><input id="empName" placeholder="Full name"></div>
+            <div class="form-field"><label>Department</label><input id="empDept" placeholder="Department"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Role</label><input id="empRole" placeholder="Role"></div>
+            <div class="form-field"><label>Status</label><select id="empStatus"><option>Active</option><option>Inactive</option></select></div>
+            <div class="form-field"><label>Created Date</label><input id="empCreatedDate" type="date"></div>
+          </div>
+          <button class="btn-primary" id="saveEmployeeBtn">💾 Save Employee</button>
+          <div id="employeeFormMessage" class="message-bar"></div>
+        </div>
+      </div>`);
+
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('empCreatedDate').value = today;
+
+    document.getElementById('saveEmployeeBtn')?.addEventListener('click', async () => {
+      const payload = {
+        'Employee ID': document.getElementById('empId').value,
+        'Employee Name': document.getElementById('empName').value,
+        'Department': document.getElementById('empDept').value,
+        'Role': document.getElementById('empRole').value,
+        'Status': document.getElementById('empStatus').value,
+        'Created Date': document.getElementById('empCreatedDate').value
+      };
+      if (!payload['Employee Name']) return showMessage('Employee name is required', 'error', 'employeeFormMessage');
+      payload.sheetTab = route.sheetTab;
+      payload.sheetName = route.sheetTab;
+      payload.tabName = route.sheetTab;
+      await saveWithSync('saveEmployeeBtn', 'employeeFormMessage', route.saveAction, payload, 'Employee saved and synchronised to Employees tab.', { afterSuccess: () => setTimeout(() => renderEmployees(), 1000) });
+    });
+  }
+
+  async function renderTickets() {
+    const allTicketsRaw = await safeGet('tickets');
+    const allTickets = Array.isArray(allTicketsRaw) ? allTicketsRaw : [];
+    const stats = calculateTicketStats(allTickets);
+    const priorityCounts = groupCount(allTickets, t => getPriority(t));
+    const departmentCounts = groupCount(allTickets, t => getDepartment(t));
+
+    let data = allTickets;
+    if (window.taskFilter === 'open') data = stats.open;
+    else if (window.taskFilter === 'closed') data = stats.closed;
+    else if (window.taskFilter === 'overdue') data = stats.openLate;
+    else if (window.taskFilter === 'closed-on-time') data = stats.closedOnTime;
+    else if (window.taskFilter === 'closed-late') data = stats.closedLate;
+
+    const columns = ['Ticket ID', 'Title', 'Priority', 'Status', 'Department', 'Assigned To', 'Due Date'];
+    const main = document.getElementById('mainContent');
+    const activeFilterText = window.taskFilter ? `Filtered: ${window.taskFilter.replace(/-/g, ' ')}` : 'All tickets';
+
+    main.innerHTML = `
+      <div class="top-bar"><div class="page-title"><h1>Tickets</h1><p>Sheet tab: Tasks · ${escapeHtml(activeFilterText)}</p></div><button class="refresh-btn" onclick="loadCurrentSection()">↻ Refresh</button></div>
+      <div class="task-status-grid">
+        <div class="status-stat-card" onclick="window.taskFilter='open';renderTickets()" style="border-top:4px solid #3b82f6"><h3 style="color:#3b82f6">${stats.open.length}</h3><p>📋 Tickets Open</p></div>
+        <div class="status-stat-card" onclick="window.taskFilter='closed';renderTickets()" style="border-top:4px solid #22c55e"><h3 style="color:#22c55e">${stats.closed.length}</h3><p>✅ Tickets Closed</p></div>
+        <div class="status-stat-card" onclick="window.taskFilter='overdue';renderTickets()" style="border-top:4px solid #ef4444"><h3 style="color:#ef4444">${stats.openLate.length}</h3><p>⚠️ Open Tickets But Late</p></div>
+        <div class="status-stat-card" onclick="window.taskFilter='closed-on-time';renderTickets()" style="border-top:4px solid #10b981"><h3 style="color:#10b981">${stats.closedOnTime.length}</h3><p>🟢 Closed On Time Tickets</p></div>
+      </div>
+      <div class="task-status-grid">
+        <div class="status-stat-card" onclick="window.taskFilter='closed-late';renderTickets()" style="border-top:4px solid #f59e0b"><h3 style="color:#f59e0b">${stats.closedLate.length}</h3><p>🟠 Closed But Late</p></div>
+        <div class="status-stat-card" onclick="window.taskFilter=null;renderTickets()" style="border-top:4px solid #8b5cf6"><h3 style="color:#8b5cf6">${allTickets.length}</h3><p>🎫 Total Tickets</p></div>
+        <div class="status-stat-card" style="border-top:4px solid #0ea5e9"><h3 style="color:#0ea5e9">${Object.keys(priorityCounts).length}</h3><p>🏷️ Tickets by Priority</p></div>
+        <div class="status-stat-card" style="border-top:4px solid #6366f1"><h3 style="color:#6366f1">${Object.keys(departmentCounts).length}</h3><p>🏢 Tickets by Department</p></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><h3>Tickets by Priority</h3><p>Current ticket count grouped by priority</p><canvas id="ticketsPriorityChart"></canvas></div>
+        <div class="chart-card"><h3>Tickets by Department</h3><p>Current ticket count grouped by department</p><canvas id="ticketsDepartmentChart"></canvas></div>
+      </div>
+      <div class="panel"><div class="panel-header"><h2>📋 Tickets</h2></div><div class="table-wrapper"><table><thead><tr>${columns.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${data.length ? data.map(row => `<tr>${columns.map(c => `<td>${escapeHtml(getCellValue(row, c))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${columns.length}" style="text-align:center">No data found</td></tr>`}</tbody></table></div></div>`;
+
+    if (typeof Chart !== 'undefined') {
+      const pCtx = document.getElementById('ticketsPriorityChart')?.getContext('2d');
+      if (pCtx) {
+        destroyChart('ticketsPriority');
+        charts.ticketsPriority = new Chart(pCtx, { type: 'doughnut', data: { labels: Object.keys(priorityCounts), datasets: [{ data: Object.values(priorityCounts), backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#8b5cf6'] }] }, options: { responsive: true } });
+      }
+      const dCtx = document.getElementById('ticketsDepartmentChart')?.getContext('2d');
+      if (dCtx) {
+        destroyChart('ticketsDepartment');
+        charts.ticketsDepartment = new Chart(dCtx, { type: 'bar', data: { labels: Object.keys(departmentCounts), datasets: [{ label: 'Tickets', data: Object.values(departmentCounts), backgroundColor: '#6366f1' }] }, options: { responsive: true } });
+      }
+    }
+  }
+
+  async function renderKPIs() {
+    const route = SHEET_ROUTES.kpis;
+    const data = await safeGet(route.action);
+    renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab);
+  }
+
+  async function renderSLA() {
+    const route = SHEET_ROUTES.sla;
+    const data = await safeGet(route.action);
+    renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab);
+  }
+
+  async function renderBSC() {
+    const route = SHEET_ROUTES.bsc;
+    const data = await safeGet(route.action);
+    renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab);
+  }
+
+  async function renderDivisions() { const route = SHEET_ROUTES.divisions; const data = await safeGet(route.action); renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab); }
+  async function renderAutomatedTasks() { const route = SHEET_ROUTES.automatedTasks; const data = await safeGet(route.action); renderDataEntryTable(route.displayTab, data, route.columns, route.saveAction, route.sheetTab); }
+
+  function renderDataEntryTable(title, data, columns, actionName, sheetTabName = title) {
+    const main = document.getElementById('mainContent');
+    const dataArray = Array.isArray(data) ? data : [];
+    const fieldId = c => `entry_${c.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    main.innerHTML = `
+      <div class="top-bar"><div class="page-title"><h1>${title}</h1><p>Sheet tab: ${sheetTabName}</p></div><button class="refresh-btn" onclick="loadCurrentSection()">↻ Refresh</button></div>
+      <div class="panel"><div class="panel-header"><h2>➕ Enter New ${title}</h2></div><div style="padding:20px">
+        <div class="form-row">
+          ${columns.map(c => `<div class="form-field"><label>${escapeHtml(c)}</label>${c === 'Assigned To' ? `<select id="${fieldId(c)}">${userOptionsHtml()}</select>` : c === 'Assigned Email' ? `<input id="${fieldId(c)}" readonly placeholder="Auto-filled email">` : c === 'Description' || c.includes('Description') ? `<textarea id="${fieldId(c)}" rows="2"></textarea>` : c === 'Status' ? `<select id="${fieldId(c)}"><option>Active</option><option>Open</option><option>Closed</option><option>Inactive</option><option>Paused</option></select>` : c === 'Priority' ? `<select id="${fieldId(c)}"><option>Medium</option><option>Low</option><option>High</option><option>Critical</option></select>` : c === 'Frequency' ? `<select id="${fieldId(c)}"><option>Daily</option><option>Weekly</option><option>Monthly</option></select>` : (c === 'Next Run' || c === 'Created Date') ? `<input id="${fieldId(c)}" type="date">` : `<input id="${fieldId(c)}" placeholder="${escapeHtml(c)}">`}</div>`).join('')}
+        </div>
+        <button class="btn-primary" id="saveDataEntryBtn">💾 Save ${title}</button>
+        <div id="dataEntryMessage" class="message-bar"></div>
+      </div></div>
+      <div class="panel"><div class="panel-header"><h2>📋 ${title}</h2></div><div class="table-wrapper"><table><thead><tr>${columns.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${dataArray.length ? dataArray.map(row => `<tr>${columns.map(c => `<td>${escapeHtml(getCellValue(row, c))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${columns.length}" style="text-align:center">No data found</td></tr>`}</tbody></table></div></div>`;
+
+    if (columns.includes('Assigned To') && columns.includes('Assigned Email')) {
+      wireAssigneeEmail(fieldId('Assigned To'), fieldId('Assigned Email'));
+    }
+
+    document.getElementById('saveDataEntryBtn')?.addEventListener('click', async () => {
+      const payload = {};
+      columns.forEach(c => { payload[c] = document.getElementById(fieldId(c)).value; });
+      payload.sheetTab = sheetTabName;
+      payload.sheetName = sheetTabName;
+      payload.tabName = sheetTabName;
+      if (columns.includes('Created Date') && !payload['Created Date']) payload['Created Date'] = new Date().toISOString().slice(0,10);
+      const firstColumn = columns[0];
+      if (!payload[firstColumn]) return showMessage(`${firstColumn} is required`, 'error', 'dataEntryMessage');
+      await saveWithSync('saveDataEntryBtn', 'dataEntryMessage', actionName, payload, `${title} record saved and synchronised.`, { afterSuccess: () => setTimeout(() => loadCurrentSection(), 1000) });
+    });
+  }
+
+  function renderSimpleTable(title, data, columns, sheetTabName = title) {
+    const main = document.getElementById('mainContent');
+    const dataArray = Array.isArray(data) ? data : [];
+    main.innerHTML = `<div class="top-bar"><div class="page-title"><h1>${title}</h1><p>Sheet tab: ${sheetTabName}</p></div><button class="refresh-btn" onclick="loadCurrentSection()">↻ Refresh</button></div><div class="panel"><div class="panel-header"><h2>📋 ${title}</h2></div><div class="table-wrapper"><table><thead><tr>${columns.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${dataArray.length ? dataArray.map(row => `<tr>${columns.map(c => `<td>${escapeHtml(getCellValue(row, c))}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${columns.length}" style="text-align:center">No data found</td></tr>`}</tbody></table></div></div>`;
+  }
+
+  async function loadCurrentSection() {
+    requireLogin();
+    document.getElementById('mainContent').innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
+    if (currentSection === 'dashboard') await renderDashboard();
+    else if (currentSection === 'users') await renderUsers();
+    else if (currentSection === 'settings') await renderSettings();
+    else if (currentSection === 'departments') await renderDepartments();
+    else if (currentSection === 'employees') await renderEmployees();
+    else if (currentSection === 'tickets') await renderTickets();
+    else if (currentSection === 'kpis') await renderKPIs();
+    else if (currentSection === 'sla') await renderSLA();
+    else if (currentSection === 'bsc') await renderBSC();
+    else if (currentSection === 'divisions') await renderDivisions();
+    else if (currentSection === 'automatedTasks') await renderAutomatedTasks();
+    else await renderDashboard();
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('data-section') === currentSection) link.classList.add('active');
+    });
+    if (currentSection !== 'tickets') window.taskFilter = null;
+  }
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      currentSection = link.getAttribute('data-section');
+      loadCurrentSection();
+    });
+  });
+
+  loadCurrentSection();
+</script>
+
 </body>
 </html>
