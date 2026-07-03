@@ -124,7 +124,7 @@
 
 <script>
 // Replace this with your deployed Apps Script Web App URL.
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNoMnHnu80Yodm8wPKMDowgBnz6yv2ZlWby7zgKPiknyJ_kmk1r3I9vvGtyqwQ26ZB4A/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwK3a-Ue47xuOVxqnJOH09I_uB2TjFl0xpjdRECsrIgA5IrrcMchjxtuN4P0QQ3mRi6/exec';
 let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
 let STATE = {tickets:[], users:[], referenceData:[], summary:{}};
 let CURRENT_FILTER = 'all';
@@ -180,8 +180,22 @@ function setupNow(){document.getElementById('loginErr').textContent='Repairing s
 function logout(){showSync('Synchronising logout...');localStorage.removeItem('ob_user');alert('Logout successful.');location.reload();}
 function start(){document.getElementById('login').classList.add('hide');document.getElementById('app').classList.remove('hide');userPill.textContent=USER.Name+' · '+USER.Role;initDates();applyRoleVisibility();refresh();}
 function refresh(){postApi('bootstrap',{userId:USER.UserID}).then(data=>{STATE=data;fillLists();applyRoleVisibility();render();}).catch(alertErr);}
+function loadTicketsView(view, max){
+  if(!USER) return;
+  postApi('getTicketsByView',{userId:USER.UserID,view:view||'all',max:max||300}).then(data=>{
+    STATE.tickets=data.tickets||[];
+    STATE.summary=data.summary||STATE.summary||{};
+    render();
+  }).catch(alertErr);
+}
 function alertErr(e){alert(e.message||e);}
-function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);}
+function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
+  if(id==='review1') loadTicketsView('review1',300);
+  else if(id==='review2') loadTicketsView('review2',300);
+  else if(id==='closed') loadTicketsView('closed',300);
+  else if(id==='task') loadTicketsView('task',300);
+  else if(id==='performance') loadTicketsView('all',500);
+}
 function modeChange(){const rec=document.querySelector('[name=mode]:checked').value==='recurring';document.querySelectorAll('.recOnly').forEach(e=>e.classList.toggle('hide',!rec));document.querySelectorAll('.singleOnly').forEach(e=>e.classList.toggle('hide',rec));}
 function activeUsers(){return (STATE.users||[]).filter(u=>String(u.IsActive).toUpperCase()!=='FALSE');}
 function selectedAssignee(){return activeUsers().find(u=>String(u.UserID)===String(ntAssignee.value))||{};}
@@ -229,24 +243,35 @@ function applyRoleVisibility(){
   document.querySelectorAll('.reviewOnly').forEach(el=>el.classList.toggle('hide',!showReview));
   if(!showReview && (document.getElementById('review1')?.classList.contains('on') || document.getElementById('review2')?.classList.contains('on'))){showTab('task');}
 }
+function assignedToCurrentUser(t){
+  const uid=String(USER?.UserID||'').trim();
+  const name=String(USER?.Name||'').trim().toLowerCase();
+  const email=String(USER?.Email||'').trim().toLowerCase();
+  return (
+    (uid && String(t.AssignedToUserID||'').trim()===uid) ||
+    (name && String(t.AssignedToName||'').trim().toLowerCase()===name) ||
+    (email && String(t.AssignedToEmail||'').trim().toLowerCase()===email)
+  );
+}
+function isOpenTicket(t){return String(t.Status||'')!=='Closed' && String(t.CurrentBasket||'')!=='Closed';}
 function myTickets(){
   const tickets=STATE.tickets||[];
   if(isExecutiveUser()){
-    return tickets.filter(t=>String(t.CreatedByUserID)===String(USER.UserID) && String(t.AssignedToUserID)!==String(USER.UserID) && t.Status!=='Closed');
+    return tickets.filter(t=>String(t.CreatedByUserID)===String(USER.UserID) && String(t.AssignedToUserID)!==String(USER.UserID) && isOpenTicket(t));
   }
-  return tickets.filter(t=>String(t.AssignedToUserID)===String(USER.UserID) && t.Status!=='Closed');
+  return tickets.filter(t=>assignedToCurrentUser(t) && isOpenTicket(t));
 }
 function isLate(t){return String(t.TimeRemainingText||'').toLowerCase().includes('late') || String(t.ClosedTiming||'').toLowerCase().includes('late');}
 function isOpenOnTime(t){return t.Status!=='Closed' && !isLate(t) && (t.CurrentBasket==='Assignee'||t.Status==='Open');}
 function filterTickets(kind){
   const tickets=STATE.tickets||[];
-  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && t.Status!=='Closed' && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
-  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
-  if(kind==='openLate') return tickets.filter(t=>t.Status!=='Closed' && isLate(t) && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
+  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && isOpenTicket(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
+  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
+  if(kind==='openLate') return tickets.filter(t=>isOpenTicket(t) && isLate(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
   if(kind==='review1') return isReviewAllowed('review1') ? tickets.filter(t=>t.CurrentBasket==='Executive1') : [];
   if(kind==='review2') return isReviewAllowed('review2') ? tickets.filter(t=>t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2') : [];
   if(kind==='closed') return tickets.filter(t=>t.Status==='Closed' || t.CurrentBasket==='Closed');
-  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && t.Status!=='Closed' && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
+  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && isOpenTicket(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
   return myTickets();
 }
 function openTicketWindow(kind){
@@ -256,10 +281,10 @@ function openTicketWindow(kind){
   else if(kind==='review2') showTab('review2');
   else if(kind==='closed') showTab('closed');
   else showTab('task');
-  render();
+  loadTicketsView(kind==='all'?'task':kind,300);
   const el=document.getElementById('taskRows'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});
+function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});const srv=STATE.summary||{}; if(srv.critical!==undefined)sum.critical=srv.critical; if(srv.openOnTime!==undefined)sum.openOnTime=srv.openOnTime; if(srv.review1!==undefined)sum.e1=srv.review1; if(srv.review2!==undefined)sum.e2=srv.review2; if(srv.closed!==undefined)sum.closed=srv.closed; if(srv.late!==undefined)sum.late=srv.late;
   if(document.getElementById('stCritical'))stCritical.textContent=sum.critical; if(document.getElementById('stOpenOnTime'))stOpenOnTime.textContent=sum.openOnTime; stE1.textContent=sum.e1;stE2.textContent=sum.e2;stClosed.textContent=sum.closed;stLate.textContent=sum.late; renderDashboard(tickets,sum); buildPerfOptions(); renderPerformance();
   const filtered=filterTickets(CURRENT_FILTER).filter(t=>(t.Title+t.TicketID+t.AssignedToName+t.Department+t.CostCenter).toLowerCase().includes(s));
   taskRows.innerHTML=(`<tr><td colspan="8" class="filterTitle">Showing: ${esc(filterLabel(CURRENT_FILTER))}</td></tr>`)+ (filtered.map(rowTask).join('')||empty(8));
