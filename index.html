@@ -124,7 +124,7 @@
 
 <script>
 // Replace this with your deployed Apps Script Web App URL.
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs7Z8pr4F-cUAAGdzGydoCZLT5ASE5AghOU7TNugrWF8A81bjz1jcl7aQPr3szCEEl/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpJvVAiUeytfpUAvfqHA38i1ChP0-RHfG4xEL_2wQoilCQyTn-4pNPtr40bFjV9-UI/exec';
 let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
 let STATE = {tickets:[], users:[], referenceData:[], summary:{}};
 let CURRENT_FILTER = 'all';
@@ -151,10 +151,11 @@ function api(action, data={}){
 
 async function postApi(action, data={}){
   if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) throw new Error('Replace SCRIPT_URL with your Apps Script Web App URL.');
+  if(!/\/exec(\?|$)/.test(SCRIPT_URL)) throw new Error('SCRIPT_URL must be the deployed Apps Script Web App /exec URL, not /dev and not a Google Docs/Sheets URL.');
   showSync('Synchronising '+action+'...');
   try{
     const payload = JSON.stringify({...data, action});
-    const res = await fetch(SCRIPT_URL, {
+    const res = await fetch(SCRIPT_URL + (SCRIPT_URL.includes('?')?'&':'?') + 'ts=' + Date.now(), {
       method: 'POST',
       headers: {'Content-Type':'text/plain;charset=utf-8'},
       body: payload,
@@ -163,7 +164,13 @@ async function postApi(action, data={}){
     const txt = await res.text();
     let json;
     try{ json = JSON.parse(txt); }
-    catch(parseErr){ throw new Error('Upload response was not valid JSON. Make sure the Apps Script is deployed as Web App: Execute as Me, Anyone with the link, and deploy a New version. Response: '+txt.slice(0,180)); }
+    catch(parseErr){
+      const preview = String(txt||'').slice(0,220);
+      if(/^\s*<!DOCTYPE html|^\s*<html/i.test(preview)){
+        throw new Error('Upload response was HTML, not JSON. This means the deployed Web App URL is wrong/old or the deployment access is not Anyone with the link. In Apps Script use Deploy > Manage deployments > Edit > New version > Execute as Me > Anyone with the link, then copy the new /exec URL into SCRIPT_URL. Response: '+preview);
+      }
+      throw new Error('Upload response was not valid JSON. Response: '+preview);
+    }
     if(!json.ok) throw new Error(json.error || 'Upload failed.');
     markSynced();
     return json.data;
