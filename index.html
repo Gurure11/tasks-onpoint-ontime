@@ -124,10 +124,11 @@
 
 <script>
 // Replace this with your deployed Apps Script Web App URL.
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwK3a-Ue47xuOVxqnJOH09I_uB2TjFl0xpjdRECsrIgA5IrrcMchjxtuN4P0QQ3mRi6/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxo6BnYnEKh3VrQcF1113MME6LPhSE9jywcVFpac2QiwaCGxuYJAZFxsrABOAx78Pm0/exec';
 let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
-let STATE = {tickets:[], users:[], referenceData:[], summary:{}};
+let STATE = {tickets:[], viewTickets:[], allTickets:[], users:[], referenceData:[], summary:{}, currentView:'dashboard'};
 let CURRENT_FILTER = 'all';
+let VIEW_REQUEST_SEQ = 0;
 
 function showSync(msg){const el=document.getElementById('syncbar'); if(el){el.classList.remove('hide'); el.innerHTML='<b>'+esc(msg||'Synchronising...')+'</b> please wait';}}
 function hideSync(){const el=document.getElementById('syncbar'); if(el) el.classList.add('hide');}
@@ -179,21 +180,46 @@ function login(){document.getElementById('loginErr').textContent='Synchronising 
 function setupNow(){document.getElementById('loginErr').textContent='Repairing sheets...';postApi('setup',{}).then(()=>{loginErr.textContent='Sheets repaired. Try login again. Your Users tab headings now match: UserID, Name, Email, Phone, WhatsApp, Username, Password, Role, Department, IsActive, CreatedAt, LastLogin, Cost Center. Try login again. If Users tab was empty use admin / admin123.';}).catch(e=>loginErr.textContent=e.message);}
 function logout(){showSync('Synchronising logout...');localStorage.removeItem('ob_user');alert('Logout successful.');location.reload();}
 function start(){document.getElementById('login').classList.add('hide');document.getElementById('app').classList.remove('hide');userPill.textContent=USER.Name+' · '+USER.Role;initDates();applyRoleVisibility();refresh();}
-function refresh(){postApi('bootstrap',{userId:USER.UserID}).then(data=>{STATE=data;fillLists();applyRoleVisibility();render();}).catch(alertErr);}
+function refresh(){
+  postApi('bootstrap',{userId:USER.UserID}).then(data=>{
+    // Keep user/reference/summary fresh, but do not wipe the currently visible ticket list.
+    STATE.users=data.users||STATE.users||[];
+    STATE.referenceData=data.referenceData||STATE.referenceData||[];
+    STATE.summary=data.summary||STATE.summary||{};
+    if((!STATE.viewTickets || !STATE.viewTickets.length) && data.tickets){
+      STATE.viewTickets=data.tickets||[];
+      STATE.tickets=STATE.viewTickets;
+      STATE.currentView='dashboard';
+    }
+    fillLists();
+    applyRoleVisibility();
+    render();
+  }).catch(alertErr);
+}
+function currentTickets(){ return STATE.viewTickets || STATE.tickets || []; }
 function loadTicketsView(view, max){
   if(!USER) return;
-  postApi('getTicketsByView',{userId:USER.UserID,view:view||'all',max:max||300}).then(data=>{
-    STATE.tickets=data.tickets||[];
+  const requestedView=view||'all';
+  const req=++VIEW_REQUEST_SEQ;
+  STATE.loadingView=requestedView;
+  postApi('getTicketsByView',{userId:USER.UserID,view:requestedView,max:max||300}).then(data=>{
+    // Ignore late responses from older tab/card requests so tickets do not appear then disappear.
+    if(req!==VIEW_REQUEST_SEQ || STATE.loadingView!==requestedView) return;
+    STATE.currentView=requestedView;
+    STATE.viewTickets=data.tickets||[];
+    STATE.tickets=STATE.viewTickets;
+    if(requestedView==='all') STATE.allTickets=STATE.viewTickets;
     STATE.summary=data.summary||STATE.summary||{};
     render();
   }).catch(alertErr);
 }
 function alertErr(e){alert(e.message||e);}
-function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
+function showTab(id, skipLoad){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
+  if(skipLoad) return;
   if(id==='review1') loadTicketsView('review1',300);
   else if(id==='review2') loadTicketsView('review2',300);
   else if(id==='closed') loadTicketsView('closed',300);
-  else if(id==='task') loadTicketsView('task',300);
+  else if(id==='task') { CURRENT_FILTER='all'; loadTicketsView('task',300); }
   else if(id==='performance') loadTicketsView('all',500);
 }
 function modeChange(){const rec=document.querySelector('[name=mode]:checked').value==='recurring';document.querySelectorAll('.recOnly').forEach(e=>e.classList.toggle('hide',!rec));document.querySelectorAll('.singleOnly').forEach(e=>e.classList.toggle('hide',rec));}
@@ -255,7 +281,7 @@ function assignedToCurrentUser(t){
 }
 function isOpenTicket(t){return String(t.Status||'')!=='Closed' && String(t.CurrentBasket||'')!=='Closed';}
 function myTickets(){
-  const tickets=STATE.tickets||[];
+  const tickets=currentTickets();
   if(isExecutiveUser()){
     return tickets.filter(t=>String(t.CreatedByUserID)===String(USER.UserID) && String(t.AssignedToUserID)!==String(USER.UserID) && isOpenTicket(t));
   }
@@ -264,7 +290,7 @@ function myTickets(){
 function isLate(t){return String(t.TimeRemainingText||'').toLowerCase().includes('late') || String(t.ClosedTiming||'').toLowerCase().includes('late');}
 function isOpenOnTime(t){return t.Status!=='Closed' && !isLate(t) && (t.CurrentBasket==='Assignee'||t.Status==='Open');}
 function filterTickets(kind){
-  const tickets=STATE.tickets||[];
+  const tickets=currentTickets();
   if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && isOpenTicket(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
   if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
   if(kind==='openLate') return tickets.filter(t=>isOpenTicket(t) && isLate(t) && (isExecutiveUser() || assignedToCurrentUser(t)));
@@ -277,14 +303,14 @@ function filterTickets(kind){
 function openTicketWindow(kind){
   if((kind==='review1'||kind==='review2')&&!isReviewAllowed(kind)){kind='all';}
   CURRENT_FILTER=kind;
-  if(kind==='review1') showTab('review1');
-  else if(kind==='review2') showTab('review2');
-  else if(kind==='closed') showTab('closed');
-  else showTab('task');
+  if(kind==='review1') showTab('review1', true);
+  else if(kind==='review2') showTab('review2', true);
+  else if(kind==='closed') showTab('closed', true);
+  else showTab('task', true);
   loadTicketsView(kind==='all'?'task':kind,300);
   const el=document.getElementById('taskRows'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});const srv=STATE.summary||{}; if(srv.critical!==undefined)sum.critical=srv.critical; if(srv.openOnTime!==undefined)sum.openOnTime=srv.openOnTime; if(srv.review1!==undefined)sum.e1=srv.review1; if(srv.review2!==undefined)sum.e2=srv.review2; if(srv.closed!==undefined)sum.closed=srv.closed; if(srv.late!==undefined)sum.late=srv.late;
+function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=currentTickets();const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});const srv=STATE.summary||{}; if(srv.critical!==undefined)sum.critical=srv.critical; if(srv.openOnTime!==undefined)sum.openOnTime=srv.openOnTime; if(srv.review1!==undefined)sum.e1=srv.review1; if(srv.review2!==undefined)sum.e2=srv.review2; if(srv.closed!==undefined)sum.closed=srv.closed; if(srv.late!==undefined)sum.late=srv.late;
   if(document.getElementById('stCritical'))stCritical.textContent=sum.critical; if(document.getElementById('stOpenOnTime'))stOpenOnTime.textContent=sum.openOnTime; stE1.textContent=sum.e1;stE2.textContent=sum.e2;stClosed.textContent=sum.closed;stLate.textContent=sum.late; renderDashboard(tickets,sum); buildPerfOptions(); renderPerformance();
   const filtered=filterTickets(CURRENT_FILTER).filter(t=>(t.Title+t.TicketID+t.AssignedToName+t.Department+t.CostCenter).toLowerCase().includes(s));
   taskRows.innerHTML=(`<tr><td colspan="8" class="filterTitle">Showing: ${esc(filterLabel(CURRENT_FILTER))}</td></tr>`)+ (filtered.map(rowTask).join('')||empty(8));
@@ -303,7 +329,7 @@ function renderDashboard(tickets,sum){
   dashBody.innerHTML=`<div class="card"><h3>Workflow Split</h3>${dashBars(split,'workflow')}</div><div class="card clickable" onclick="showDashboardList('score','Average Final Score')"><h3>Performance</h3><div class="stat"><div class="l">Average final score</div><div class="v">${avg}%</div></div><p class="muted">Click to show closed ticket score data.</p></div><div class="card"><h3>By Department</h3>${dashBars(byDept,'Department')}</div><div class="card"><h3>By Cost Center</h3>${dashBars(byCC,'CostCenter')}</div>`;
 }
 function dashBars(obj,type){const max=Math.max(1,...Object.values(obj).map(Number));return Object.keys(obj).map(k=>{let kind= type==='workflow'?({'Critical Tickets':'critical','Open & Ontime':'openOnTime','Executive1 Review':'review1','Executive2 Review':'review2','Open & Late':'openLate','Closed':'closed'}[k]||'all') : type+':'+k; let click=type.startsWith('perfGroup:')?`showPerformanceGroup('${esc(type.split(':')[1])}','${esc(k)}')`:`showDashboardList('${esc(kind)}','${esc(k)}')`; let cls=(k.includes('Critical')||k.includes('Late'))?'bad':(k.includes('Ontime')?'good':'');return `<div class="barrow clickable ${cls}" onclick="${click}"><div class="lbl">${esc(k)}</div><div class="track"><div class="fill" style="width:${Math.round(Number(obj[k])/max*100)}%"></div></div><div class="num">${obj[k]}${type.startsWith('perfGroup:')?'%':''}</div></div>`}).join('')||'<p class="muted">No data.</p>';}
-function showDashboardList(kind,title){let rows=[]; if(kind==='score') rows=(STATE.tickets||[]).filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); else if(kind.includes(':')){const [field,val]=kind.split(':'); rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===val);} else rows=filterTickets(kind); dashList.innerHTML=miniTicketTable(title,rows);}
+function showDashboardList(kind,title){let rows=[]; if(kind==='score') rows=currentTickets().filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); else if(kind.includes(':')){const [field,val]=kind.split(':'); rows=currentTickets().filter(t=>String(t[field]||'Unassigned')===val);} else rows=filterTickets(kind); dashList.innerHTML=miniTicketTable(title,rows);}
 function miniTicketTable(title,rows){return `<div class="panel"><h2>${esc(title)} Data</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Department</th><th>Cost Center</th><th>Status</th><th>Priority</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th></tr></thead><tbody>${rows.map(t=>`<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${esc(t.TicketID)}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${esc(t.Department)}</td><td>${esc(t.CostCenter)}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`).join('')||empty(11)}</tbody></table></div></div>`}
 function buildPerfOptions(){
   const mode=document.getElementById('perfMode')?.value||'individual';
@@ -321,23 +347,23 @@ function buildPerfOptions(){
   if(vals.includes(old) || old==='__ALL__') sel.value=old; else sel.value='__ALL__';
 }
 function avgScore(rows){return avgComputedFinal(rows);}
-function groupPerformanceRows(field, sourceValues){const tickets=STATE.tickets||[]; const names=[...new Set([...(sourceValues||[]),...tickets.map(t=>t[field]||'Unassigned')].filter(Boolean))].sort();return names.map(name=>{const rows=tickets.filter(t=>String(t[field]||'Unassigned')===String(name));const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t));return {name,rows,total:rows.length,closed:closed.length,late:late.length,avg:avgScore(rows)};});}
+function groupPerformanceRows(field, sourceValues){const tickets=currentTickets(); const names=[...new Set([...(sourceValues||[]),...tickets.map(t=>t[field]||'Unassigned')].filter(Boolean))].sort();return names.map(name=>{const rows=tickets.filter(t=>String(t[field]||'Unassigned')===String(name));const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t));return {name,rows,total:rows.length,closed:closed.length,late:late.length,avg:avgScore(rows)};});}
 function avgField(rows, field){const vals=rows.map(t=>Number(t[field])).filter(n=>!isNaN(n));return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):'';}
 function performanceSummaryTable(title, groups, field){return `<div class="panel"><h2>${esc(title)}</h2><div class="scroll"><table><thead><tr><th>Name</th><th>Total Tickets</th><th>Closed</th><th>Open Late</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th><th>Action</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.name)}</td><td>${g.total}</td><td>${g.closed}</td><td>${g.late}</td><td>${score(avgField(g.rows,'SystemScore'))}</td><td>${score(avgField(g.rows,'Executive1Score'))}</td><td>${score(avgField(g.rows,'Executive2Score'))}</td><td>${finalScore(avgComputedFinal(g.rows))}</td><td><button class="btn" onclick="showPerformanceGroup('${esc(field)}','${esc(g.name)}')">Open Data</button></td></tr>`).join('')||empty(9)}</tbody></table></div></div>`;}
-function showPerformanceGroup(field,name){const rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(name));perfList.innerHTML=miniTicketTable('Performance Report - '+name, rows);}
+function showPerformanceGroup(field,name){const rows=currentTickets().filter(t=>String(t[field]||'Unassigned')===String(name));perfList.innerHTML=miniTicketTable('Performance Report - '+name, rows);}
 function renderPerformance(){const mode=document.getElementById('perfMode')?.value||'individual'; const val=document.getElementById('perfValue')?.value||''; const users=activeUsers(); const field=mode==='individual'?'AssignedToName':mode==='department'?'Department':'CostCenter'; if(!document.getElementById('perfBody'))return;
   if(mode==='department' || mode==='costcenter'){
     const sourceValues=users.map(u=>mode==='department'?(u.Department||'Unassigned'):(u.CostCenter||'Unassigned'));
     const groups=groupPerformanceRows(field, sourceValues);
     const selected=val && val!=='__ALL__'?groups.find(g=>String(g.name)===String(val)):null;
-    const allRows=selected?selected.rows:(STATE.tickets||[]);
-    const overall=selected?selected.avg:avgComputedFinal(STATE.tickets||[]);
+    const allRows=selected?selected.rows:currentTickets();
+    const overall=selected?selected.avg:avgComputedFinal(currentTickets());
     const chartObj={}; groups.forEach(g=>chartObj[g.name]=g.avg);
     perfBody.innerHTML=`<div class="card"><h3>${esc(selected?selected.name:(mode==='department'?'All Departments':'All Cost Centers'))}</h3><div class="stat"><div class="l">Average performance</div><div class="v">${overall}%</div></div><p class="muted">Scores are averaged from closed ticket final scores stored in the Scores tab.</p></div><div class="card"><h3>${esc(mode==='department'?'Department Scores':'Cost Center Scores')}</h3>${dashBars(chartObj,'perfGroup:'+field)}</div>`;
     perfList.innerHTML=performanceSummaryTable(mode==='department'?'All Department Scores':'All Cost Center Scores',groups,field)+(selected?miniTicketTable('Selected Data - '+selected.name, selected.rows):'');
     return;
   }
-  const rows=val==='__ALL__'?(STATE.tickets||[]):(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(val)); const title=val==='__ALL__'?'All Users':(val||'No Selection'); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); const sysAvg=avgField(rows,'SystemScore'); const e1Avg=avgField(rows,'Executive1Score'); const e2Avg=avgField(rows,'Executive2Score'); perfBody.innerHTML=`<div class="card"><h3>${esc(title)}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total visible tickets.</p></div><div class="card"><h3>Scores</h3><p><b>System:</b> ${score(sysAvg)} &nbsp; <b>Exec1:</b> ${score(e1Avg)} &nbsp; <b>Exec2:</b> ${score(e2Avg)} &nbsp; <b>Final:</b> ${finalScore(avg)}</p></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+title, rows);}
+  const rows=val==='__ALL__'?currentTickets():currentTickets().filter(t=>String(t[field]||'Unassigned')===String(val)); const title=val==='__ALL__'?'All Users':(val||'No Selection'); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); const sysAvg=avgField(rows,'SystemScore'); const e1Avg=avgField(rows,'Executive1Score'); const e2Avg=avgField(rows,'Executive2Score'); perfBody.innerHTML=`<div class="card"><h3>${esc(title)}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total visible tickets.</p></div><div class="card"><h3>Scores</h3><p><b>System:</b> ${score(sysAvg)} &nbsp; <b>Exec1:</b> ${score(e1Avg)} &nbsp; <b>Exec2:</b> ${score(e2Avg)} &nbsp; <b>Final:</b> ${finalScore(avg)}</p></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+title, rows);}
 function printPerformance(){document.querySelectorAll('.section').forEach(s=>s.classList.remove('printTarget'));document.getElementById('performance').classList.add('printTarget');window.print();}
 function empty(n){return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:28px">No tickets found.</td></tr>`}
 function lateText(t){if(Number(t.LateDays||0)>0)return Number(t.LateDays)+' day(s) late';return t.TimeRemainingText||'0 days late';}
