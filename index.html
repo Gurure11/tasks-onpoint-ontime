@@ -124,7 +124,7 @@
 
 <script>
 // Replace this with your deployed Apps Script Web App URL.
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbMamtGFcoSEVaxzwYfd8JuHgKbCTRmcklOetER8oXJH6u9C65ma6j1JuEspC9vu4P/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzh_fjTLhfuMg44BXDKr3lMSFLKBmYPgeRQF9-5imnz3AWnTUjou46YYQQxA6cUmwzE/exec';
 let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
 let STATE = {tickets:[], users:[], referenceData:[], summary:{}};
 let CURRENT_FILTER = 'all';
@@ -148,61 +148,14 @@ function api(action, data={}){
     document.body.appendChild(s);
   });
 }
-
-async function postApi(action, data={}){
-  if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) throw new Error('Replace SCRIPT_URL with your Apps Script Web App URL.');
-  if(!/\/exec(\?|$)/.test(SCRIPT_URL)) throw new Error('SCRIPT_URL must be the deployed Apps Script Web App /exec URL, not /dev and not a Google Docs/Sheets URL.');
-  showSync('Synchronising '+action+'...');
-  try{
-    const payload = JSON.stringify({...data, action});
-    const res = await fetch(SCRIPT_URL + (SCRIPT_URL.includes('?')?'&':'?') + 'ts=' + Date.now(), {
-      method: 'POST',
-      headers: {'Content-Type':'text/plain;charset=utf-8'},
-      body: payload,
-      redirect: 'follow'
-    });
-    const txt = await res.text();
-    let json;
-    try{ json = JSON.parse(txt); }
-    catch(parseErr){
-      const preview = String(txt||'').slice(0,220);
-      if(/^\s*<!DOCTYPE html|^\s*<html/i.test(preview)){
-        throw new Error('Upload response was HTML, not JSON. This means the deployed Web App URL is wrong/old or the deployment access is not Anyone with the link. In Apps Script use Deploy > Manage deployments > Edit > New version > Execute as Me > Anyone with the link, then copy the new /exec URL into SCRIPT_URL. Response: '+preview);
-      }
-      throw new Error('Upload response was not valid JSON. Response: '+preview);
-    }
-    if(!json.ok) throw new Error(json.error || 'Upload failed.');
-    markSynced();
-    return json.data;
-  }catch(err){
-    throw new Error(err.message || 'Upload failed. Check Apps Script deployment permissions and Drive folder access.');
-  }finally{
-    hideSync();
-  }
-}
-
 function initDates(){const d=new Date(); const iso=d.toISOString().slice(0,10); ['ntIssue','ntDue','rtStart'].forEach(id=>{const el=document.getElementById(id); if(el) el.value=iso;});}
-function login(){document.getElementById('loginErr').textContent='Synchronising login...';postApi('login',{username:loginUser.value.trim(),password:loginPass.value.trim()}).then(u=>{USER=u;localStorage.setItem('ob_user',JSON.stringify(u));start();alert('Login successful.');}).catch(e=>loginErr.textContent=e.message);}
-function setupNow(){document.getElementById('loginErr').textContent='Repairing sheets...';postApi('setup',{}).then(()=>{loginErr.textContent='Sheets repaired. Try login again. Your Users tab headings now match: UserID, Name, Email, Phone, WhatsApp, Username, Password, Role, Department, IsActive, CreatedAt, LastLogin, Cost Center. Try login again. If Users tab was empty use admin / admin123.';}).catch(e=>loginErr.textContent=e.message);}
+function login(){document.getElementById('loginErr').textContent='Synchronising login...';api('login',{username:loginUser.value.trim(),password:loginPass.value.trim()}).then(u=>{USER=u;localStorage.setItem('ob_user',JSON.stringify(u));start();alert('Login successful.');}).catch(e=>loginErr.textContent=e.message);}
+function setupNow(){document.getElementById('loginErr').textContent='Repairing sheets...';api('setup',{}).then(()=>{loginErr.textContent='Sheets repaired. Try login again. Your Users tab headings now match: UserID, Name, Email, Phone, WhatsApp, Username, Password, Role, Department, IsActive, CreatedAt, LastLogin, Cost Center. Try login again. If Users tab was empty use admin / admin123.';}).catch(e=>loginErr.textContent=e.message);}
 function logout(){showSync('Synchronising logout...');localStorage.removeItem('ob_user');alert('Logout successful.');location.reload();}
 function start(){document.getElementById('login').classList.add('hide');document.getElementById('app').classList.remove('hide');userPill.textContent=USER.Name+' · '+USER.Role;initDates();applyRoleVisibility();refresh();}
-function refresh(){postApi('bootstrap',{userId:USER.UserID}).then(data=>{STATE=data;fillLists();applyRoleVisibility();render();}).catch(alertErr);}
-function loadTicketsView(view, max){
-  if(!USER) return;
-  postApi('getTicketsByView',{userId:USER.UserID,view:view||'all',max:max||300}).then(data=>{
-    STATE.tickets=data.tickets||[];
-    STATE.summary=data.summary||STATE.summary||{};
-    render();
-  }).catch(alertErr);
-}
+function refresh(){api('bootstrap',{userId:USER.UserID}).then(data=>{STATE=data;fillLists();applyRoleVisibility();render();}).catch(alertErr);}
 function alertErr(e){alert(e.message||e);}
-function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
-  if(id==='review1') loadTicketsView('review1',300);
-  else if(id==='review2') loadTicketsView('review2',300);
-  else if(id==='closed') loadTicketsView('closed',300);
-  else if(id==='task') loadTicketsView('task',300);
-  else if(id==='performance') loadTicketsView('all',500);
-}
+function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);}
 function modeChange(){const rec=document.querySelector('[name=mode]:checked').value==='recurring';document.querySelectorAll('.recOnly').forEach(e=>e.classList.toggle('hide',!rec));document.querySelectorAll('.singleOnly').forEach(e=>e.classList.toggle('hide',rec));}
 function activeUsers(){return (STATE.users||[]).filter(u=>String(u.IsActive).toUpperCase()!=='FALSE');}
 function selectedAssignee(){return activeUsers().find(u=>String(u.UserID)===String(ntAssignee.value))||{};}
@@ -217,7 +170,7 @@ function assigneeChanged(){
   ntAssigneePhone.value=u.Phone||'';
   ntAssigneeWhatsApp.value=u.WhatsApp||'';
   ntDept.value=u.Department||'';
-  ntCostCenter.value=u.CostCenter||u['Cost Center']||'';
+  ntCostCenter.value=u.CostCenter||'';
   buildNewTaskWhatsAppCopy();
 }
 ['ntTitle','ntDesc','ntPriority','ntIssue','ntDue','rtStart','rtFreq','rtDueDays','rtOcc'].forEach(id=>setTimeout(()=>{const el=document.getElementById(id); if(el){el.addEventListener('input',buildNewTaskWhatsAppCopy);el.addEventListener('change',buildNewTaskWhatsAppCopy);}},0));
@@ -245,14 +198,6 @@ function isReviewAllowed(kind){
   if(kind==='review2') return r==='executive2'||r==='exec2';
   return true;
 }
-function normKey(v){return String(v||'').trim().toLowerCase();}
-function ticketMatchesLoggedUser(t,mode){
-  const keys=[USER?.UserID,USER?.Name,USER?.Email,USER?.Username].map(normKey).filter(Boolean);
-  const assigned=[t.AssignedToUserID,t.AssignedToName,t.AssignedToEmail,t.AssignedToUsername].map(normKey);
-  const created=[t.CreatedByUserID,t.CreatedByName,t.CreatedByEmail,t.CreatedByUsername].map(normKey);
-  const pool=mode==='created'?created:assigned;
-  return keys.some(k=>pool.includes(k));
-}
 function applyRoleVisibility(){
   const showReview=isExecutiveUser();
   document.querySelectorAll('.reviewOnly').forEach(el=>el.classList.toggle('hide',!showReview));
@@ -261,21 +206,21 @@ function applyRoleVisibility(){
 function myTickets(){
   const tickets=STATE.tickets||[];
   if(isExecutiveUser()){
-    return tickets.filter(t=>ticketMatchesLoggedUser(t,'created') && !ticketMatchesLoggedUser(t,'assigned') && t.Status!=='Closed');
+    return tickets.filter(t=>String(t.CreatedByUserID)===String(USER.UserID) && String(t.AssignedToUserID)!==String(USER.UserID) && t.Status!=='Closed');
   }
-  return tickets.filter(t=>ticketMatchesLoggedUser(t,'assigned') && t.Status!=='Closed');
+  return tickets.filter(t=>String(t.AssignedToUserID)===String(USER.UserID) && t.Status!=='Closed');
 }
 function isLate(t){return String(t.TimeRemainingText||'').toLowerCase().includes('late') || String(t.ClosedTiming||'').toLowerCase().includes('late');}
 function isOpenOnTime(t){return t.Status!=='Closed' && !isLate(t) && (t.CurrentBasket==='Assignee'||t.Status==='Open');}
 function filterTickets(kind){
   const tickets=STATE.tickets||[];
-  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && t.Status!=='Closed' && (isExecutiveUser() || ticketMatchesLoggedUser(t,'assigned')));
-  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || ticketMatchesLoggedUser(t,'assigned')));
-  if(kind==='openLate') return tickets.filter(t=>t.Status!=='Closed' && isLate(t) && (isExecutiveUser() || ticketMatchesLoggedUser(t,'assigned')));
+  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && t.Status!=='Closed' && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
+  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
+  if(kind==='openLate') return tickets.filter(t=>t.Status!=='Closed' && isLate(t) && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
   if(kind==='review1') return isReviewAllowed('review1') ? tickets.filter(t=>t.CurrentBasket==='Executive1') : [];
-  if(kind==='review2') return isReviewAllowed('review2') ? tickets.filter(t=>t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2') : [];
+  if(kind==='review2') return isReviewAllowed('review2') ? tickets.filter(t=>t.CurrentBasket==='Executive2') : [];
   if(kind==='closed') return tickets.filter(t=>t.Status==='Closed' || t.CurrentBasket==='Closed');
-  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && t.Status!=='Closed' && (isExecutiveUser() || ticketMatchesLoggedUser(t,'assigned')));
+  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && t.Status!=='Closed' && (isExecutiveUser() || String(t.AssignedToUserID)===String(USER.UserID)));
   return myTickets();
 }
 function openTicketWindow(kind){
@@ -285,30 +230,28 @@ function openTicketWindow(kind){
   else if(kind==='review2') showTab('review2');
   else if(kind==='closed') showTab('closed');
   else showTab('task');
-  loadTicketsView(kind==='all'?'task':kind,300);
+  render();
   const el=document.getElementById('taskRows'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});const srv=STATE.summary||{}; if(srv.critical!==undefined)sum.critical=srv.critical; if(srv.openOnTime!==undefined)sum.openOnTime=srv.openOnTime; if(srv.review1!==undefined)sum.e1=srv.review1; if(srv.review2!==undefined)sum.e2=srv.review2; if(srv.closed!==undefined)sum.closed=srv.closed; if(srv.late!==undefined)sum.late=srv.late;
+function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});
   if(document.getElementById('stCritical'))stCritical.textContent=sum.critical; if(document.getElementById('stOpenOnTime'))stOpenOnTime.textContent=sum.openOnTime; stE1.textContent=sum.e1;stE2.textContent=sum.e2;stClosed.textContent=sum.closed;stLate.textContent=sum.late; renderDashboard(tickets,sum); buildPerfOptions(); renderPerformance();
   const filtered=filterTickets(CURRENT_FILTER).filter(t=>(t.Title+t.TicketID+t.AssignedToName+t.Department+t.CostCenter).toLowerCase().includes(s));
   taskRows.innerHTML=(`<tr><td colspan="8" class="filterTitle">Showing: ${esc(filterLabel(CURRENT_FILTER))}</td></tr>`)+ (filtered.map(rowTask).join('')||empty(8));
   review1Rows.innerHTML=isReviewAllowed('review1')?(tickets.filter(t=>t.CurrentBasket==='Executive1').map(rowReview1).join('')||empty(6)):empty(6);
-  review2Rows.innerHTML=isReviewAllowed('review2')?(tickets.filter(t=>t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2').map(rowReview2).join('')||empty(6)):empty(6);
+  review2Rows.innerHTML=isReviewAllowed('review2')?(tickets.filter(t=>t.CurrentBasket==='Executive2').map(rowReview2).join('')||empty(6)):empty(6);
   closedRows.innerHTML=tickets.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(rowClosed).join('')||empty(8);
 }
 function filterLabel(k){return ({critical:'Critical Tickets',openOnTime:'Open & Ontime Tickets',openLate:'Open and Late Tickets',review1:'Executive1 Review Basket',review2:'Executive2 Review Basket',closed:'Closed Tickets',assigned:'Assigned Tickets',all:isExecutiveUser()?'Tickets I Assigned':'My Assigned Tickets'})[k]||k;}
-function computedFinalNumber(t){const stored=Number(t.FinalScore);if(!(t.FinalScore===''||t.FinalScore==null||isNaN(stored)))return stored;const sys=Number(t.SystemScore),e1=Number(t.Executive1Score),e2=Number(t.Executive2Score);if([sys,e1,e2].some(n=>isNaN(n)))return null;return Math.round(((e1/100)+(e2/100))*sys);}
-function avgComputedFinal(rows){const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(computedFinalNumber).filter(n=>n!==null&&!isNaN(n));return closed.length?Math.round(closed.reduce((a,b)=>a+b,0)/closed.length):0;}
 function renderDashboard(tickets,sum){
   const byDept={}; const byCC={}; let totalScore=0, scoreCount=0;
-  tickets.forEach(t=>{byDept[t.Department||'Unassigned']=(byDept[t.Department||'Unassigned']||0)+1;byCC[t.CostCenter||'Unassigned']=(byCC[t.CostCenter||'Unassigned']||0)+1;const cf=computedFinalNumber(t);if((t.Status==='Closed'||t.CurrentBasket==='Closed')&&cf!==null){totalScore+=cf;scoreCount++;}});
+  tickets.forEach(t=>{byDept[t.Department||'Unassigned']=(byDept[t.Department||'Unassigned']||0)+1;byCC[t.CostCenter||'Unassigned']=(byCC[t.CostCenter||'Unassigned']||0)+1;if(t.FinalScore!==''&&t.FinalScore!=null){totalScore+=Number(t.FinalScore);scoreCount++;}});
   const avg=scoreCount?Math.round(totalScore/scoreCount):0;
   const split={'Critical Tickets':sum.critical,'Open & Ontime':sum.openOnTime,'Executive1 Review':sum.e1,'Executive2 Review':sum.e2,'Open & Late':sum.late,'Closed':sum.closed};
   dashBody.innerHTML=`<div class="card"><h3>Workflow Split</h3>${dashBars(split,'workflow')}</div><div class="card clickable" onclick="showDashboardList('score','Average Final Score')"><h3>Performance</h3><div class="stat"><div class="l">Average final score</div><div class="v">${avg}%</div></div><p class="muted">Click to show closed ticket score data.</p></div><div class="card"><h3>By Department</h3>${dashBars(byDept,'Department')}</div><div class="card"><h3>By Cost Center</h3>${dashBars(byCC,'CostCenter')}</div>`;
 }
 function dashBars(obj,type){const max=Math.max(1,...Object.values(obj).map(Number));return Object.keys(obj).map(k=>{let kind= type==='workflow'?({'Critical Tickets':'critical','Open & Ontime':'openOnTime','Executive1 Review':'review1','Executive2 Review':'review2','Open & Late':'openLate','Closed':'closed'}[k]||'all') : type+':'+k; let click=type.startsWith('perfGroup:')?`showPerformanceGroup('${esc(type.split(':')[1])}','${esc(k)}')`:`showDashboardList('${esc(kind)}','${esc(k)}')`; let cls=(k.includes('Critical')||k.includes('Late'))?'bad':(k.includes('Ontime')?'good':'');return `<div class="barrow clickable ${cls}" onclick="${click}"><div class="lbl">${esc(k)}</div><div class="track"><div class="fill" style="width:${Math.round(Number(obj[k])/max*100)}%"></div></div><div class="num">${obj[k]}${type.startsWith('perfGroup:')?'%':''}</div></div>`}).join('')||'<p class="muted">No data.</p>';}
 function showDashboardList(kind,title){let rows=[]; if(kind==='score') rows=(STATE.tickets||[]).filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); else if(kind.includes(':')){const [field,val]=kind.split(':'); rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===val);} else rows=filterTickets(kind); dashList.innerHTML=miniTicketTable(title,rows);}
-function miniTicketTable(title,rows){return `<div class="panel"><h2>${esc(title)} Data</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Department</th><th>Cost Center</th><th>Status</th><th>Priority</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th></tr></thead><tbody>${rows.map(t=>`<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${esc(t.TicketID)}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${esc(t.Department)}</td><td>${esc(t.CostCenter)}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`).join('')||empty(11)}</tbody></table></div></div>`}
+function miniTicketTable(title,rows){return `<div class="panel"><h2>${esc(title)} Data</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Department</th><th>Cost Center</th><th>Status</th><th>Priority</th><th>Score</th></tr></thead><tbody>${rows.map(t=>`<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${esc(t.TicketID)}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${esc(t.Department)}</td><td>${esc(t.CostCenter)}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td>${t.FinalScore!==''&&t.FinalScore!=null?finalScore(t.FinalScore):score(t.SystemScore)}</td></tr>`).join('')||empty(8)}</tbody></table></div></div>`}
 function buildPerfOptions(){
   const mode=document.getElementById('perfMode')?.value||'individual';
   const sel=document.getElementById('perfValue'); if(!sel)return;
@@ -319,15 +262,13 @@ function buildPerfOptions(){
   if(mode==='costcenter') vals=users.map(u=>u.CostCenter||'Unassigned').filter(Boolean);
   vals=[...new Set(vals)].sort();
   const old=sel.value;
-  if(mode==='individual') sel.innerHTML='<option value="__ALL__">All Users</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
-  else if(mode==='department' || mode==='costcenter') sel.innerHTML='<option value="__ALL__">All '+(mode==='department'?'Departments':'Cost Centers')+'</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  if(mode==='department' || mode==='costcenter') sel.innerHTML='<option value="__ALL__">All '+(mode==='department'?'Departments':'Cost Centers')+'</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
   else sel.innerHTML=vals.map(v=>`<option>${esc(v)}</option>`).join('');
-  if(vals.includes(old) || old==='__ALL__') sel.value=old; else sel.value='__ALL__';
+  if(vals.includes(old) || old==='__ALL__') sel.value=old; else if(mode==='department'||mode==='costcenter') sel.value='__ALL__';
 }
-function avgScore(rows){return avgComputedFinal(rows);}
+function avgScore(rows){const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');return closed.length?Math.round(closed.reduce((a,t)=>a+Number(t.FinalScore||0),0)/closed.length):0;}
 function groupPerformanceRows(field, sourceValues){const tickets=STATE.tickets||[]; const names=[...new Set([...(sourceValues||[]),...tickets.map(t=>t[field]||'Unassigned')].filter(Boolean))].sort();return names.map(name=>{const rows=tickets.filter(t=>String(t[field]||'Unassigned')===String(name));const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t));return {name,rows,total:rows.length,closed:closed.length,late:late.length,avg:avgScore(rows)};});}
-function avgField(rows, field){const vals=rows.map(t=>Number(t[field])).filter(n=>!isNaN(n));return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):'';}
-function performanceSummaryTable(title, groups, field){return `<div class="panel"><h2>${esc(title)}</h2><div class="scroll"><table><thead><tr><th>Name</th><th>Total Tickets</th><th>Closed</th><th>Open Late</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th><th>Action</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.name)}</td><td>${g.total}</td><td>${g.closed}</td><td>${g.late}</td><td>${score(avgField(g.rows,'SystemScore'))}</td><td>${score(avgField(g.rows,'Executive1Score'))}</td><td>${score(avgField(g.rows,'Executive2Score'))}</td><td>${finalScore(avgComputedFinal(g.rows))}</td><td><button class="btn" onclick="showPerformanceGroup('${esc(field)}','${esc(g.name)}')">Open Data</button></td></tr>`).join('')||empty(9)}</tbody></table></div></div>`;}
+function performanceSummaryTable(title, groups, field){return `<div class="panel"><h2>${esc(title)}</h2><div class="scroll"><table><thead><tr><th>Name</th><th>Total Tickets</th><th>Closed</th><th>Open Late</th><th>Average Score</th><th>Action</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.name)}</td><td>${g.total}</td><td>${g.closed}</td><td>${g.late}</td><td><b>${g.avg}%</b></td><td><button class="btn" onclick="showPerformanceGroup('${esc(field)}','${esc(g.name)}')">Open Data</button></td></tr>`).join('')||empty(6)}</tbody></table></div></div>`;}
 function showPerformanceGroup(field,name){const rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(name));perfList.innerHTML=miniTicketTable('Performance Report - '+name, rows);}
 function renderPerformance(){const mode=document.getElementById('perfMode')?.value||'individual'; const val=document.getElementById('perfValue')?.value||''; const users=activeUsers(); const field=mode==='individual'?'AssignedToName':mode==='department'?'Department':'CostCenter'; if(!document.getElementById('perfBody'))return;
   if(mode==='department' || mode==='costcenter'){
@@ -335,40 +276,37 @@ function renderPerformance(){const mode=document.getElementById('perfMode')?.val
     const groups=groupPerformanceRows(field, sourceValues);
     const selected=val && val!=='__ALL__'?groups.find(g=>String(g.name)===String(val)):null;
     const allRows=selected?selected.rows:(STATE.tickets||[]);
-    const overall=selected?selected.avg:avgComputedFinal(STATE.tickets||[]);
+    const overall=selected?selected.avg:(groups.length?Math.round(groups.reduce((a,g)=>a+g.avg,0)/groups.length):0);
     const chartObj={}; groups.forEach(g=>chartObj[g.name]=g.avg);
-    perfBody.innerHTML=`<div class="card"><h3>${esc(selected?selected.name:(mode==='department'?'All Departments':'All Cost Centers'))}</h3><div class="stat"><div class="l">Average performance</div><div class="v">${overall}%</div></div><p class="muted">Scores are averaged from closed ticket final scores stored in the Scores tab.</p></div><div class="card"><h3>${esc(mode==='department'?'Department Scores':'Cost Center Scores')}</h3>${dashBars(chartObj,'perfGroup:'+field)}</div>`;
+    perfBody.innerHTML=`<div class="card"><h3>${esc(selected?selected.name:(mode==='department'?'All Departments':'All Cost Centers'))}</h3><div class="stat"><div class="l">Average performance</div><div class="v">${overall}%</div></div><p class="muted">Scores are averaged from closed tickets with final scores.</p></div><div class="card"><h3>${esc(mode==='department'?'Department Scores':'Cost Center Scores')}</h3>${dashBars(chartObj,'perfGroup:'+field)}</div>`;
     perfList.innerHTML=performanceSummaryTable(mode==='department'?'All Department Scores':'All Cost Center Scores',groups,field)+(selected?miniTicketTable('Selected Data - '+selected.name, selected.rows):'');
     return;
   }
-  const rows=val==='__ALL__'?(STATE.tickets||[]):(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(val)); const title=val==='__ALL__'?'All Users':(val||'No Selection'); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); const sysAvg=avgField(rows,'SystemScore'); const e1Avg=avgField(rows,'Executive1Score'); const e2Avg=avgField(rows,'Executive2Score'); perfBody.innerHTML=`<div class="card"><h3>${esc(title)}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total visible tickets.</p></div><div class="card"><h3>Scores</h3><p><b>System:</b> ${score(sysAvg)} &nbsp; <b>Exec1:</b> ${score(e1Avg)} &nbsp; <b>Exec2:</b> ${score(e2Avg)} &nbsp; <b>Final:</b> ${finalScore(avg)}</p></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+title, rows);}
+  const rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(val)); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); perfBody.innerHTML=`<div class="card"><h3>${esc(val||'No Selection')}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total visible tickets.</p></div><div class="card"><h3>Score</h3><div class="stat"><div class="l">Average final score</div><div class="v">${avg}%</div></div></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+val, rows);}
 function printPerformance(){document.querySelectorAll('.section').forEach(s=>s.classList.remove('printTarget'));document.getElementById('performance').classList.add('printTarget');window.print();}
 function empty(n){return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:28px">No tickets found.</td></tr>`}
 function lateText(t){if(Number(t.LateDays||0)>0)return Number(t.LateDays)+' day(s) late';return t.TimeRemainingText||'0 days late';}
 function rowTask(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${fmt(t.DueDate)}</td><td>${esc(lateText(t))}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td><button class="btn good" onclick="openTicket('${t.TicketID}')">Open</button></td></tr>`}
 function rowReview1(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.SubmittedAt)}</td><td>${score(t.SystemScore)}</td><td>${esc(t.AssignedToName)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
 function rowReview2(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${esc(t.TimeRemainingText)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
-function rowClosed(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.ClosedAt)}</td><td>${esc(t.ClosedTiming)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`}
-function status(t){const cls=t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2'?'s-review':String(t.TimeRemainingText).includes('late')?'s-late':'s-open';return `<span class="status ${cls}">${esc(t.Status)}</span>`}
-function score(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`${Math.round(n)}%`}
-function finalScoreClass(v){const n=Number(v); if(isNaN(n))return ''; if(n<50)return 'score-final-red'; if(n>=90)return 'score-final-black'; if(n>=75)return 'score-final-blue'; return 'score-final-green';}
-function finalScore(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`<span class="${finalScoreClass(n)}">${Math.round(n)}%</span>`}
+function rowClosed(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.ClosedAt)}</td><td>${esc(t.ClosedTiming)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(t.FinalScore)}</td></tr>`}
+function status(t){const cls=t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'?'s-review':String(t.TimeRemainingText).includes('late')?'s-late':'s-open';return `<span class="status ${cls}">${esc(t.Status)}</span>`}
+function score(v){return (v===''||v==null)?'—':`${Math.round(Number(v))}%`}
+function finalScoreClass(v){const n=Number(v||0); if(n<50)return 'score-final-red'; if(n>=90)return 'score-final-black'; if(n>=75)return 'score-final-blue'; return 'score-final-green';}
+function finalScore(v){return (v===''||v==null)?'—':`<span class="${finalScoreClass(v)}">${Math.round(Number(v))}%</span>`}
 function linkListFromUploadAttachment(v){return String(v||'').split(/\s+/).filter(x=>/^https?:\/\//i.test(x)).map((url,i)=>`<div class="fileline"><a target="_blank" href="${esc(url)}">Ticket upload link ${i+1}</a></div>`).join('');}
 function fmt(v){return v?String(v).replace('T',' ').slice(0,16):'—'}
 function esc(v){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-function createTicket(){newErr.textContent='';newMsg.textContent='';const mode=document.querySelector('[name=mode]:checked').value;const base={userId:USER.UserID,assignedToUserId:ntAssignee.value,title:ntTitle.value,description:ntDesc.value,priority:ntPriority.value,department:ntDept.value,costCenter:(selectedAssignee().CostCenter||selectedAssignee()['Cost Center']||ntCostCenter.value)};const action=mode==='recurring'?'createRecurringTicket':'createTicket';const data=mode==='recurring'?{...base,startDate:rtStart.value,frequency:rtFreq.value,dueDays:rtDueDays.value,occurrences:rtOcc.value}:{...base,issueDate:ntIssue.value,dueDate:ntDue.value};postApi(action,data).then((res)=>{const first=(res.ticket||((res.tickets||[])[0])||{}); const msg=buildNewTaskWhatsAppCopy(first.TicketID); newMsg.textContent=' Ticket created. WhatsApp message copied/opened for assignee.'; copyText(msg); const u=selectedAssignee(); const phone=cleanPhone(u.WhatsApp||u.Phone); if(phone) window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank'); ntTitle.value='';ntDesc.value='';refresh();}).catch(e=>newErr.textContent=e.message);}
+function createTicket(){newErr.textContent='';newMsg.textContent='';const mode=document.querySelector('[name=mode]:checked').value;const base={userId:USER.UserID,assignedToUserId:ntAssignee.value,title:ntTitle.value,description:ntDesc.value,priority:ntPriority.value,department:ntDept.value,costCenter:ntCostCenter.value};const action=mode==='recurring'?'createRecurringTicket':'createTicket';const data=mode==='recurring'?{...base,startDate:rtStart.value,frequency:rtFreq.value,dueDays:rtDueDays.value,occurrences:rtOcc.value}:{...base,issueDate:ntIssue.value,dueDate:ntDue.value};api(action,data).then((res)=>{const first=(res.ticket||((res.tickets||[])[0])||{}); const msg=buildNewTaskWhatsAppCopy(first.TicketID); newMsg.textContent=' Ticket created. WhatsApp message copied/opened for assignee.'; copyText(msg); const u=selectedAssignee(); const phone=cleanPhone(u.WhatsApp||u.Phone); if(phone) window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank'); ntTitle.value='';ntDesc.value='';refresh();}).catch(e=>newErr.textContent=e.message);}
 
 let DETAIL=null;
-function openTicket(id){postApi('getTicketDetail',{userId:USER.UserID,ticketId:id}).then(d=>{DETAIL=d;drawDrawer();drawer.classList.add('open');scrim.classList.add('open');}).catch(alertErr);}
+function openTicket(id){api('getTicketDetail',{userId:USER.UserID,ticketId:id}).then(d=>{DETAIL=d;drawDrawer();drawer.classList.add('open');scrim.classList.add('open');}).catch(alertErr);}
 function closeDrawer(){drawer.classList.remove('open');scrim.classList.remove('open');}
-function drawDrawer(){const t=DETAIL.ticket;dRef.textContent=t.TicketID;dStatus.outerHTML=`<span id="dStatus" class="status ${t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2'?'s-review':'s-open'}">${esc(t.Status)}</span>`;dBody.innerHTML=`<h2>${esc(t.Title)}</h2><p class="muted">${esc(t.Description||'No description')}</p><div class="kv"><div><small>Created by</small><b>${esc(t.CreatedByName)}</b></div><div><small>Assigned to</small><b>${esc(t.AssignedToName)}</b></div><div><small>Assignee Email</small><b>${esc(t.AssignedToEmail||'')}</b></div><div><small>Assignee WhatsApp</small><b>${esc(t.AssignedToWhatsApp||'')}</b></div><div><small>Department</small><b>${esc(t.Department||'')}</b></div><div><small>Cost Center</small><b>${esc(t.CostCenter||'')}</b></div><div><small>Due Date</small><b>${fmt(t.DueDate)}</b></div><div><small>Submission Date</small><b>${fmt(t.SubmittedAt)}</b></div><div><small>Time lapse</small><b>${esc(t.TimeRemainingText)}</b></div><div><small>System Score</small><b>${score(t.SystemScore)}</b></div><div><small>Final Score</small><b>${finalScore(computedFinalNumber(t))}</b></div><div><small>Executive1</small><b>${score(t.Executive1Score)} ${esc(t.Executive1Name||'')}</b></div><div><small>Executive2</small><b>${score(t.Executive2Score)} ${esc(t.Executive2Name||'')}</b></div></div><div class="copybar"><button class="btn" onclick="copyTicketWhatsApp()">Copy Task to WhatsApp</button><button class="btn good" onclick="openTicketWhatsApp()">Open WhatsApp to Assignee</button></div><h3>Attachments</h3>${(DETAIL.attachments.map(a=>`<div class="fileline"><a target="_blank" href="${a.DriveUrl}">${esc(a.FileName)}</a></div>`).join('') + linkListFromUploadAttachment(t.UploadAttachment)) || '<p class="muted">No attachments.</p>'}<div class="f"><label>Upload Attachment / File</label><input type="file" id="fileUp"><button class="btn" onclick="uploadFile()">Upload File</button></div><h3>Comments</h3><div class="comments">${DETAIL.comments.map(c=>`<div class="comment"><div class="meta">${esc(c.UserName)} · ${esc(c.Role)} · ${fmt(c.CreatedAt)}</div>${esc(c.Comment)}${c.DriveUrl?`<div class="fileline"><a target="_blank" href="${c.DriveUrl}">${esc(c.FileName||'View upload')}</a></div>`:''}</div>`).join('')||'<p class="muted">No comments.</p>'}</div><div class="f"><label>Add Comment</label><textarea id="commentTxt"></textarea><button class="btn" onclick="addComment()">Post Comment</button></div><h3>More Time Requests</h3><div class="comments">${(DETAIL.timeRequests||[]).map(r=>`<div class="comment"><div class="meta">${esc(r.RequestedByName)} · ${fmt(r.CreatedAt)} · ${esc(r.Status)}</div>Requested date: <b>${esc(r.RequestedDueDate)}</b><br>${esc(r.Reason||'')}</div>`).join('')||'<p class="muted">No time extension requests.</p>'}</div>`;drawActions(t);}
-function hasPendingTimeRequest(){return (DETAIL.timeRequests||[]).some(r=>String(r.Status||'').indexOf('Approved')<0 && String(r.Status||'').indexOf('Rejected')<0);}
-function drawActions(t){let html='';if(t.CurrentBasket==='Assignee'&&(ticketMatchesLoggedUser(t,'assigned')||ticketMatchesLoggedUser(t,'created')||isExecutiveUser()))html+=`<button class="btn primary" onclick="submitTicket()">Submit Ticket to Executive1</button><div class="scorebox"><label>Request more time</label><input id="moreTimeDate" type="date"><input id="moreTimeReason" placeholder="Reason for more time"><button class="btn" onclick="requestMoreTime()">Send Request</button></div>`;if(hasPendingTimeRequest()&&(ticketMatchesLoggedUser(t,'created')||isReviewAllowed('review1')))html+=`<button class="btn good" onclick="approveMoreTime()">Approve More Time Request</button>`;if(t.CurrentBasket==='Executive1'&&isReviewAllowed('review1'))html+=`<div class="scorebox"><label>Executive1 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Approval / return comment"><button class="btn primary" onclick="approve1()">Approve to Executive2</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;if((t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')&&isReviewAllowed('review2'))html+=`<div class="scorebox"><span class="pill">System Score: ${score(t.SystemScore)}</span><label>Executive2 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Closing / return comment"><button class="btn primary" onclick="approve2()">Approve & Close</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;dActions.innerHTML=html||'<span class="muted">No action available for your role on this ticket.</span>';const rd=document.getElementById('returnDue');if(rd){const d=new Date();d.setDate(d.getDate()+1);rd.value=d.toISOString().slice(0,10);}const md=document.getElementById('moreTimeDate');if(md){const d=new Date();d.setDate(d.getDate()+2);md.value=d.toISOString().slice(0,10);}}
-function requestMoreTime(){const d=document.getElementById('moreTimeDate')?.value; if(!d)return alert('Select the new requested submission date.');postApi('requestMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,requestedDueDate:d,reason:document.getElementById('moreTimeReason')?.value||''}).then(()=>{alert('More time request sent to Executive1 and ticket creator for approval.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
-function approveMoreTime(){postApi('approveMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('More time approval captured. If both required approvals are complete, the new submission date has been applied.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
-function returnTicket(){const due=document.getElementById('returnDue')?.value; if(!due)return alert('Select a new due date before returning this ticket.');postApi('returnTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,newDueDate:due,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('Ticket returned and re-opened with a new due date.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
-function addComment(){postApi('addComment',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt.value}).then(()=>openTicket(DETAIL.ticket.TicketID)).catch(alertErr)}
+function drawDrawer(){const t=DETAIL.ticket;dRef.textContent=t.TicketID;dStatus.outerHTML=`<span id="dStatus" class="status ${t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'?'s-review':'s-open'}">${esc(t.Status)}</span>`;dBody.innerHTML=`<h2>${esc(t.Title)}</h2><p class="muted">${esc(t.Description||'No description')}</p><div class="kv"><div><small>Created by</small><b>${esc(t.CreatedByName)}</b></div><div><small>Assigned to</small><b>${esc(t.AssignedToName)}</b></div><div><small>Assignee Email</small><b>${esc(t.AssignedToEmail||'')}</b></div><div><small>Assignee WhatsApp</small><b>${esc(t.AssignedToWhatsApp||'')}</b></div><div><small>Department</small><b>${esc(t.Department||'')}</b></div><div><small>Cost Center</small><b>${esc(t.CostCenter||'')}</b></div><div><small>Due Date</small><b>${fmt(t.DueDate)}</b></div><div><small>Submission Date</small><b>${fmt(t.SubmittedAt)}</b></div><div><small>Time lapse</small><b>${esc(t.TimeRemainingText)}</b></div><div><small>System Score</small><b>${score(t.SystemScore)}</b></div><div><small>Final Score</small><b>${finalScore(t.FinalScore)}</b></div><div><small>Executive1</small><b>${score(t.Executive1Score)} ${esc(t.Executive1Name||'')}</b></div><div><small>Executive2</small><b>${score(t.Executive2Score)} ${esc(t.Executive2Name||'')}</b></div></div><div class="copybar"><button class="btn" onclick="copyTicketWhatsApp()">Copy Task to WhatsApp</button><button class="btn good" onclick="openTicketWhatsApp()">Open WhatsApp to Assignee</button></div><h3>Attachments</h3>${(DETAIL.attachments.map(a=>`<div class="fileline"><a target="_blank" href="${a.DriveUrl}">${esc(a.FileName)}</a></div>`).join('') + linkListFromUploadAttachment(t.UploadAttachment)) || '<p class="muted">No attachments.</p>'}<div class="f"><label>Upload Attachment / File</label><input type="file" id="fileUp"><button class="btn" onclick="uploadFile()">Upload File</button></div><h3>Comments</h3><div class="comments">${DETAIL.comments.map(c=>`<div class="comment"><div class="meta">${esc(c.UserName)} · ${esc(c.Role)} · ${fmt(c.CreatedAt)}</div>${esc(c.Comment)}${c.DriveUrl?`<div class="fileline"><a target="_blank" href="${c.DriveUrl}">${esc(c.FileName||'View upload')}</a></div>`:''}</div>`).join('')||'<p class="muted">No comments.</p>'}</div><div class="f"><label>Add Comment</label><textarea id="commentTxt"></textarea><button class="btn" onclick="addComment()">Post Comment</button></div>`;drawActions(t);}
+function drawActions(t){let html='';if(t.CurrentBasket==='Assignee'&&(t.AssignedToUserID===USER.UserID||t.CreatedByUserID===USER.UserID||USER.Role==='Admin'))html+=`<button class="btn primary" onclick="submitTicket()">Submit Ticket to Executive1</button>`;if(t.CurrentBasket==='Executive1'&&(USER.Role==='Executive1'||USER.Role==='Admin'))html+=`<div class="scorebox"><label>Executive1 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Approval / return comment"><button class="btn primary" onclick="approve1()">Approve to Executive2</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;if(t.CurrentBasket==='Executive2'&&(USER.Role==='Executive2'||USER.Role==='Admin'))html+=`<div class="scorebox"><span class="pill">System Score: ${score(t.SystemScore)}</span><label>Executive2 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Closing / return comment"><button class="btn primary" onclick="approve2()">Approve & Close</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;dActions.innerHTML=html||'<span class="muted">No action available for your role on this ticket.</span>';const rd=document.getElementById('returnDue');if(rd){const d=new Date();d.setDate(d.getDate()+1);rd.value=d.toISOString().slice(0,10);}}
+function returnTicket(){const due=document.getElementById('returnDue')?.value; if(!due)return alert('Select a new due date before returning this ticket.');api('returnTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,newDueDate:due,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('Ticket returned and re-opened with a new due date.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function addComment(){api('addComment',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt.value}).then(()=>openTicket(DETAIL.ticket.TicketID)).catch(alertErr)}
 
 function readFileAsBase64(file){
   return new Promise((resolve,reject)=>{
@@ -379,49 +317,41 @@ function readFileAsBase64(file){
   });
 }
 async function uploadFileChunked(file, ticketId, comment){
-  // Attachments now use POST instead of JSONP. This avoids URL-length failures
-  // and is the recommended method for images, PDFs, Word/Excel files and other documents.
-  const maxBytes = 18 * 1024 * 1024;
-  if(file.size > maxBytes){
-    throw new Error('File is too large. Please upload a file smaller than 18MB, or compress/split it.');
-  }
   const base64 = await readFileAsBase64(file);
-  return postApi('uploadAttachmentPost', {
-    userId: USER.UserID,
-    ticketId: ticketId,
-    fileName: file.name,
-    mimeType: file.type || 'application/octet-stream',
-    base64: base64,
-    comment: comment || ''
-  });
+  // Small chunks prevent Apps Script JSONP URL failures on documents/images.
+  // Larger chunks often trigger browser/proxy URL-length errors before Apps Script receives them.
+  const chunkSize = 6000;
+  const totalChunks = Math.ceil(base64.length / chunkSize);
+  showSync('Starting upload: '+file.name+'...');
+  const init = await api('initAttachmentUpload',{userId:USER.UserID,ticketId,fileName:file.name,mimeType:file.type || 'application/octet-stream',totalChunks,comment:comment||''});
+  for(let i=0;i<totalChunks;i++){
+    const chunk = base64.slice(i*chunkSize,(i+1)*chunkSize);
+    showSync('Uploading '+file.name+' chunk '+(i+1)+' of '+totalChunks+'...');
+    await api('uploadAttachmentChunk',{uploadId:init.uploadId,index:i,chunk});
+  }
+  showSync('Finishing upload and writing Drive links...');
+  return api('finishAttachmentUpload',{uploadId:init.uploadId,totalChunks});
 }
 
-async function submitTicket(){
+function submitTicket(){
   const f=document.getElementById('fileUp')?.files?.[0];
-  try{
-    if(f) await uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'');
-    await postApi('submitTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt?.value||''});
-    alert('Ticket submitted to Executive1 successfully. Clock stopped, system score captured, and attachment link posted where applicable.');
-    refresh();
-    openTicket(DETAIL.ticket.TicketID);
-  }catch(e){alertErr(e);}
+  api('submitTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt?.value||''})
+    .then(async ()=>{
+      if(f) await uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'');
+      alert('Ticket submitted to Executive1 successfully. Clock stopped, system score captured, and attachment link posted where applicable.');
+      refresh();
+      openTicket(DETAIL.ticket.TicketID);
+    })
+    .catch(alertErr);
 }
-function approve1(){postApi('executive1Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive1 approval successful. Ticket moved to Executive2.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
-function approve2(){postApi('executive2Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive2 approval successful. Ticket is permanently closed.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
-async function uploadFile(){
+function approve1(){api('executive1Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive1 approval successful. Ticket moved to Executive2.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function approve2(){api('executive2Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive2 approval successful. Ticket is permanently closed.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function uploadFile(){
   const f=fileUp.files[0];
   if(!f) return alert('Choose a file first.');
-  try{
-    await uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'');
-    if(DETAIL.ticket.CurrentBasket==='Assignee'){
-      await postApi('submitTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt?.value||'Uploaded attachment and submitted for Executive1 scoring.'});
-      alert('Attachment uploaded and ticket submitted to Executive1 for scoring.');
-    }else{
-      alert('Attachment uploaded successfully. The Drive link has been posted to Tickets.UploadAttachment and Updates.');
-    }
-    refresh();
-    openTicket(DETAIL.ticket.TicketID);
-  }catch(e){alertErr(e);}
+  uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'')
+    .then(()=>{alert('Attachment uploaded successfully. The Drive link has been posted to Tickets.UploadAttachment and Updates.');refresh();openTicket(DETAIL.ticket.TicketID);})
+    .catch(alertErr);
 }
 
 if(USER) start();
