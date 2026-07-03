@@ -1,1071 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Distinct Infrastructure · Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    :root {
-      --primary-blue: #0b2f6b;
-      --deep-blue: #071f47;
-      --bright-blue: #1464d2;
-      --soft-blue: #eaf3ff;
-      --gold: #d4af37;
-      --gold-light: #ffe7a3;
-      --gold-deep: #9a7416;
-      --white: #ffffff;
-      --text: #12304f;
-      --muted: #6b7a90;
-      --line: rgba(20,68,126,0.16);
-      --shadow: 0 20px 60px rgba(7,31,71,0.18);
-      --card-radius: 22px;
-      --transition: 0.2s ease;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
-    body {
-      min-height:100vh;
-      background: radial-gradient(circle at top left, rgba(212,175,55,0.32), transparent 30%),
-                  linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 45%, var(--bright-blue) 100%);
-      padding:24px;
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    body::before {
-      content:"";
-      position:fixed;
-      inset:-30%;
-      background:linear-gradient(120deg, transparent, rgba(255,255,255,0.12), transparent);
-      animation:shine 8s linear infinite;
-      pointer-events:none;
-    }
-    @keyframes shine {
-      0%{transform:translateX(-40%) rotate(10deg)}
-      100%{transform:translateX(40%) rotate(10deg)}
-    }
-    .container {
-      max-width:1400px;
-      margin:auto;
-      background:rgba(255,255,255,0.96);
-      padding:28px;
-      border-radius:26px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(255,255,255,0.5);
-      animation:pageIn 0.75s ease both;
-    }
-    @keyframes pageIn {
-      from{opacity:0; transform:translateY(18px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-    .header {
-      text-align:center;
-      margin-bottom:28px;
-      padding:28px 20px;
-      border-radius:22px;
-      background:linear-gradient(135deg, var(--primary-blue), var(--bright-blue));
-      color:white;
-      box-shadow:0 14px 35px rgba(11,47,107,0.28);
-      position:relative;
-      overflow:hidden;
-    }
-    .header::after {
-      content:"";
-      position:absolute;
-      width:180px;
-      height:180px;
-      border-radius:50%;
-      background:rgba(212,175,55,0.25);
-      right:-50px;
-      top:-70px;
-      animation:floatOrb 5s ease-in-out infinite alternate;
-    }
-    @keyframes floatOrb {
-      from{transform:translateY(0) scale(1)}
-      to{transform:translateY(22px) scale(1.08)}
-    }
-    .header h1 { color:white; margin-bottom:8px; font-size:clamp(26px, 4vw, 42px); letter-spacing:0.5px; }
-    .header p { color:#eef6ff; font-size:14px; line-height:1.5; position:relative; z-index:1; }
-    .header strong { color:var(--gold-light); }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Onpoint-base MIS Ticket Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F4F7;--card:#fff;--line:#E0E6ED;--ink:#17202B;--muted:#647184;--brand:#00A8F0;--brand2:#0B79B0;--soft:#E6F6FE;--good:#159766;--warn:#C6841A;--bad:#D14343;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:var(--sans);color:var(--ink)}button,input,select,textarea{font:inherit}.hide{display:none!important}.top{background:#fff;border-top:3px solid var(--brand);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.wrap{max-width:1240px;margin:auto;padding:0 20px}.top .wrap{height:64px;display:flex;align-items:center;gap:14px}.logo{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800}.brand h1{font-size:17px;margin:0}.brand p{font-size:12px;margin:2px 0 0;color:var(--muted)}.sp{flex:1}.pill{font-family:var(--mono);font-size:11px;border:1px solid #BFE6F8;background:var(--soft);color:var(--brand2);padding:5px 9px;border-radius:99px}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer}.btn:hover{border-color:var(--brand)}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.good{border-color:#BFE8D3;color:var(--good)}.btn.bad{border-color:#F2C6C6;color:var(--bad)}.hero{padding:22px 0}.grid{display:grid;gap:14px}.cards{grid-template-columns:repeat(6,1fr)}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px}.stat .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.stat .v{font-family:var(--mono);font-size:30px;font-weight:700;margin-top:6px}.tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin-top:8px}.tab{border:0;background:transparent;color:var(--muted);padding:13px 15px;cursor:pointer;border-bottom:3px solid transparent}.tab.on{color:var(--ink);border-bottom-color:var(--brand);font-weight:700}.section{display:none;padding:18px 0 50px}.section.on{display:block}.panel{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden}.panel h2{font-size:15px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line)}table{width:100%;border-collapse:collapse;font-size:13px}th{font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--muted);text-align:left;background:#F8FAFC;padding:11px;border-bottom:1px solid var(--line)}td{padding:11px;border-bottom:1px solid var(--line);color:#334155}tr:hover td{background:#FAFCFF}.status{font-family:var(--mono);font-size:10px;border-radius:5px;padding:3px 7px;text-transform:uppercase}.s-open{background:#EEF2F6;color:#475569}.s-review{background:var(--soft);color:var(--brand2)}.s-closed{background:#E7F7EE;color:var(--good)}.s-late{background:#FDECEC;color:var(--bad)}.priority-Critical{color:var(--bad);font-weight:700}.priority-High{color:var(--warn);font-weight:700}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.loginbox{width:420px;max-width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 18px 50px rgba(15,25,45,.08)}.loginbox h1{margin:0 0 6px;font-size:22px}.loginbox p{margin:0 0 20px;color:var(--muted);font-size:13px}.f{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.f label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}.f input,.f select,.f textarea{border:1px solid #CDD6E0;border-radius:8px;padding:9px 10px;background:#fff}.f textarea{min-height:82px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.wide{grid-column:1/-1}.err{color:var(--bad);font-size:12px;min-height:16px}.ok{color:var(--good);font-size:12px}.drawer{position:fixed;right:0;top:0;height:100vh;width:560px;max-width:96vw;background:#fff;border-left:1px solid var(--line);box-shadow:-20px 0 60px rgba(15,25,45,.2);z-index:20;transform:translateX(105%);transition:.2s;display:flex;flex-direction:column}.drawer.open{transform:translateX(0)}.scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:19;display:none}.scrim.open{display:block}.dh{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}.dh b{font-family:var(--mono);font-size:12px;color:var(--brand2)}.dh button{margin-left:auto}.db{padding:18px;overflow:auto;flex:1}.kv{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}.kv div{background:#fff;padding:10px}.kv small{display:block;font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase}.kv b{display:block;margin-top:4px;font-size:13px}.comments{display:flex;flex-direction:column;gap:8px}.comment{border:1px solid var(--line);border-radius:9px;padding:10px}.comment .meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:4px}.actions{border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:8px;flex-wrap:wrap}.scorebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.scorebox input{width:90px}.fileline{font-size:12px;margin-top:7px;color:var(--muted)}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{border:1px solid #CDD6E0;border-radius:8px;padding:7px 9px}.muted{color:var(--muted)}.ro{background:#F8FAFC!important;color:#647184}.copybar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.dashgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.barrow{display:flex;align-items:center;gap:10px;margin:9px 0}.barrow .lbl{width:135px;font-size:12px;color:var(--muted)}.barrow .track{flex:1;height:12px;background:#EEF2F6;border-radius:99px;overflow:hidden}.barrow .fill{height:100%;background:var(--brand)}.barrow .num{font-family:var(--mono);font-size:12px;width:45px;text-align:right}@media(max-width:900px){.dashgrid{grid-template-columns:1fr}}@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.wide{grid-column:auto}.wrap{padding:0 14px}table{min-width:900px}.scroll{overflow:auto}}
 
-    /* ----- DASHBOARD CARDS (clickable) ----- */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 18px;
-      margin: 28px 0 24px 0;
-    }
-    .stat-card {
-      background: white;
-      padding: 18px 12px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      box-shadow: 0 8px 18px rgba(11,47,107,0.06);
-      text-align: center;
-      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-      backdrop-filter: blur(2px);
-      background: rgba(255,255,255,0.85);
-      cursor: pointer;
-      position: relative;
-    }
-    .stat-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 18px 30px rgba(11,47,107,0.18);
-      border-color: var(--gold);
-    }
-    .stat-card:active {
-      transform: scale(0.96);
-    }
-    .stat-card i {
-      font-size: 28px;
-      color: var(--bright-blue);
-      background: var(--soft-blue);
-      padding: 10px;
-      border-radius: 50%;
-      margin-bottom: 10px;
-      display: inline-block;
-    }
-    .stat-card .count {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--primary-blue);
-      line-height: 1.2;
-    }
-    .stat-card .label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-    .stat-card .sub {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .stat-card .filter-badge {
-      position: absolute;
-      top: 6px;
-      right: 8px;
-      font-size: 10px;
-      background: var(--gold);
-      color: #071f47;
-      padding: 2px 8px;
-      border-radius: 10px;
-      opacity: 0.7;
-    }
+/* OLD APPROVER NAVIGATION STYLE COPIED INTO NEW LIVE HTML */
+.asat{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.viewas{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);font-weight:600}
+.viewas .role{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--brand2);background:var(--soft);border:1px solid #CDEBFA;padding:3px 8px;border-radius:5px;font-weight:500}
+.tabs{position:sticky;top:64px;z-index:4;background:var(--bg);box-shadow:0 6px 9px -8px rgba(20,30,50,.22)}
+.tab.active,.tab.on{color:var(--ink);font-weight:700;border-bottom-color:var(--brand)}
+.tab.tab-cta{color:var(--brand2);font-weight:700}.tab.tab-cta.on,.tab.tab-cta.active{background:var(--soft)}
+.syncbar{position:fixed;right:18px;bottom:18px;z-index:100;background:#fff;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:9px;padding:10px 14px;box-shadow:0 10px 30px rgba(20,30,50,.13);font-size:12.5px;color:var(--ink)}
+.syncbar.hide{display:none!important}.syncbar b{font-family:var(--mono);color:var(--brand2)}
 
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin: 12px 0 22px 0;
-      gap: 12px;
-    }
-    .action-row .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold), var(--gold-deep));
-      color: #071f47;
-      border: none;
-      padding: 14px 32px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 15px;
-      box-shadow: 0 10px 24px rgba(154,116,22,0.28);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-gold:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 32px rgba(154,116,22,0.36);
-      filter: saturate(1.1);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--primary-blue);
-      color: var(--primary-blue);
-      padding: 12px 24px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 14px;
-      transition: 0.2s ease;
-      cursor: pointer;
-    }
-    .btn-outline:hover {
-      background: var(--primary-blue);
-      color: white;
-    }
-    .btn-back {
-      background: linear-gradient(135deg, #6c7a8a, #4a5568);
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-back:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-    }
 
-    /* form section */
-    #entrySection {
-      margin-top: 28px;
-      border-top: 2px dashed var(--line);
-      padding-top: 20px;
-    }
-    #entrySection h2 {
-      color: var(--primary-blue);
-      margin-bottom: 16px;
-      font-size: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+.card.clickable{cursor:pointer;transition:.15s}.card.clickable:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,25,45,.10);border-color:var(--brand)}
+.stat.critical{border-left:5px solid var(--bad)}.stat.ontime{border-left:5px solid var(--good)}.stat.late{border-left:5px solid var(--bad)}.stat.review{border-left:5px solid var(--brand)}
+.stat.critical .v,.stat.late .v{color:var(--bad)}.stat.ontime .v{color:var(--good)}
+.ticket-link{font-family:var(--mono);font-weight:700;color:var(--brand2);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.ticket-link:hover{color:var(--bad);background:#FFF1F1;border-radius:4px}
+.barrow.clickable{cursor:pointer;border-radius:8px;padding:3px}.barrow.clickable:hover{background:#F4FAFE}.barrow.good .fill{background:var(--good)}.barrow.bad .fill{background:var(--bad)}.barrow.warn .fill{background:var(--warn)}
+.filterTitle{font-family:var(--mono);font-size:11px;color:var(--brand2);margin:0 0 10px}.printOnly{display:none}.score-final-red{color:#D14343!important;font-weight:800}.score-final-green{color:#159766!important;font-weight:800}.score-final-blue{color:#0B79B0!important;font-weight:800}.score-final-black{color:#000!important;font-weight:800}@media print{header,.tabs,.toolbar,.btn,.actions,#syncbar,#scrim,#drawer{display:none!important}.section{display:block!important}.section:not(.printTarget){display:none!important}.panel{border:0}.printOnly{display:block}.wrap{max-width:none}.card{break-inside:avoid}}
 
-    .form-grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap:16px;
-      margin-bottom:22px;
-    }
-    .form-group {
-      display:flex;
-      flex-direction:column;
-      padding:14px;
-      background:linear-gradient(180deg, #ffffff, var(--soft-blue));
-      border:1px solid var(--line);
-      border-radius:18px;
-      transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-      animation:cardIn 0.45s ease both;
-    }
-    .form-group:hover {
-      transform:translateY(-3px);
-      box-shadow:0 14px 28px rgba(11,47,107,0.12);
-      border-color:rgba(212,175,55,0.7);
-    }
-    @keyframes cardIn {
-      from{opacity:0; transform:translateY(10px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-    label {
-      margin-bottom:7px;
-      font-weight:bold;
-      color:var(--primary-blue);
-      font-size:13px;
-    }
-    input, select, textarea {
-      width:100%;
-      padding:12px 13px;
-      border:1px solid rgba(11,47,107,0.22);
-      border-radius:12px;
-      font-size:14px;
-      background:white;
-      color:var(--text);
-      transition:border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline:none;
-      border-color:var(--gold);
-      box-shadow:0 0 0 4px rgba(212,175,55,0.2);
-      transform:translateY(-1px);
-    }
-    textarea { min-height:44px; resize:vertical; }
-    .form-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-top: 10px;
-    }
-    button {
-      background:linear-gradient(135deg, var(--gold), var(--gold-deep));
-      color:#071f47;
-      border:none;
-      padding:14px 30px;
-      border-radius:999px;
-      cursor:pointer;
-      font-size:15px;
-      font-weight:800;
-      box-shadow:0 12px 26px rgba(154,116,22,0.28);
-      transition:transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-    }
-    button:hover {
-      transform:translateY(-3px);
-      box-shadow:0 18px 34px rgba(154,116,22,0.36);
-      filter:saturate(1.1);
-    }
-    .btn-blue {
-      background:linear-gradient(135deg, var(--bright-blue), var(--primary-blue));
-      color:white;
-    }
-    .btn-danger {
-      background:linear-gradient(135deg, #ef4444, #991b1b);
-      color:white;
-    }
-    .status {
-      margin-top:16px;
-      font-weight:bold;
-      color:var(--primary-blue);
-      background:rgba(212,175,55,0.16);
-      border-left:5px solid var(--gold);
-      padding:12px 14px;
-      border-radius:12px;
-      min-height:20px;
-    }
-    .table-wrap {
-      width:100%;
-      overflow-x:auto;
-      border-radius:18px;
-      border:1px solid var(--line);
-      margin-top:28px;
-      box-shadow:0 10px 24px rgba(11,47,107,0.08);
-    }
-    table {
-      width:100%;
-      min-width:980px;
-      border-collapse:collapse;
-      background:white;
-    }
-    th {
-      background:linear-gradient(135deg, var(--primary-blue), var(--bright-blue));
-      color:white;
-      padding:13px;
-      text-align:left;
-      font-size:13px;
-      white-space:nowrap;
-      border-bottom:3px solid var(--gold);
-    }
-    td {
-      padding:11px 13px;
-      border-bottom:1px solid var(--line);
-      font-size:13px;
-      color:var(--text);
-      white-space:nowrap;
-    }
-    tr:hover { background:#f4f8ff; }
-    .hidden { display:none !important; }
-    
-    /* Actions column - moved to right */
-    .action-col {
-      min-width: 160px;
-      text-align: right;
-    }
-    .action-col .row-actions {
-      display: flex;
-      gap: 6px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-    .row-actions button {
-      padding: 6px 12px;
-      font-size: 12px;
-      margin: 0;
-      border-radius: 20px;
-    }
-    .row-actions .btn-sm-edit { background: var(--bright-blue); color: white; }
-    .row-actions .btn-sm-edit:hover { filter: brightness(1.1); }
-    .row-actions .btn-sm-upload { background: var(--gold); color: #071f47; }
-    .row-actions .btn-sm-upload:hover { filter: brightness(1.1); }
-    .row-actions .btn-sm-delete { background: #ef4444; color: white; }
-
-    .regbook-link {
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .regbook-link a {
-      color: var(--bright-blue);
-      text-decoration: none;
-      border-bottom: 1px dotted var(--bright-blue);
-    }
-    .regbook-link a:hover { color: var(--gold-deep); }
-
-    .filter-active {
-      border-color: var(--gold) !important;
-      box-shadow: 0 0 0 3px rgba(212,175,55,0.3) !important;
-    }
-
-    @media (max-width: 768px) {
-      body { padding:12px; }
-      .container { padding:16px; border-radius:20px; }
-      .dashboard-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .action-row { flex-direction: column; align-items: stretch; }
-      .btn-gold, .btn-outline { justify-content: center; }
-      .form-actions { flex-direction: column; }
-      .form-actions button { width: 100%; justify-content: center; }
-      .action-col .row-actions { justify-content: center; }
-    }
-    @media print {
-      body { background:white; }
-      .header, .action-row, #entrySection, .toolbar, .connection-panel, .status, .btn-gold, .btn-outline { display:none !important; }
-      .container { box-shadow:none; border:none; max-width:none; padding:0; }
-    }
-  </style>
+</style>
 </head>
 <body>
-<div class="container" id="appContainer">
-  <div class="header">
-    <h1>Distinct Infrastructure</h1>
-    <p>Vehicle & Asset Register · Dashboard</p>
-    <p><strong>Google Storage:</strong> Asset Register O/a Distinct Infrastructure</p>
-  </div>
-
-  <!-- DASHBOARD CARDS (clickable) - Focus on Drilling, Yellow, and Small Plant -->
-  <div class="dashboard-grid" id="dashboardCards">
-    <div class="stat-card" data-filter="Drilling"><i class="fas fa-oil-can"></i><div class="count" id="cntDrilling">0</div><div class="label">Drilling Plant</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Yellow Plant"><i class="fas fa-digging"></i><div class="count" id="cntYellow">0</div><div class="label">Yellow Plant</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Small Plant"><i class="fas fa-th-list"></i><div class="count" id="cntSmallPlant">0</div><div class="label">Small Plant</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Trucks"><i class="fas fa-truck"></i><div class="count" id="cntTrucks">0</div><div class="label">Trucks</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Trailers"><i class="fas fa-trailer"></i><div class="count" id="cntTrailers">0</div><div class="label">Trailers</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Executive"><i class="fas fa-car"></i><div class="count" id="cntExecutive">0</div><div class="label">Executive Cars</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Bowser"><i class="fas fa-gas-pump"></i><div class="count" id="cntBowser">0</div><div class="label">Bowsers</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Admin"><i class="fas fa-building"></i><div class="count" id="cntAdmin">0</div><div class="label">Admin</div><span class="filter-badge">click</span></div>
-    <div class="stat-card" data-filter="Projects &amp; Tenders"><i class="fas fa-briefcase"></i><div class="count" id="cntProjects">0</div><div class="label">Projects &amp; Tenders</div><span class="filter-badge">click</span></div>
-  </div>
-
-  <!-- ACTION ROW -->
-  <div class="action-row">
-    <div class="btn-group">
-      <button class="btn-gold" id="newEntryBtn"><i class="fas fa-plus-circle"></i> New Entry</button>
-      <button class="btn-outline" id="refreshDashBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
-      <button class="btn-outline" id="clearFilterBtn"><i class="fas fa-times-circle"></i> Clear Filter</button>
-    </div>
-    <div class="btn-group">
-      <button class="btn-outline" id="printBtn"><i class="fas fa-print"></i> Print</button>
-      <button class="btn-outline" id="excelBtn"><i class="fas fa-file-excel"></i> CSV</button>
-    </div>
-  </div>
-
-  <!-- ENTRY SECTION -->
-  <div id="entrySection" class="hidden">
-    <h2>
-      <span><i class="fas fa-pen-alt" style="color:var(--gold);"></i> New Asset Entry</span>
-      <button class="btn-back" id="backToDashboardBtn"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
-    </h2>
-      </button>
-                <button class="action-btn" onclick="window.location.href='insurance.html'">
-                    <span>🚛</span>
-                    Insurance Report
-                </button>
-    <form id="assetForm">
-      <div class="form-grid">
-        <div class="form-group"><label>Code</label><select id="code"><option value="">Select Code</option><option>73803</option><option>73802</option><option>73801</option><option>73800</option></select></div>
-        <div class="form-group"><label>Asset Class</label><select id="assetClass"><option value="">Select Asset Class</option><option>Admin</option><option>Bowser</option><option>Drilling</option><option>Executive</option><option>Projects &amp; Tender</option><option>Small Plant</option><option>Trailers</option><option>Trucks</option><option>Yellow Plant</option></select></div>
-        <div class="form-group"><label>Purchase Date</label><input type="date" id="purchaseDate"></div>
-        <div class="form-group"><label>Purchased by</label><select id="purchasedBy"><option value="">Select Purchased By</option><option>Onpoint</option><option>Aqua Telecoms</option><option>Nkanyezi</option><option>Distinct</option></select></div>
-        <div class="form-group"><label>Financing</label><input type="text" id="financing"></div>
-        <div class="form-group"><label>Description</label><input type="text" id="description"></div>
-        <div class="form-group"><label>Model</label><select id="model"><option value="">Select Model Year</option><option value="2000">2000</option><option value="2001">2001</option><option value="2002">2002</option><option value="2003">2003</option><option value="2004">2004</option><option value="2005">2005</option><option value="2006">2006</option><option value="2007">2007</option><option value="2008">2008</option><option value="2009">2009</option><option value="2010">2010</option><option value="2011">2011</option><option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option><option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option></select></div>
-        <div class="form-group"><label>Make of Vehicle</label><select id="makeOfVehicle"><option value="">Select Make</option><option>Toyota</option><option>Faw</option><option>Ford</option><option>Foton</option><option>Mahindra</option><option>Isuzu</option><option>Mercedes Benz</option><option>VW</option><option>Nissan</option></select></div>
-        <div class="form-group"><label>Body Type</label><select id="bodyType"><option value="">Select Body Type</option><option>Sedan</option><option>Hatchback</option><option>Truck</option><option>Minibus</option><option>SUV</option><option>Bakkie</option><option>Lorry</option></select></div>
-        <div class="form-group"><label>Registration no</label><input type="text" id="registrationNo"></div>
-        <div class="form-group"><label>Engine no</label><input type="text" id="engineNo"></div>
-        <div class="form-group"><label>Vin no</label><input type="text" id="vinNo"></div>
-        <div class="form-group"><label>Cost</label><input type="number" id="cost"></div>
-        <div class="form-group"><label>Market Value</label><input type="number" id="marketValue"></div>
-        <div class="form-group"><label>ZOHO</label><select id="zoho"><option value="">Select ZOHO</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label>Location</label><input type="text" id="location"></div>
-        <div class="form-group"><label>Driver/Operator</label><input type="text" id="driverOperator"></div>
-        <div class="form-group"><label>Allocation/Dept</label><input type="text" id="allocationDept"></div>
-        <div class="form-group"><label>Registered Entity</label><input type="text" id="registeredEntity"></div>
-        <div class="form-group"><label>Covered by</label><select id="coveredBy"><option value="">Select Insurance</option><option>Outsurance</option><option>Auto General</option><option>Standard Bank</option><option>Other</option></select></div>
-        <div class="form-group"><label>TRACKING COMPANY</label><select id="trackingCompany"><option value="">Select Tracking</option><option>Netstar</option><option>Car Tracker</option><option>The Both(Car Tracker & Netstar)</option></select></div>
-        <div class="form-group"><label>Installment Amount</label><input type="number" id="installmentAmount"></div>
-        <div class="form-group"><label>Last Installment date</label><input type="date" id="lastInstallmentDate"></div>
-        <div class="form-group"><label>eTag Toll</label><select id="eTagToll"><option value="">Select eTag</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label>NOTES</label><textarea id="notes"></textarea></div>
-        <div class="form-group"><label>Reg. Boo</label><input type="text" id="regBoo"></div>
-        <div class="form-group"><label>Useful life</label><input type="number" id="usefulLife"></div>
-        <div class="form-group"><label>Recharge</label><input type="number" id="recharge"></div>
-        <div class="form-group"><label>Monthly dpn</label><input type="number" id="monthlyDpn"></div>
-        <div class="form-group"><label>Year</label><select id="year"><option value="">Select Year</option><option value="2000">2000</option><option value="2001">2001</option><option value="2002">2002</option><option value="2003">2003</option><option value="2004">2004</option><option value="2005">2005</option><option value="2006">2006</option><option value="2007">2007</option><option value="2008">2008</option><option value="2009">2009</option><option value="2010">2010</option><option value="2011">2011</option><option value="2012">2012</option><option value="2013">2013</option><option value="2014">2014</option><option value="2015">2015</option><option value="2016">2016</option><option value="2017">2017</option><option value="2018">2018</option><option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option></select></div>
-        <div class="form-group"><label>Months Dpn</label><input type="number" id="monthsDpn"></div>
-        <div class="form-group"><label>Accum dpn</label><input type="number" id="accumDpn"></div>
-        <div class="form-group"><label>NBV</label><input type="number" id="nbv"></div>
-        <div class="form-group"><label>Outstanding VAF</label><input type="number" id="oustandingVaf"></div>
-        <div class="form-group"><label>Value</label><input type="number" id="value"></div>
-        <div class="form-group"><label>Vehicle Reg Book Upload</label><input type="file" id="vehicleRegBookFile" accept="image/*,application/pdf,.doc,.docx"></div>
-        <div class="form-group"><label>Tracking Certificate Upload</label><input type="file" id="trackingCertificateFile" accept="image/*,application/pdf,.doc,.docx"></div>
-        <input type="hidden" id="rowNumber">
-        <input type="hidden" id="vehicleRegBookLink">
-        <input type="hidden" id="trackingCertificateLink">
-        <input type="hidden" id="regBookLink">
-      </div>
-      <div class="form-actions">
-        <button type="submit" id="saveBtn">Save Asset</button>
-        <button type="button" class="btn-blue" id="clearBtn">Clear Form</button>
-        <button type="button" class="btn-outline" id="cancelEntryBtn">Cancel</button>
-      </div>
-    </form>
-    <div class="status" id="status"></div>
-  </div>
-
-  <!-- transaction journal -->
-  <div class="table-wrap">
-    <h2 style="color:var(--primary-blue);margin-top:28px;margin-bottom:10px;">
-      Transaction Journal
-      <span id="filterIndicator" style="font-size:14px;font-weight:normal;color:var(--muted);margin-left:12px;"></span>
-    </h2>
-    <table id="assetTable">
-      <thead><tr>
-        <th>Code</th><th>Asset Class</th><th>Purchase Date</th><th>Purchased by</th><th>Financing</th><th>Description</th><th>Model</th><th>Make of Vehicle</th><th>Body Type</th><th>Registration no</th><th>Engine no</th><th>Vin no</th><th>Cost</th><th>Market Value</th><th>ZOHO</th><th>Location</th><th>Driver/Operator</th>
-        <th>Allocation/Dept</th><th>Registered Entity</th><th>Covered by</th><th>TRACKING COMPANY</th><th>Installment Amount</th><th>Last Installment date</th><th>eTag Toll</th><th>NOTES</th><th>Reg. Boo</th><th>Useful life</th><th>Recharge</th><th>Monthly dpn</th><th>Year</th><th>Months Dpn</th><th>Accum dpn</th><th>NBV</th><th>Outstanding VAF</th><th>Value</th><th>Vehicle Reg Book</th><th>Tracking Certificate</th>
-        <th class="action-col">Actions</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
+<div id="login" class="login">
+  <div class="loginbox">
+    <div class="logo">OB</div><br>
+    <h1>Onpoint-base Login</h1>
+    <p>Connected to Google Sheet: <b>Onpoint-base</b></p>
+    <div class="f"><label>Username / Email / UserID</label><input id="loginUser" placeholder="admin or your Users tab username"></div>
+    <div class="f"><label>Password</label><input id="loginPass" type="password" placeholder="Password value or admin123"></div>
+    <button class="btn primary" onclick="login()">Login</button><button class="btn" style="margin-left:8px" onclick="setupNow()">Repair / Setup Sheets</button>
+    <div id="loginErr" class="err"></div>
   </div>
 </div>
 
+<div id="app" class="hide">
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><div class="logo">OB</div><div><div class="t"><b>OnpointBase</b> <span>· MIS Tickets</span></div><p id="navSub" class="asat">Live workflow dashboard</p></div></div>
+    <div class="sp"></div>
+    <div class="asat" id="asAt">Synchronised: —</div>
+    <div class="viewas">Logged in as <span id="userPill" class="role"></span></div>
+    <button class="btn" onclick="logout()">Logout</button>
+  </div>
+</header>
+<main class="wrap">
+  <div class="hero">
+    <div class="grid cards">
+      <div class="card stat clickable critical" onclick="openTicketWindow('critical')"><div class="l">Critical Tickets</div><div id="stCritical" class="v">0</div></div>
+      <div class="card stat clickable ontime" onclick="openTicketWindow('openOnTime')"><div class="l">Open &amp; Ontime</div><div id="stOpenOnTime" class="v">0</div></div>
+      <div class="card stat clickable review reviewOnly" onclick="openTicketWindow('review1')"><div class="l">Review Basket Executive1</div><div id="stE1" class="v">0</div></div>
+      <div class="card stat clickable review reviewOnly" onclick="openTicketWindow('review2')"><div class="l">Review Basket Executive2</div><div id="stE2" class="v">0</div></div>
+      <div class="card stat clickable late" onclick="openTicketWindow('openLate')"><div class="l">Open and Late Tickets</div><div id="stLate" class="v">0</div></div>
+      <div class="card stat clickable" onclick="openTicketWindow('closed')"><div class="l">Closed Tickets</div><div id="stClosed" class="v">0</div></div>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab tab-cta" data-tab="new" onclick="showTab('new')">+ Create ticket</button>
+      <button class="tab active on" data-tab="dashboard" onclick="showTab('dashboard')">Executive</button>
+      <button class="tab reviewOnly" data-tab="review1" onclick="showTab('review1')">Review</button>
+      <button class="tab reviewOnly" data-tab="review2" onclick="showTab('review2')">Approvals</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">My tickets</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Critical</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Assigned</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Open &amp; late</button>
+      <button class="tab" data-tab="closed" onclick="showTab('closed')">Closed on time</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Scorecards</button>
+      <button class="tab" data-tab="performance" onclick="showTab('performance')">Performance</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Explore</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Activity</button>
+    </div>
+  </div>
+
+  <section id="dashboard" class="section on"><div class="panel"><h2>Workflow Dashboard</h2><div style="padding:16px"><p class="muted">Live overview from tickets visible to the logged-in user. Click any card, graph or bar to open the represented ticket data.</p><div id="dashBody" class="dashgrid"></div><div id="dashList" style="margin-top:14px"></div></div></div></section>
+
+  <section id="performance" class="section"><div class="panel"><h2>Performance</h2><div style="padding:16px"><div class="toolbar"><select id="perfMode" onchange="renderPerformance()"><option value="individual">Individual Performance</option><option value="department">Department Performance</option><option value="costcenter">Cost Center Performance</option></select><select id="perfValue" onchange="renderPerformance()"></select><button class="btn" onclick="printPerformance()">Print Report</button></div><p class="muted">Select an individual, department or cost center, then print the selected report.</p><div id="perfBody" class="dashgrid"></div><div id="perfList" style="margin-top:14px"></div></div></div></section>
+
+  <section id="task" class="section"><div class="toolbar"><input id="searchTask" oninput="render()" placeholder="Search tickets"><button class="btn" onclick="refresh()">Refresh</button></div><div class="panel"><h2>Task Drawer</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Due</th><th>Timelapse</th><th>Status</th><th>Priority</th><th>Action</th></tr></thead><tbody id="taskRows"></tbody></table></div></div></section>
+  <section id="review1" class="section"><div class="panel"><h2>Executive1 Review Basket</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Submitted</th><th>System Score</th><th>Assignee</th><th>Action</th></tr></thead><tbody id="review1Rows"></tbody></table></div></div></section>
+  <section id="review2" class="section"><div class="panel"><h2>Executive2 Review Basket</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>System Score</th><th>Executive1 Score</th><th>Submission Timing</th><th>Action</th></tr></thead><tbody id="review2Rows"></tbody></table></div></div></section>
+  <section id="closed" class="section"><div class="panel"><h2>Closed Tickets</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Closed</th><th>Timing</th><th>System</th><th>Exec1</th><th>Exec2</th><th>Final %</th></tr></thead><tbody id="closedRows"></tbody></table></div></div></section>
+
+  <section id="new" class="section">
+    <div class="panel"><h2>Create New Ticket / Recurring Ticket</h2><div style="padding:16px">
+      <div class="toolbar"><label><input type="radio" name="mode" value="single" checked onchange="modeChange()"> Single Ticket</label><label><input type="radio" name="mode" value="recurring" onchange="modeChange()"> Recurring Ticket</label></div>
+      <div class="formgrid">
+        <div class="f wide"><label>Title *</label><input id="ntTitle"></div>
+        <div class="f wide"><label>Description</label><textarea id="ntDesc"></textarea></div>
+        <div class="f"><label>Assign To *</label><select id="ntAssignee" onchange="assigneeChanged()"></select></div>
+        <div class="f"><label>Assignee Email</label><input id="ntAssigneeEmail" class="ro" readonly></div>
+        <div class="f"><label>Assignee Phone</label><input id="ntAssigneePhone" class="ro" readonly></div>
+        <div class="f"><label>Assignee WhatsApp</label><input id="ntAssigneeWhatsApp" class="ro" readonly></div>
+        <div class="f"><label>Department</label><input id="ntDept" class="ro" readonly></div>
+        <div class="f"><label>Cost Center</label><input id="ntCostCenter" class="ro" readonly></div>
+        <div class="f"><label>Priority</label><select id="ntPriority"><option>Low</option><option selected>Normal</option><option>High</option><option>Critical</option></select></div>
+        <div class="f wide"><label>WhatsApp task copy</label><textarea id="ntWhatsAppCopy" class="ro" readonly></textarea><div class="copybar"><button type="button" class="btn" onclick="copyNewTaskWhatsApp()">Copy WhatsApp Message</button><button type="button" class="btn good" onclick="openNewTaskWhatsApp()">Open WhatsApp</button></div></div>
+        <div class="f singleOnly"><label>Issue Date</label><input id="ntIssue" type="date"></div>
+        <div class="f singleOnly"><label>Due Date *</label><input id="ntDue" type="date"></div>
+        <div class="f recOnly hide"><label>Start Date *</label><input id="rtStart" type="date"></div>
+        <div class="f recOnly hide"><label>Frequency</label><select id="rtFreq"><option>Daily</option><option selected>Weekly</option><option>Monthly</option></select></div>
+        <div class="f recOnly hide"><label>Due after days</label><input id="rtDueDays" type="number" value="1"></div>
+        <div class="f recOnly hide"><label>Occurrences</label><input id="rtOcc" type="number" value="4"></div>
+      </div>
+      <button class="btn primary" onclick="createTicket()">Create Ticket</button><span id="newMsg" class="ok"></span><div id="newErr" class="err"></div>
+    </div></div>
+  </section>
+</main>
+</div>
+
+<div id="scrim" class="scrim" onclick="closeDrawer()"></div>
+<aside id="drawer" class="drawer"><div class="dh"><b id="dRef"></b><span id="dStatus" class="status"></span><button class="btn" onclick="closeDrawer()">Close</button></div><div id="dBody" class="db"></div><div id="dActions" class="actions"></div></aside>
+
+<div id="syncbar" class="syncbar hide"><b>Synchronising...</b> please wait</div>
+
 <script>
-  // ======================== CONFIG =========================
-  const SHEET_ID = "1eM_UPV9MRaEU9lDoNk-D2FHac9PXTpHzOUBBXvzEAfw";
-  const DASHBOARD_SHEET_NAME = "Assert Reg";
-  const DASHBOARD_SHEET_ALIASES = ["Assert Reg", "Asssert Reg"];
-  const EQUIPMENT_SHEET_NAME = "Drilling_Equipment";
-  const EQUIPMENT_FILTERS = ["Drilling", "Yellow Plant", "Small Plant"];
-  const ASSERT_REG_FILTERS = ["Trucks", "Trailers", "Executive", "Bowser", "Admin", "Projects & Tender", "Projects & Tenders"];
-  // REPLACE THIS URL WITH YOUR DEPLOYED APPS SCRIPT URL
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4KqYccmeeU8HVVoqXcFWk7M_6XICtAjeReNuwF1msEL4Q9vPm7lj7NzQ0G48O3zMa/exec";
+// Replace this with your deployed Apps Script Web App URL.
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4KqYccmeeU8HVVoqXcFWk7M_6XICtAjeReNuwF1msEL4Q9vPm7lj7NzQ0G48O3zMa/exec';
+let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
+let STATE = {tickets:[], users:[], referenceData:[], summary:{}};
+let CURRENT_FILTER = 'all';
 
-  const FIELD_IDS = [
-    "code","assetClass","purchaseDate","purchasedBy","financing","description",
-    "model","makeOfVehicle","bodyType","registrationNo","engineNo","vinNo","cost","marketValue",
-    "zoho","location","driverOperator",
-    "allocationDept","registeredEntity","coveredBy","trackingCompany","installmentAmount",
-    "lastInstallmentDate","eTagToll","notes","regBoo","usefulLife","recharge",
-    "monthlyDpn","year","monthsDpn","accumDpn","nbv","oustandingVaf","value"
-  ];
+function showSync(msg){const el=document.getElementById('syncbar'); if(el){el.classList.remove('hide'); el.innerHTML='<b>'+esc(msg||'Synchronising...')+'</b> please wait';}}
+function hideSync(){const el=document.getElementById('syncbar'); if(el) el.classList.add('hide');}
+function markSynced(){const el=document.getElementById('asAt'); if(el) el.textContent='Synchronised: '+new Date().toLocaleString();}
+function api(action, data={}){
+  if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) return Promise.reject(new Error('Replace SCRIPT_URL with your Apps Script Web App URL.'));
+  showSync('Synchronising '+action+'...');
+  const payload = encodeURIComponent(JSON.stringify({...data, action}));
+  const cb = 'cb_' + Math.random().toString(36).slice(2);
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    let finished=false;
+    const cleanup=()=>{try{delete window[cb];}catch(e){} try{s.remove();}catch(e){} hideSync(); markSynced();};
+    const timer=setTimeout(()=>{if(finished)return; finished=true; cleanup(); reject(new Error('Apps Script JSONP connection timed out. For uploads, use smaller files or redeploy the latest Apps Script as Web App: Execute as Me, Anyone with the link.'));}, 60000);
+    window[cb]=(res)=>{if(finished)return; finished=true; clearTimeout(timer); cleanup(); res && res.ok ? resolve(res.data) : reject(new Error((res && res.error) || 'Request failed'));};
+    s.onerror=()=>{if(finished)return; finished=true; clearTimeout(timer); cleanup(); reject(new Error('Apps Script JSONP connection failed. Check deployment permissions, SCRIPT_URL, and file chunk size.'));};
+    s.src = SCRIPT_URL + '?callback=' + cb + '&payload=' + payload;
+    document.body.appendChild(s);
+  });
+}
 
-  let allAssets = [];
-  let dashboardAssets = [];
-  let equipmentAssets = [];
-  let currentFilter = null;
-  let currentSheetName = DASHBOARD_SHEET_NAME;
-
-  function valueOrBlank(v) {
-    if (v === undefined || v === null) return "";
-    if (typeof v === "string" && v.includes("T")) {
-      const d = new Date(v);
-      if (!isNaN(d)) return d.toISOString().split('T')[0];
-    }
-    return v;
-  }
-
-  function getAssetClass(asset) {
-    return String((asset && (asset.assetClass || asset.AssetClass || asset["Asset Class"] || asset["Asset class"] || asset["ASSET CLASS"])) || "").trim();
-  }
-
-  function normaliseAssetRow(row) {
-    if (!row) return row;
-    if (!row.assetClass) row.assetClass = getAssetClass(row);
-    return row;
-  }
-
-  function apiPost(payload) {
-    return fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    }).then(res => res.json());
-  }
-
-  function fileToPayload(file) {
-    return new Promise((resolve, reject) => {
-      if (!file) return resolve(null);
-      const reader = new FileReader();
-      reader.onload = ev => resolve({
-        fileName: file.name,
-        mimeType: file.type || "application/octet-stream",
-        fileData: String(ev.target.result).split(',')[1]
-      });
-      reader.onerror = () => reject(new Error("Could not read file: " + file.name));
-      reader.readAsDataURL(file);
+async function postApi(action, data={}){
+  if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) throw new Error('Replace SCRIPT_URL with your Apps Script Web App URL.');
+  showSync('Synchronising '+action+'...');
+  try{
+    const payload = JSON.stringify({...data, action});
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: payload,
+      redirect: 'follow'
     });
+    const txt = await res.text();
+    let json;
+    try{ json = JSON.parse(txt); }
+    catch(parseErr){ throw new Error('Upload response was not valid JSON. Make sure the Apps Script is deployed as Web App: Execute as Me, Anyone with the link, and deploy a New version. Response: '+txt.slice(0,180)); }
+    if(!json.ok) throw new Error(json.error || 'Upload failed.');
+    markSynced();
+    return json.data;
+  }catch(err){
+    throw new Error(err.message || 'Upload failed. Check Apps Script deployment permissions and Drive folder access.');
+  }finally{
+    hideSync();
   }
+}
 
-  function linkCell(link, label) {
-    return link ? `<div class="regbook-link"><a href="${link}" target="_blank"><i class="fas fa-file-alt"></i> ${label || 'View'}</a></div>` : `<span style="color:#aaa;">—</span>`;
+function initDates(){const d=new Date(); const iso=d.toISOString().slice(0,10); ['ntIssue','ntDue','rtStart'].forEach(id=>{const el=document.getElementById(id); if(el) el.value=iso;});}
+function login(){document.getElementById('loginErr').textContent='Synchronising login...';postApi('login',{username:loginUser.value.trim(),password:loginPass.value.trim()}).then(u=>{USER=u;localStorage.setItem('ob_user',JSON.stringify(u));start();alert('Login successful.');}).catch(e=>loginErr.textContent=e.message);}
+function setupNow(){document.getElementById('loginErr').textContent='Repairing sheets...';postApi('setup',{}).then(()=>{loginErr.textContent='Sheets repaired. Try login again. Your Users tab headings now match: UserID, Name, Email, Phone, WhatsApp, Username, Password, Role, Department, IsActive, CreatedAt, LastLogin, Cost Center. Try login again. If Users tab was empty use admin / admin123.';}).catch(e=>loginErr.textContent=e.message);}
+function logout(){showSync('Synchronising logout...');localStorage.removeItem('ob_user');alert('Logout successful.');location.reload();}
+function start(){document.getElementById('login').classList.add('hide');document.getElementById('app').classList.remove('hide');userPill.textContent=USER.Name+' · '+USER.Role;initDates();applyRoleVisibility();refresh();}
+function refresh(){postApi('bootstrap',{userId:USER.UserID}).then(data=>{STATE=data;fillLists();applyRoleVisibility();render();}).catch(alertErr);}
+function loadTicketsView(view, max){
+  if(!USER) return;
+  postApi('getTicketsByView',{userId:USER.UserID,view:view||'all',max:max||300}).then(data=>{
+    STATE.tickets=data.tickets||[];
+    STATE.summary=data.summary||STATE.summary||{};
+    render();
+  }).catch(alertErr);
+}
+function alertErr(e){alert(e.message||e);}
+function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
+  if(id==='review1') loadTicketsView('review1',300);
+  else if(id==='review2') loadTicketsView('review2',300);
+  else if(id==='closed') loadTicketsView('closed',300);
+  else if(id==='task') loadTicketsView('task',300);
+  else if(id==='performance') loadTicketsView('all',500);
+}
+function modeChange(){const rec=document.querySelector('[name=mode]:checked').value==='recurring';document.querySelectorAll('.recOnly').forEach(e=>e.classList.toggle('hide',!rec));document.querySelectorAll('.singleOnly').forEach(e=>e.classList.toggle('hide',rec));}
+function activeUsers(){return (STATE.users||[]).filter(u=>String(u.IsActive).toUpperCase()!=='FALSE');}
+function selectedAssignee(){return activeUsers().find(u=>String(u.UserID)===String(ntAssignee.value))||{};}
+function fillLists(){
+  ntAssignee.innerHTML=activeUsers().map(u=>`<option value="${u.UserID}">${esc(u.Name)} — ${esc(u.Role||'User')}</option>`).join('');
+  assigneeChanged();
+}
+function assigneeChanged(){
+  const u=selectedAssignee();
+  if(!u.UserID) return;
+  ntAssigneeEmail.value=u.Email||'';
+  ntAssigneePhone.value=u.Phone||'';
+  ntAssigneeWhatsApp.value=u.WhatsApp||'';
+  ntDept.value=u.Department||'';
+  ntCostCenter.value=u.CostCenter||'';
+  buildNewTaskWhatsAppCopy();
+}
+['ntTitle','ntDesc','ntPriority','ntIssue','ntDue','rtStart','rtFreq','rtDueDays','rtOcc'].forEach(id=>setTimeout(()=>{const el=document.getElementById(id); if(el){el.addEventListener('input',buildNewTaskWhatsAppCopy);el.addEventListener('change',buildNewTaskWhatsAppCopy);}},0));
+function buildNewTaskWhatsAppCopy(ref){
+  const u=selectedAssignee();
+  const mode=document.querySelector('[name=mode]:checked')?.value||'single';
+  const due=mode==='recurring'?`${rtFreq?.value||'Recurring'} from ${rtStart?.value||''}, due after ${rtDueDays?.value||''} day(s), ${rtOcc?.value||''} occurrence(s)`:ntDue?.value;
+  const msg=`ONPOINT-BASE NEW TASK${ref?' - '+ref:''}\n\nAssigned to: ${u.Name||''}\nDepartment: ${u.Department||''}\nCost Center: ${u.CostCenter||''}\nTitle: ${ntTitle?.value||''}\nPriority: ${ntPriority?.value||''}\nIssue Date: ${ntIssue?.value||''}\nDue: ${due||''}\n\nDescription:\n${ntDesc?.value||''}`;
+  if(document.getElementById('ntWhatsAppCopy')) ntWhatsAppCopy.value=msg;
+  return msg;
+}
+function cleanPhone(p){return String(p||'').replace(/[^0-9]/g,'').replace(/^0/,'27');}
+async function copyText(txt){try{await navigator.clipboard.writeText(txt);alert('Task copied to clipboard.');}catch(e){prompt('Copy this message:',txt);}}
+function copyNewTaskWhatsApp(){copyText(buildNewTaskWhatsAppCopy());}
+function openNewTaskWhatsApp(){const u=selectedAssignee();const phone=cleanPhone(u.WhatsApp||u.Phone);if(!phone)return alert('No WhatsApp number found for selected assignee in Users tab.');window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(buildNewTaskWhatsAppCopy()),'_blank');}
+function openTicketWhatsApp(){const t=DETAIL.ticket;const phone=cleanPhone(t.AssignedToWhatsApp||t.AssignedToPhone);if(!phone)return alert('No WhatsApp number found for this assignee.');const msg=t.WhatsAppMessage||ticketWhatsAppText(t);window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');}
+function copyTicketWhatsApp(){copyText(DETAIL.ticket.WhatsAppMessage||ticketWhatsAppText(DETAIL.ticket));}
+function ticketWhatsAppText(t){return `ONPOINT-BASE TASK ${t.TicketID}\n\nAssigned to: ${t.AssignedToName}\nDepartment: ${t.Department||''}\nCost Center: ${t.CostCenter||''}\nTitle: ${t.Title}\nPriority: ${t.Priority}\nIssue Date: ${fmt(t.IssueDate)}\nDue: ${fmt(t.DueDate)}\nStatus: ${t.Status}\nTime lapse: ${t.TimeRemainingText||''}\n\nDescription:\n${t.Description||''}`;}
+function userRoleKey(){return String(USER?.Role||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function isExecutiveUser(){const r=userRoleKey();return r==='admin'||r==='adminmanager'||r==='executive1'||r==='exec1'||r==='executive2'||r==='exec2';}
+function isReviewAllowed(kind){
+  const r=userRoleKey();
+  if(r==='admin'||r==='adminmanager') return true;
+  if(kind==='review1') return r==='executive1'||r==='exec1';
+  if(kind==='review2') return r==='executive2'||r==='exec2';
+  return true;
+}
+function applyRoleVisibility(){
+  const showReview=isExecutiveUser();
+  document.querySelectorAll('.reviewOnly').forEach(el=>el.classList.toggle('hide',!showReview));
+  if(!showReview && (document.getElementById('review1')?.classList.contains('on') || document.getElementById('review2')?.classList.contains('on'))){showTab('task');}
+}
+function norm(v){return String(v||'').trim().toLowerCase();}
+function isMineAssigned(t){
+  return norm(t.AssignedToUserID)===norm(USER.UserID) ||
+         norm(t.AssignedToEmail)===norm(USER.Email) ||
+         norm(t.AssignedToName)===norm(USER.Name) ||
+         norm(t.AssignedToUsername)===norm(USER.Username);
+}
+function isMineCreated(t){
+  return norm(t.CreatedByUserID)===norm(USER.UserID) ||
+         norm(t.CreatedByEmail)===norm(USER.Email) ||
+         norm(t.CreatedByName)===norm(USER.Name) ||
+         norm(t.CreatedByUsername)===norm(USER.Username);
+}
+function myTickets(){
+  const tickets=STATE.tickets||[];
+  if(isExecutiveUser()){
+    return tickets.filter(t=>isMineCreated(t) && !isMineAssigned(t) && t.Status!=='Closed' && t.CurrentBasket!=='Closed');
   }
-
-  function isEquipmentFilter(filter) {
-    return EQUIPMENT_FILTERS.some(f => f.toLowerCase() === String(filter || "").toLowerCase());
+  return tickets.filter(t=>isMineAssigned(t) && t.Status!=='Closed' && t.CurrentBasket!=='Closed');
+}
+function isLate(t){return String(t.TimeRemainingText||'').toLowerCase().includes('late') || String(t.ClosedTiming||'').toLowerCase().includes('late');}
+function isOpenOnTime(t){return t.Status!=='Closed' && !isLate(t) && (t.CurrentBasket==='Assignee'||t.Status==='Open');}
+function filterTickets(kind){
+  const tickets=STATE.tickets||[];
+  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && t.Status!=='Closed' && t.CurrentBasket!=='Closed' && (isExecutiveUser() || isMineAssigned(t)));
+  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || isMineAssigned(t)));
+  if(kind==='openLate') return tickets.filter(t=>t.Status!=='Closed' && t.CurrentBasket!=='Closed' && isLate(t) && (isExecutiveUser() || isMineAssigned(t)));
+  if(kind==='review1') return isReviewAllowed('review1') ? tickets.filter(t=>t.CurrentBasket==='Executive1' && t.Status!=='Closed') : [];
+  if(kind==='review2') return isReviewAllowed('review2') ? tickets.filter(t=>(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2') && t.Status!=='Closed') : [];
+  if(kind==='closed') return tickets.filter(t=>t.Status==='Closed' || t.CurrentBasket==='Closed');
+  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && t.Status!=='Closed' && (isExecutiveUser() || isMineAssigned(t)));
+  return myTickets();
+}
+function openTicketWindow(kind){
+  if((kind==='review1'||kind==='review2')&&!isReviewAllowed(kind)){kind='all';}
+  CURRENT_FILTER=kind;
+  if(kind==='review1') showTab('review1');
+  else if(kind==='review2') showTab('review2');
+  else if(kind==='closed') showTab('closed');
+  else showTab('task');
+  loadTicketsView(kind==='all'?'task':kind,300);
+  const el=document.getElementById('taskRows'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=STATE.tickets||[];const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};tickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});const srv=STATE.summary||{}; if(srv.critical!==undefined)sum.critical=srv.critical; if(srv.openOnTime!==undefined)sum.openOnTime=srv.openOnTime; if(srv.review1!==undefined)sum.e1=srv.review1; if(srv.review2!==undefined)sum.e2=srv.review2; if(srv.closed!==undefined)sum.closed=srv.closed; if(srv.late!==undefined)sum.late=srv.late;
+  if(document.getElementById('stCritical'))stCritical.textContent=sum.critical; if(document.getElementById('stOpenOnTime'))stOpenOnTime.textContent=sum.openOnTime; stE1.textContent=sum.e1;stE2.textContent=sum.e2;stClosed.textContent=sum.closed;stLate.textContent=sum.late; renderDashboard(tickets,sum); if(document.getElementById('performance')?.classList.contains('on')){buildPerfOptions(); renderPerformance();}
+  const filtered=filterTickets(CURRENT_FILTER).filter(t=>(t.Title+t.TicketID+t.AssignedToName+t.Department+t.CostCenter).toLowerCase().includes(s));
+  taskRows.innerHTML=(`<tr><td colspan="8" class="filterTitle">Showing: ${esc(filterLabel(CURRENT_FILTER))}</td></tr>`)+ (filtered.map(rowTask).join('')||empty(8));
+  review1Rows.innerHTML=isReviewAllowed('review1')?(tickets.filter(t=>t.CurrentBasket==='Executive1').map(rowReview1).join('')||empty(6)):empty(6);
+  review2Rows.innerHTML=isReviewAllowed('review2')?(tickets.filter(t=>t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2').map(rowReview2).join('')||empty(6)):empty(6);
+  closedRows.innerHTML=tickets.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(rowClosed).join('')||empty(8);
+}
+function filterLabel(k){return ({critical:'Critical Tickets',openOnTime:'Open & Ontime Tickets',openLate:'Open and Late Tickets',review1:'Executive1 Review Basket',review2:'Executive2 Review Basket',closed:'Closed Tickets',assigned:'Assigned Tickets',all:isExecutiveUser()?'Tickets I Assigned':'My Assigned Tickets'})[k]||k;}
+function computedFinalNumber(t){const stored=Number(t.FinalScore);return (t.FinalScore===''||t.FinalScore==null||isNaN(stored))?null:stored;}
+function avgComputedFinal(rows){const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(computedFinalNumber).filter(n=>n!==null&&!isNaN(n));return closed.length?Math.round(closed.reduce((a,b)=>a+b,0)/closed.length):0;}
+function renderDashboard(tickets,sum){
+  const byDept={}; const byCC={}; let totalScore=0, scoreCount=0;
+  tickets.forEach(t=>{byDept[t.Department||'Unassigned']=(byDept[t.Department||'Unassigned']||0)+1;byCC[t.CostCenter||'Unassigned']=(byCC[t.CostCenter||'Unassigned']||0)+1;const cf=computedFinalNumber(t);if((t.Status==='Closed'||t.CurrentBasket==='Closed')&&cf!==null){totalScore+=cf;scoreCount++;}});
+  const avg=scoreCount?Math.round(totalScore/scoreCount):0;
+  const split={'Critical Tickets':sum.critical,'Open & Ontime':sum.openOnTime,'Executive1 Review':sum.e1,'Executive2 Review':sum.e2,'Open & Late':sum.late,'Closed':sum.closed};
+  dashBody.innerHTML=`<div class="card"><h3>Workflow Split</h3>${dashBars(split,'workflow')}</div><div class="card clickable" onclick="showDashboardList('score','Average Final Score')"><h3>Performance</h3><div class="stat"><div class="l">Average final score</div><div class="v">${avg}%</div></div><p class="muted">Click to show closed ticket score data.</p></div><div class="card"><h3>By Department</h3>${dashBars(byDept,'Department')}</div><div class="card"><h3>By Cost Center</h3>${dashBars(byCC,'CostCenter')}</div>`;
+}
+function dashBars(obj,type){const max=Math.max(1,...Object.values(obj).map(Number));return Object.keys(obj).map(k=>{let kind= type==='workflow'?({'Critical Tickets':'critical','Open & Ontime':'openOnTime','Executive1 Review':'review1','Executive2 Review':'review2','Open & Late':'openLate','Closed':'closed'}[k]||'all') : type+':'+k; let click=type.startsWith('perfGroup:')?`showPerformanceGroup('${esc(type.split(':')[1])}','${esc(k)}')`:`showDashboardList('${esc(kind)}','${esc(k)}')`; let cls=(k.includes('Critical')||k.includes('Late'))?'bad':(k.includes('Ontime')?'good':'');return `<div class="barrow clickable ${cls}" onclick="${click}"><div class="lbl">${esc(k)}</div><div class="track"><div class="fill" style="width:${Math.round(Number(obj[k])/max*100)}%"></div></div><div class="num">${obj[k]}${type.startsWith('perfGroup:')?'%':''}</div></div>`}).join('')||'<p class="muted">No data.</p>';}
+function showDashboardList(kind,title){let rows=[]; if(kind==='score') rows=(STATE.tickets||[]).filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); else if(kind.includes(':')){const [field,val]=kind.split(':'); rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===val);} else rows=filterTickets(kind); dashList.innerHTML=miniTicketTable(title,rows);}
+function miniTicketTable(title,rows){return `<div class="panel"><h2>${esc(title)} Data</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Department</th><th>Cost Center</th><th>Status</th><th>Priority</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th></tr></thead><tbody>${rows.map(t=>`<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${esc(t.TicketID)}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${esc(t.Department)}</td><td>${esc(t.CostCenter)}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`).join('')||empty(11)}</tbody></table></div></div>`}
+function buildPerfOptions(){
+  const mode=document.getElementById('perfMode')?.value||'individual';
+  const sel=document.getElementById('perfValue'); if(!sel)return;
+  const users=activeUsers();
+  let vals=[];
+  if(mode==='individual') vals=users.map(u=>u.Name).filter(Boolean);
+  if(mode==='department') vals=users.map(u=>u.Department||'Unassigned').filter(Boolean);
+  if(mode==='costcenter') vals=users.map(u=>u.CostCenter||'Unassigned').filter(Boolean);
+  vals=[...new Set(vals)].sort();
+  const old=sel.value;
+  if(mode==='individual') sel.innerHTML='<option value="__ALL__">All Users</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  else if(mode==='department' || mode==='costcenter') sel.innerHTML='<option value="__ALL__">All '+(mode==='department'?'Departments':'Cost Centers')+'</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  else sel.innerHTML=vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  if(vals.includes(old) || old==='__ALL__') sel.value=old; else sel.value='__ALL__';
+}
+function avgScore(rows){return avgComputedFinal(rows);}
+function groupPerformanceRows(field, sourceValues){const tickets=STATE.tickets||[]; const names=[...new Set([...(sourceValues||[]),...tickets.map(t=>t[field]||'Unassigned')].filter(Boolean))].sort();return names.map(name=>{const rows=tickets.filter(t=>String(t[field]||'Unassigned')===String(name));const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t));return {name,rows,total:rows.length,closed:closed.length,late:late.length,avg:avgScore(rows)};});}
+function avgField(rows, field){const vals=rows.map(t=>Number(t[field])).filter(n=>!isNaN(n));return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):'';}
+function performanceSummaryTable(title, groups, field){return `<div class="panel"><h2>${esc(title)}</h2><div class="scroll"><table><thead><tr><th>Name</th><th>Total Tickets</th><th>Closed</th><th>Open Late</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th><th>Action</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.name)}</td><td>${g.total}</td><td>${g.closed}</td><td>${g.late}</td><td>${score(avgField(g.rows,'SystemScore'))}</td><td>${score(avgField(g.rows,'Executive1Score'))}</td><td>${score(avgField(g.rows,'Executive2Score'))}</td><td>${finalScore(avgComputedFinal(g.rows))}</td><td><button class="btn" onclick="showPerformanceGroup('${esc(field)}','${esc(g.name)}')">Open Data</button></td></tr>`).join('')||empty(9)}</tbody></table></div></div>`;}
+function showPerformanceGroup(field,name){const rows=(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(name));perfList.innerHTML=miniTicketTable('Performance Report - '+name, rows);}
+function renderPerformance(){const mode=document.getElementById('perfMode')?.value||'individual'; const val=document.getElementById('perfValue')?.value||''; const users=activeUsers(); const field=mode==='individual'?'AssignedToName':mode==='department'?'Department':'CostCenter'; if(!document.getElementById('perfBody'))return;
+  if(mode==='department' || mode==='costcenter'){
+    const sourceValues=users.map(u=>mode==='department'?(u.Department||'Unassigned'):(u.CostCenter||'Unassigned'));
+    const groups=groupPerformanceRows(field, sourceValues);
+    const selected=val && val!=='__ALL__'?groups.find(g=>String(g.name)===String(val)):null;
+    const allRows=selected?selected.rows:(STATE.tickets||[]);
+    const overall=selected?selected.avg:avgComputedFinal(STATE.tickets||[]);
+    const chartObj={}; groups.forEach(g=>chartObj[g.name]=g.avg);
+    perfBody.innerHTML=`<div class="card"><h3>${esc(selected?selected.name:(mode==='department'?'All Departments':'All Cost Centers'))}</h3><div class="stat"><div class="l">Average performance</div><div class="v">${overall}%</div></div><p class="muted">Scores are averaged from closed ticket final scores stored in the Scores tab.</p></div><div class="card"><h3>${esc(mode==='department'?'Department Scores':'Cost Center Scores')}</h3>${dashBars(chartObj,'perfGroup:'+field)}</div>`;
+    perfList.innerHTML=performanceSummaryTable(mode==='department'?'All Department Scores':'All Cost Center Scores',groups,field)+(selected?miniTicketTable('Selected Data - '+selected.name, selected.rows):'');
+    return;
   }
+  const rows=val==='__ALL__'?(STATE.tickets||[]):(STATE.tickets||[]).filter(t=>String(t[field]||'Unassigned')===String(val)); const title=val==='__ALL__'?'All Users':(val||'No Selection'); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); const sysAvg=avgField(rows,'SystemScore'); const e1Avg=avgField(rows,'Executive1Score'); const e2Avg=avgField(rows,'Executive2Score'); perfBody.innerHTML=`<div class="card"><h3>${esc(title)}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total visible tickets.</p></div><div class="card"><h3>Scores</h3><p><b>System:</b> ${score(sysAvg)} &nbsp; <b>Exec1:</b> ${score(e1Avg)} &nbsp; <b>Exec2:</b> ${score(e2Avg)} &nbsp; <b>Final:</b> ${finalScore(avg)}</p></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+title, rows);}
+function printPerformance(){document.querySelectorAll('.section').forEach(s=>s.classList.remove('printTarget'));document.getElementById('performance').classList.add('printTarget');window.print();}
+function empty(n){return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:28px">No tickets found.</td></tr>`}
+function lateText(t){if(Number(t.LateDays||0)>0)return Number(t.LateDays)+' day(s) late';return t.TimeRemainingText||'0 days late';}
+function rowTask(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${fmt(t.DueDate)}</td><td>${esc(lateText(t))}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td><button class="btn good" onclick="openTicket('${t.TicketID}')">Open</button></td></tr>`}
+function rowReview1(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.SubmittedAt)}</td><td>${score(t.SystemScore)}</td><td>${esc(t.AssignedToName)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
+function rowReview2(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${esc(t.TimeRemainingText)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
+function rowClosed(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.ClosedAt)}</td><td>${esc(t.ClosedTiming)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`}
+function status(t){const cls=t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2'?'s-review':String(t.TimeRemainingText).includes('late')?'s-late':'s-open';return `<span class="status ${cls}">${esc(t.Status)}</span>`}
+function score(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`${Math.round(n)}%`}
+function finalScoreClass(v){const n=Number(v); if(isNaN(n))return ''; if(n<50)return 'score-final-red'; if(n>=90)return 'score-final-black'; if(n>=75)return 'score-final-blue'; return 'score-final-green';}
+function finalScore(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`<span class="${finalScoreClass(n)}">${Math.round(n)}%</span>`}
+function linkListFromUploadAttachment(v){return String(v||'').split(/\s+/).filter(x=>/^https?:\/\//i.test(x)).map((url,i)=>`<div class="fileline"><a target="_blank" href="${esc(url)}">Ticket upload link ${i+1}</a></div>`).join('');}
+function fmt(v){return v?String(v).replace('T',' ').slice(0,16):'—'}
+function esc(v){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-  function isAssertRegFilter(filter) {
-    const f = String(filter || "").toLowerCase();
-    return ASSERT_REG_FILTERS.some(x => x.toLowerCase() === f || f.includes(x.toLowerCase()) || x.toLowerCase().includes(f));
-  }
+function createTicket(){newErr.textContent='';newMsg.textContent='';const mode=document.querySelector('[name=mode]:checked').value;const base={userId:USER.UserID,assignedToUserId:ntAssignee.value,title:ntTitle.value,description:ntDesc.value,priority:ntPriority.value,department:ntDept.value,costCenter:ntCostCenter.value};const action=mode==='recurring'?'createRecurringTicket':'createTicket';const data=mode==='recurring'?{...base,startDate:rtStart.value,frequency:rtFreq.value,dueDays:rtDueDays.value,occurrences:rtOcc.value}:{...base,issueDate:ntIssue.value,dueDate:ntDue.value};postApi(action,data).then((res)=>{const first=(res.ticket||((res.tickets||[])[0])||{}); const msg=buildNewTaskWhatsAppCopy(first.TicketID); newMsg.textContent=' Ticket created. WhatsApp message copied/opened for assignee.'; copyText(msg); const u=selectedAssignee(); const phone=cleanPhone(u.WhatsApp||u.Phone); if(phone) window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank'); ntTitle.value='';ntDesc.value='';refresh();}).catch(e=>newErr.textContent=e.message);}
 
-  function sheetForAsset(asset) {
-    return isEquipmentFilter(getAssetClass(asset)) ? EQUIPMENT_SHEET_NAME : DASHBOARD_SHEET_NAME;
-  }
+let DETAIL=null;
+function openTicket(id){postApi('getTicketDetail',{userId:USER.UserID,ticketId:id}).then(d=>{DETAIL=d;drawDrawer();drawer.classList.add('open');scrim.classList.add('open');}).catch(alertErr);}
+function closeDrawer(){drawer.classList.remove('open');scrim.classList.remove('open');}
+function drawDrawer(){const t=DETAIL.ticket;dRef.textContent=t.TicketID;dStatus.outerHTML=`<span id="dStatus" class="status ${t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2'?'s-review':'s-open'}">${esc(t.Status)}</span>`;dBody.innerHTML=`<h2>${esc(t.Title)}</h2><p class="muted">${esc(t.Description||'No description')}</p><div class="kv"><div><small>Created by</small><b>${esc(t.CreatedByName)}</b></div><div><small>Assigned to</small><b>${esc(t.AssignedToName)}</b></div><div><small>Assignee Email</small><b>${esc(t.AssignedToEmail||'')}</b></div><div><small>Assignee WhatsApp</small><b>${esc(t.AssignedToWhatsApp||'')}</b></div><div><small>Department</small><b>${esc(t.Department||'')}</b></div><div><small>Cost Center</small><b>${esc(t.CostCenter||'')}</b></div><div><small>Due Date</small><b>${fmt(t.DueDate)}</b></div><div><small>Submission Date</small><b>${fmt(t.SubmittedAt)}</b></div><div><small>Time lapse</small><b>${esc(t.TimeRemainingText)}</b></div><div><small>System Score</small><b>${score(t.SystemScore)}</b></div><div><small>Final Score</small><b>${finalScore(computedFinalNumber(t))}</b></div><div><small>Executive1</small><b>${score(t.Executive1Score)} ${esc(t.Executive1Name||'')}</b></div><div><small>Executive2</small><b>${score(t.Executive2Score)} ${esc(t.Executive2Name||'')}</b></div></div><div class="copybar"><button class="btn" onclick="copyTicketWhatsApp()">Copy Task to WhatsApp</button><button class="btn good" onclick="openTicketWhatsApp()">Open WhatsApp to Assignee</button></div><h3>Attachments</h3>${(DETAIL.attachments.map(a=>`<div class="fileline"><a target="_blank" href="${a.DriveUrl}">${esc(a.FileName)}</a></div>`).join('') + linkListFromUploadAttachment(t.UploadAttachment)) || '<p class="muted">No attachments.</p>'}<div class="f"><label>Upload Attachment / File</label><input type="file" id="fileUp"><button class="btn" onclick="uploadFile()">Upload File</button></div><h3>Comments</h3><div class="comments">${DETAIL.comments.map(c=>`<div class="comment"><div class="meta">${esc(c.UserName)} · ${esc(c.Role)} · ${fmt(c.CreatedAt)}</div>${esc(c.Comment)}${c.DriveUrl?`<div class="fileline"><a target="_blank" href="${c.DriveUrl}">${esc(c.FileName||'View upload')}</a></div>`:''}</div>`).join('')||'<p class="muted">No comments.</p>'}</div><div class="f"><label>Add Comment</label><textarea id="commentTxt"></textarea><button class="btn" onclick="addComment()">Post Comment</button></div><h3>More Time Requests</h3><div class="comments">${(DETAIL.timeRequests||[]).map(r=>`<div class="comment"><div class="meta">${esc(r.RequestedByName)} · ${fmt(r.CreatedAt)} · ${esc(r.Status)}</div>Requested date: <b>${esc(r.RequestedDueDate)}</b><br>${esc(r.Reason||'')}</div>`).join('')||'<p class="muted">No time extension requests.</p>'}</div>`;drawActions(t);}
+function hasPendingTimeRequest(){return (DETAIL.timeRequests||[]).some(r=>String(r.Status||'').indexOf('Approved')<0 && String(r.Status||'').indexOf('Rejected')<0);}
+function drawActions(t){let html='';if(t.CurrentBasket==='Assignee'&&(t.AssignedToUserID===USER.UserID||t.CreatedByUserID===USER.UserID||USER.Role==='Admin'))html+=`<button class="btn primary" onclick="submitTicket()">Submit Ticket to Executive1</button><div class="scorebox"><label>Request more time</label><input id="moreTimeDate" type="date"><input id="moreTimeReason" placeholder="Reason for more time"><button class="btn" onclick="requestMoreTime()">Send Request</button></div>`;if(hasPendingTimeRequest()&&(t.CreatedByUserID===USER.UserID||USER.Role==='Executive1'||USER.Role==='Admin'))html+=`<button class="btn good" onclick="approveMoreTime()">Approve More Time Request</button>`;if(t.CurrentBasket==='Executive1'&&(USER.Role==='Executive1'||USER.Role==='Admin'))html+=`<div class="scorebox"><label>Executive1 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Approval / return comment"><button class="btn primary" onclick="approve1()">Approve to Executive2</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;if((t.CurrentBasket==='Executive2'||t.CurrentBasket==='HiringApprovalExecutive2')&&(USER.Role==='Executive2'||USER.Role==='Admin'))html+=`<div class="scorebox"><span class="pill">System Score: ${score(t.SystemScore)}</span><label>Executive2 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Closing / return comment"><button class="btn primary" onclick="approve2()">Approve & Close</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;dActions.innerHTML=html||'<span class="muted">No action available for your role on this ticket.</span>';const rd=document.getElementById('returnDue');if(rd){const d=new Date();d.setDate(d.getDate()+1);rd.value=d.toISOString().slice(0,10);}const md=document.getElementById('moreTimeDate');if(md){const d=new Date();d.setDate(d.getDate()+2);md.value=d.toISOString().slice(0,10);}}
+function requestMoreTime(){const d=document.getElementById('moreTimeDate')?.value; if(!d)return alert('Select the new requested submission date.');postApi('requestMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,requestedDueDate:d,reason:document.getElementById('moreTimeReason')?.value||''}).then(()=>{alert('More time request sent to Executive1 and ticket creator for approval.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
+function approveMoreTime(){postApi('approveMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('More time approval captured. If both required approvals are complete, the new submission date has been applied.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
+function returnTicket(){const due=document.getElementById('returnDue')?.value; if(!due)return alert('Select a new due date before returning this ticket.');postApi('returnTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,newDueDate:due,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('Ticket returned and re-opened with a new due date.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function addComment(){postApi('addComment',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt.value}).then(()=>openTicket(DETAIL.ticket.TicketID)).catch(alertErr)}
 
-  function normaliseRows(response) {
-    if (Array.isArray(response)) return response;
-    if (response && Array.isArray(response.data)) return response.data;
-    if (response && Array.isArray(response.rows)) return response.rows;
-    if (response && Array.isArray(response.assets)) return response.assets;
-    return [];
-  }
-
-  function addSheetMeta(rows, sheetName) {
-    return (rows || []).map(r => normaliseAssetRow({ ...r, _sheetName: r._sheetName || sheetName }));
-  }
-
-  function showStatus(msg, isError = false) {
-    const statusEl = document.getElementById("status");
-    statusEl.innerHTML = msg;
-    statusEl.style.borderLeftColor = isError ? "#ef4444" : "var(--gold)";
-    statusEl.style.background = isError ? "rgba(239,68,68,0.1)" : "rgba(212,175,55,0.16)";
-  }
-
-  // ---- dashboard update with click handlers ----
-  function updateDashboard(assets) {
-    const classMap = {
-      'Drilling': ['drilling', 'drilling plant'],
-      'Yellow Plant': ['yellow plant', 'yellow', 'yellowplant'],
-      'Small Plant': ['small plant', 'smallplant', 'small'],
-      'Trucks': ['truck', 'trucks'],
-      'Trailers': ['trailer', 'trailers'],
-      'Executive': ['executive', 'executive cars', 'exec'],
-      'Bowser': ['bowser', 'bowsers'],
-      'Admin': ['admin', 'administration'],
-      'Projects & Tenders': ['projects', 'projects & tender', 'projects & tenders', 'projects and tender', 'projects and tenders', 'project & tender', 'project and tender', 'tender']
-    };
-    const counts = {};
-    Object.keys(classMap).forEach(key => counts[key] = 0);
-    const dashboardSource = dashboardAssets.length ? dashboardAssets : (assets || []);
-    const equipmentSource = equipmentAssets.length ? equipmentAssets : (assets || []);
-    Object.keys(classMap).forEach(key => {
-      const source = isEquipmentFilter(key) ? equipmentSource : dashboardSource;
-      (source || []).forEach(a => {
-        const cls = getAssetClass(a).toLowerCase();
-        const keywords = classMap[key];
-        if (keywords.some(kw => cls.includes(kw) || cls === kw)) {
-          counts[key]++;
-        }
-      });
-    });
-    document.getElementById("cntDrilling").textContent = counts['Drilling'];
-    document.getElementById("cntYellow").textContent = counts['Yellow Plant'];
-    document.getElementById("cntSmallPlant").textContent = counts['Small Plant'];
-    document.getElementById("cntTrucks").textContent = counts['Trucks'];
-    document.getElementById("cntTrailers").textContent = counts['Trailers'];
-    document.getElementById("cntExecutive").textContent = counts['Executive'];
-    document.getElementById("cntBowser").textContent = counts['Bowser'];
-    document.getElementById("cntAdmin").textContent = counts['Admin'];
-    document.getElementById("cntProjects").textContent = counts['Projects & Tenders'];
-
-    // Update click handlers for cards
-    document.querySelectorAll('.stat-card').forEach(card => {
-      const filter = card.dataset.filter;
-      card.onclick = function() {
-        applyFilter(filter);
-      };
-    });
-  }
-
-  // ---- filtering ----
-  async function applyFilter(filter) {
-    currentFilter = filter;
-    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('filter-active'));
-    document.querySelectorAll('.stat-card').forEach(c => {
-      if (c.dataset.filter === filter) c.classList.add('filter-active');
-    });
-    document.getElementById('filterIndicator').textContent = `Filter: ${filter}`;
-
-    if (isEquipmentFilter(filter)) {
-      currentSheetName = EQUIPMENT_SHEET_NAME;
-      if (!equipmentAssets.length) await loadSheetAssets(EQUIPMENT_SHEET_NAME, false);
-      allAssets = equipmentAssets;
-    } else {
-      currentSheetName = DASHBOARD_SHEET_NAME;
-      allAssets = dashboardAssets;
-    }
-    renderTable(allAssets, filter);
-  }
-
-  function clearFilter() {
-    currentFilter = null;
-    currentSheetName = DASHBOARD_SHEET_NAME;
-    allAssets = dashboardAssets;
-    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('filter-active'));
-    document.getElementById('filterIndicator').textContent = '';
-    renderTable(allAssets);
-  }
-
-  // ---- render table with filter ----
-  function renderTable(assets, filter) {
-    const tbody = document.querySelector("#assetTable tbody");
-    let rows = assets || allAssets;
-    if (filter) {
-      const filterLower = filter.toLowerCase();
-      rows = rows.filter(a => {
-        const cls = getAssetClass(a).toLowerCase();
-        return cls.includes(filterLower);
-      });
-    }
-    tbody.innerHTML = "";
-    if (!rows.length) {
-      const colCount = document.querySelector("#assetTable thead tr").children.length;
-      tbody.innerHTML = `<tr><td colspan="${colCount}">No entries found${filter ? ' for filter: '+filter : ''}.</td></tr>`;
-      return;
-    }
-    rows.forEach(function(data, index){
-      const row = document.createElement("tr");
-
-      // Data cells (all except actions)
-      const displayFields = FIELD_IDS.filter(id => id !== "licenced" && id !== "typeOfLicence" && id !== "validityOfLicence");
-      displayFields.forEach(field => {
-        const td = document.createElement("td");
-        let val = valueOrBlank(data[field]);
-        if (field === "purchaseDate" || field === "lastInstallmentDate") {
-          if (val && val.includes("T")) {
-            const d = new Date(val);
-            if (!isNaN(d)) val = d.toISOString().split('T')[0];
-          }
-        }
-        td.textContent = val;
-        row.appendChild(td);
-      });
-
-      // Document links
-      const regTd = document.createElement("td");
-      const regLink = data.vehicleRegBookLink || data.regBookLink || data["Vehicle Reg Book"] || "";
-      regTd.innerHTML = linkCell(regLink, "View Reg Book");
-      row.appendChild(regTd);
-
-      const trackingTd = document.createElement("td");
-      const trackingLink = data.trackingCertificateLink || data["Tracking Certificate"] || "";
-      trackingTd.innerHTML = linkCell(trackingLink, "View Tracking");
-      row.appendChild(trackingTd);
-
-      // Action cell (right side)
-      const actionCell = document.createElement("td");
-      actionCell.className = "action-col";
-      const actionDiv = document.createElement("div");
-      actionDiv.className = "row-actions";
-
-      // Edit
-      const editBtn = document.createElement("button");
-      editBtn.className = "btn-sm-edit";
-      editBtn.innerHTML = '<i class="fas fa-edit"></i>';
-      editBtn.title = "Edit row";
-      editBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        FIELD_IDS.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = valueOrBlank(data[id]);
-        });
-        document.getElementById("rowNumber").value = data.rowNumber || "";
-        document.getElementById("vehicleRegBookLink").value = data.vehicleRegBookLink || data.regBookLink || data["Vehicle Reg Book"] || "";
-        document.getElementById("trackingCertificateLink").value = data.trackingCertificateLink || data["Tracking Certificate"] || "";
-        document.getElementById("regBookLink").value = data.regBookLink || "";
-        document.getElementById("saveBtn").textContent = "Update Asset";
-        document.getElementById("entrySection").classList.remove("hidden");
-        window.scrollTo({ top: document.getElementById("entrySection").offsetTop - 20, behavior: "smooth" });
-      });
-
-      function makeUploadButton(docType, title, fieldName) {
-        const btn = document.createElement("button");
-        btn.className = "btn-sm-upload";
-        btn.innerHTML = '<i class="fas fa-upload"></i>';
-        btn.title = title;
-        btn.addEventListener("click", function(e) {
-          e.stopPropagation();
-          const fileInput = document.createElement("input");
-          fileInput.type = "file";
-          fileInput.accept = "image/*,application/pdf,.doc,.docx";
-          fileInput.onchange = function(ev) {
-            const file = ev.target.files[0];
-            if (!file) return showStatus("No file selected", true);
-            showStatus("Uploading " + file.name + "...");
-            fileToPayload(file).then(filePayload => {
-              return apiPost({ action: "uploadDocument", rowNumber: data.rowNumber, docType, sheetField: fieldName, sheetId: SHEET_ID, sheetName: data._sheetName || currentSheetName || sheetForAsset(data), ...filePayload });
-            }).then(res => {
-              if (res.status === "success") {
-                showStatus("✅ " + title + " uploaded successfully!");
-                data[fieldName] = res.fileLink;
-                loadAssets();
-              } else {
-                showStatus("❌ Upload failed: " + (res.message || "unknown error"), true);
-              }
-            }).catch(err => {
-              console.error(err);
-              showStatus("❌ Upload error: " + err.message, true);
-            });
-          };
-          fileInput.click();
-        });
-        return btn;
-      }
-
-      const uploadBtn = makeUploadButton("Vehicle Reg Book", "Vehicle Reg Book", "vehicleRegBookLink");
-      const uploadTrackingBtn = makeUploadButton("Tracking Certificate", "Tracking Certificate", "trackingCertificateLink");
-
-      // Delete
-      const delBtn = document.createElement("button");
-      delBtn.className = "btn-sm-delete";
-      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
-      delBtn.title = "Delete row";
-      delBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        if (!confirm("Delete this asset entry?")) return;
-        const payload = { action: "deleteAsset", rowNumber: data.rowNumber, sheetId: SHEET_ID, sheetName: data._sheetName || currentSheetName || sheetForAsset(data) };
-        apiPost(payload)
-          .then(res => {
-            if (res.status === "success") {
-              showStatus("✅ Deleted successfully");
-              loadAssets();
-            } else {
-              showStatus("❌ Delete failed: " + res.message, true);
-            }
-          })
-          .catch(err => {
-            console.error(err);
-            showStatus("❌ Delete error: " + err.message, true);
-          });
-      });
-
-      actionDiv.appendChild(editBtn);
-      actionDiv.appendChild(uploadBtn);
-      actionDiv.appendChild(uploadTrackingBtn);
-      actionDiv.appendChild(delBtn);
-      actionCell.appendChild(actionDiv);
-      row.appendChild(actionCell);
-
-      tbody.appendChild(row);
-    });
-  }
-
-  // ---- load assets ----
-  function loadSheetAssets(sheetName, makeActive = true) {
-    showStatus("Loading data from " + sheetName + "...");
-    const namesToTry = (sheetName === DASHBOARD_SHEET_NAME) ? DASHBOARD_SHEET_ALIASES : [sheetName];
-
-    function fetchOne(index) {
-      const activeSheetName = namesToTry[index];
-      const url = `${SCRIPT_URL}?action=list&sheetId=${encodeURIComponent(SHEET_ID)}&sheetName=${encodeURIComponent(activeSheetName)}`;
-      return fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error("Network response was not ok");
-          return res.json();
-        })
-        .then(response => {
-          const rows = addSheetMeta(normaliseRows(response), activeSheetName);
-          if (!rows.length && index + 1 < namesToTry.length) return fetchOne(index + 1);
-          return { rows, activeSheetName };
-        })
-        .catch(err => {
-          if (index + 1 < namesToTry.length) return fetchOne(index + 1);
-          throw err;
-        });
-    }
-
-    return fetchOne(0)
-      .then(result => {
-        const rows = result.rows;
-        const activeSheetName = result.activeSheetName;
-        if (sheetName === EQUIPMENT_SHEET_NAME) {
-          equipmentAssets = rows;
-        } else {
-          dashboardAssets = rows;
-        }
-        if (makeActive) {
-          currentSheetName = activeSheetName;
-          allAssets = rows;
-          if (currentFilter) {
-            renderTable(allAssets, currentFilter);
-          } else {
-            renderTable(allAssets);
-          }
-        }
-        updateDashboard(allAssets);
-        showStatus("✅ Loaded " + rows.length + " entries from " + activeSheetName);
-        return rows;
-      })
-      .catch(err => {
-        console.error(err);
-        showStatus("❌ Could not load data from " + sheetName + ": " + err.message, true);
-        return [];
-      });
-  }
-
-  async function loadAssets() {
-    const mainRows = await loadSheetAssets(DASHBOARD_SHEET_NAME, true);
-    await loadSheetAssets(EQUIPMENT_SHEET_NAME, false);
-
-    // Default Transaction Journal must always show Assert/Asssert Reg only.
-    if (currentFilter && isEquipmentFilter(currentFilter)) {
-      allAssets = equipmentAssets;
-      renderTable(allAssets, currentFilter);
-      showStatus("✅ Loaded " + allAssets.length + " entries from " + EQUIPMENT_SHEET_NAME);
-    } else if (currentFilter) {
-      allAssets = dashboardAssets;
-      renderTable(allAssets, currentFilter);
-      showStatus("✅ Loaded " + allAssets.length + " entries from " + currentSheetName);
-    } else {
-      currentSheetName = DASHBOARD_SHEET_NAME;
-      allAssets = dashboardAssets;
-      renderTable(allAssets);
-      showStatus("✅ Transaction Journal loaded from Assert Reg / Asssert Reg: " + allAssets.length + " entries");
-    }
-    updateDashboard(allAssets);
-    return allAssets;
-  }
-
-  // ---- form submit ----
-  document.getElementById("assetForm").addEventListener("submit", async function(e){
-    e.preventDefault();
-    const data = {};
-    FIELD_IDS.forEach(id => { data[id] = document.getElementById(id).value; });
-    const rowNum = document.getElementById("rowNumber").value;
-    if (rowNum) data.rowNumber = rowNum;
-    data.vehicleRegBookLink = document.getElementById("vehicleRegBookLink").value || "";
-    data.trackingCertificateLink = document.getElementById("trackingCertificateLink").value || "";
-    data.regBookLink = document.getElementById("regBookLink").value || "";
-    data.action = "saveAsset";
-    data.sheetId = SHEET_ID;
-    data.sheetName = rowNum ? currentSheetName : sheetForAsset(data);
-
-    try {
-      showStatus("Saving asset and documents...");
-      data.vehicleRegBookFile = await fileToPayload(document.getElementById("vehicleRegBookFile").files[0]);
-      data.trackingCertificateFile = await fileToPayload(document.getElementById("trackingCertificateFile").files[0]);
-      const response = await apiPost(data);
-      if (response.status !== "success") throw new Error(response.message || "Save failed");
-      showStatus(rowNum ? "✅ Asset Updated Successfully" : "✅ Asset Saved Successfully");
-      document.getElementById("assetForm").reset();
-      document.getElementById("rowNumber").value = "";
-      document.getElementById("vehicleRegBookLink").value = "";
-      document.getElementById("trackingCertificateLink").value = "";
-      document.getElementById("regBookLink").value = "";
-      document.getElementById("saveBtn").textContent = "Save Asset";
-      await loadAssets();
-    } catch (err) {
-      console.error(err);
-      showStatus("❌ Error Saving Asset: " + err.message, true);
-    }
+function readFileAsBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(String(r.result).split(',')[1]||'');
+    r.onerror=()=>reject(new Error('Could not read the selected attachment.'));
+    r.readAsDataURL(file);
   });
-
-  // ---- clear form ----
-  document.getElementById("clearBtn").addEventListener("click", function(){
-    document.getElementById("assetForm").reset();
-    document.getElementById("rowNumber").value = "";
-    document.getElementById("vehicleRegBookLink").value = "";
-    document.getElementById("trackingCertificateLink").value = "";
-    document.getElementById("regBookLink").value = "";
-    document.getElementById("saveBtn").textContent = "Save Asset";
-    showStatus("Form cleared.");
+}
+async function uploadFileChunked(file, ticketId, comment){
+  // Attachments now use POST instead of JSONP. This avoids URL-length failures
+  // and is the recommended method for images, PDFs, Word/Excel files and other documents.
+  const maxBytes = 18 * 1024 * 1024;
+  if(file.size > maxBytes){
+    throw new Error('File is too large. Please upload a file smaller than 18MB, or compress/split it.');
+  }
+  const base64 = await readFileAsBase64(file);
+  return postApi('uploadAttachmentPost', {
+    userId: USER.UserID,
+    ticketId: ticketId,
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    base64: base64,
+    comment: comment || ''
   });
+}
 
-  // ---- new entry ----
-  document.getElementById("newEntryBtn").addEventListener("click", function(){
-    document.getElementById("entrySection").classList.remove("hidden");
-    document.getElementById("assetForm").reset();
-    document.getElementById("rowNumber").value = "";
-    document.getElementById("vehicleRegBookLink").value = "";
-    document.getElementById("trackingCertificateLink").value = "";
-    document.getElementById("regBookLink").value = "";
-    document.getElementById("saveBtn").textContent = "Save Asset";
-    window.scrollTo({ top: document.getElementById("entrySection").offsetTop - 20, behavior: "smooth" });
-  });
+async function submitTicket(){
+  const f=document.getElementById('fileUp')?.files?.[0];
+  try{
+    if(f) await uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'');
+    await postApi('submitTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt?.value||''});
+    alert('Ticket submitted to Executive1 successfully. Clock stopped, system score captured, and attachment link posted where applicable.');
+    refresh();
+    openTicket(DETAIL.ticket.TicketID);
+  }catch(e){alertErr(e);}
+}
+function approve1(){postApi('executive1Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive1 approval successful. Ticket moved to Executive2.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function approve2(){postApi('executive2Approve',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,score:scoreIn.value,comment:scoreComment.value}).then(()=>{alert('Executive2 approval successful. Ticket is permanently closed.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function uploadFile(){
+  const f=fileUp.files[0];
+  if(!f) return alert('Choose a file first.');
+  uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'')
+    .then(()=>{alert('Attachment uploaded successfully. The Drive link has been posted to Tickets.UploadAttachment and Updates.');refresh();openTicket(DETAIL.ticket.TicketID);})
+    .catch(alertErr);
+}
 
-  // ---- back to dashboard ----
-  document.getElementById("backToDashboardBtn").addEventListener("click", function(){
-    document.getElementById("entrySection").classList.add("hidden");
-    document.getElementById("assetForm").reset();
-    document.getElementById("rowNumber").value = "";
-    document.getElementById("vehicleRegBookLink").value = "";
-    document.getElementById("trackingCertificateLink").value = "";
-    document.getElementById("regBookLink").value = "";
-    document.getElementById("saveBtn").textContent = "Save Asset";
-    showStatus("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    if (currentFilter) {
-      renderTable(allAssets, currentFilter);
-    } else {
-      renderTable(allAssets);
-    }
-  });
-
-  // ---- cancel ----
-  document.getElementById("cancelEntryBtn").addEventListener("click", function(){
-    document.getElementById("entrySection").classList.add("hidden");
-    document.getElementById("assetForm").reset();
-    document.getElementById("rowNumber").value = "";
-    document.getElementById("vehicleRegBookLink").value = "";
-    document.getElementById("trackingCertificateLink").value = "";
-    document.getElementById("regBookLink").value = "";
-    document.getElementById("saveBtn").textContent = "Save Asset";
-    showStatus("");
-    if (currentFilter) {
-      renderTable(allAssets, currentFilter);
-    } else {
-      renderTable(allAssets);
-    }
-  });
-
-  // ---- refresh ----
-  document.getElementById("refreshDashBtn").addEventListener("click", function(){
-    loadAssets();
-  });
-
-  // ---- clear filter ----
-  document.getElementById("clearFilterBtn").addEventListener("click", function(){
-    clearFilter();
-  });
-
-  // ---- print ----
-  document.getElementById("printBtn").addEventListener("click", function(){
-    window.print();
-  });
-
-  // ---- CSV ----
-  document.getElementById("excelBtn").addEventListener("click", function(){
-    const rows = currentFilter ? allAssets.filter(a => {
-      const cls = String(a.assetClass || "").trim().toLowerCase();
-      return cls.includes(currentFilter.toLowerCase());
-    }) : allAssets;
-    const displayFields = FIELD_IDS.filter(id => id !== "licenced" && id !== "typeOfLicence" && id !== "validityOfLicence");
-    const headers = [...displayFields, "vehicleRegBookLink", "trackingCertificateLink"];
-    const csvRows = [headers, ...rows.map(row => {
-      const vals = displayFields.map(id => valueOrBlank(row[id]));
-      vals.push(row.vehicleRegBookLink || row.regBookLink || "");
-      vals.push(row.trackingCertificateLink || "");
-      return vals;
-    })];
-    const csv = csvRows.map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "asset-register-report.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // ---- init ----
-  document.addEventListener("DOMContentLoaded", function(){
-    loadAssets();
-  });
+if(USER) start();
 </script>
 </body>
 </html>
