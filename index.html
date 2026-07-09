@@ -1,1348 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>OnPoint Fleet · accident report + cost center</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Onpoint-base MIS Ticket Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F1F4F7;--card:#fff;--line:#E0E6ED;--ink:#17202B;--muted:#647184;--brand:#00A8F0;--brand2:#0B79B0;--soft:#E6F6FE;--good:#159766;--warn:#C6841A;--bad:#D14343;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:var(--sans);color:var(--ink)}button,input,select,textarea{font:inherit}.hide{display:none!important}.top{background:#fff;border-top:3px solid var(--brand);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.wrap{max-width:1240px;margin:auto;padding:0 20px}.top .wrap{height:64px;display:flex;align-items:center;gap:14px}.logo{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800}.brand h1{font-size:17px;margin:0}.brand p{font-size:12px;margin:2px 0 0;color:var(--muted)}.sp{flex:1}.pill{font-family:var(--mono);font-size:11px;border:1px solid #BFE6F8;background:var(--soft);color:var(--brand2);padding:5px 9px;border-radius:99px}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer}.btn:hover{border-color:var(--brand)}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.good{border-color:#BFE8D3;color:var(--good)}.btn.bad{border-color:#F2C6C6;color:var(--bad)}.hero{padding:22px 0}.grid{display:grid;gap:14px}.cards{grid-template-columns:repeat(6,1fr)}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px}.stat .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.stat .v{font-family:var(--mono);font-size:30px;font-weight:700;margin-top:6px}.tabs{display:flex;gap:4px;overflow:auto;border-bottom:1px solid var(--line);margin-top:8px}.tab{border:0;background:transparent;color:var(--muted);padding:13px 15px;cursor:pointer;border-bottom:3px solid transparent}.tab.on{color:var(--ink);border-bottom-color:var(--brand);font-weight:700}.section{display:none;padding:18px 0 50px}.section.on{display:block}.panel{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden}.panel h2{font-size:15px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line)}table{width:100%;border-collapse:collapse;font-size:13px}th{font-family:var(--mono);font-size:10px;text-transform:uppercase;color:var(--muted);text-align:left;background:#F8FAFC;padding:11px;border-bottom:1px solid var(--line)}td{padding:11px;border-bottom:1px solid var(--line);color:#334155}tr:hover td{background:#FAFCFF}.status{font-family:var(--mono);font-size:10px;border-radius:5px;padding:3px 7px;text-transform:uppercase}.s-open{background:#EEF2F6;color:#475569}.s-review{background:var(--soft);color:var(--brand2)}.s-closed{background:#E7F7EE;color:var(--good)}.s-late{background:#FDECEC;color:var(--bad)}.priority-Critical{color:var(--bad);font-weight:700}.priority-High{color:var(--warn);font-weight:700}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.loginbox{width:420px;max-width:100%;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 18px 50px rgba(15,25,45,.08)}.loginbox h1{margin:0 0 6px;font-size:22px}.loginbox p{margin:0 0 20px;color:var(--muted);font-size:13px}.f{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.f label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}.f input,.f select,.f textarea{border:1px solid #CDD6E0;border-radius:8px;padding:9px 10px;background:#fff}.f textarea{min-height:82px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.wide{grid-column:1/-1}.err{color:var(--bad);font-size:12px;min-height:16px}.ok{color:var(--good);font-size:12px}.drawer{position:fixed;right:0;top:0;height:100vh;width:560px;max-width:96vw;background:#fff;border-left:1px solid var(--line);box-shadow:-20px 0 60px rgba(15,25,45,.2);z-index:20;transform:translateX(105%);transition:.2s;display:flex;flex-direction:column}.drawer.open{transform:translateX(0)}.scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:19;display:none}.scrim.open{display:block}.dh{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}.dh b{font-family:var(--mono);font-size:12px;color:var(--brand2)}.dh button{margin-left:auto}.db{padding:18px;overflow:auto;flex:1}.kv{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}.kv div{background:#fff;padding:10px}.kv small{display:block;font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase}.kv b{display:block;margin-top:4px;font-size:13px}.comments{display:flex;flex-direction:column;gap:8px}.comment{border:1px solid var(--line);border-radius:9px;padding:10px}.comment .meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:4px}.actions{border-top:1px solid var(--line);padding:14px 18px;display:flex;gap:8px;flex-wrap:wrap}.scorebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.scorebox input{width:90px}.fileline{font-size:12px;margin-top:7px;color:var(--muted)}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{border:1px solid #CDD6E0;border-radius:8px;padding:7px 9px}.muted{color:var(--muted)}.ro{background:#F8FAFC!important;color:#647184}.copybar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.dashgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.barrow{display:flex;align-items:center;gap:10px;margin:9px 0}.barrow .lbl{width:135px;font-size:12px;color:var(--muted)}.barrow .track{flex:1;height:12px;background:#EEF2F6;border-radius:99px;overflow:hidden}.barrow .fill{height:100%;background:var(--brand)}.barrow .num{font-family:var(--mono);font-size:12px;width:45px;text-align:right}@media(max-width:900px){.dashgrid{grid-template-columns:1fr}}@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.wide{grid-column:auto}.wrap{padding:0 14px}table{min-width:900px}.scroll{overflow:auto}}
 
-        body {
-            background: #f0f4fc;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            position: relative;
-        }
+/* OLD APPROVER NAVIGATION STYLE COPIED INTO NEW LIVE HTML */
+.asat{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.viewas{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);font-weight:600}
+.viewas .role{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--brand2);background:var(--soft);border:1px solid #CDEBFA;padding:3px 8px;border-radius:5px;font-weight:500}
+.tabs{position:sticky;top:64px;z-index:4;background:var(--bg);box-shadow:0 6px 9px -8px rgba(20,30,50,.22)}
+.tab.active,.tab.on{color:var(--ink);font-weight:700;border-bottom-color:var(--brand)}
+.tab.tab-cta{color:var(--brand2);font-weight:700}.tab.tab-cta.on,.tab.tab-cta.active{background:var(--soft)}
+.syncbar{position:fixed;right:18px;bottom:18px;z-index:100;background:#fff;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:9px;padding:10px 14px;box-shadow:0 10px 30px rgba(20,30,50,.13);font-size:12.5px;color:var(--ink)}
+.syncbar.hide{display:none!important}.syncbar b{font-family:var(--mono);color:var(--brand2)}
 
-        /* floating WA – royal blue */
-        .floating-wa {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1100;
-            background: #25D366;
-            color: white;
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-            border: 2px solid white;
-            text-decoration: none;
-            transition: 0.15s ease;
-        }
-        .floating-wa:hover {
-            transform: scale(1.04);
-            box-shadow: 0 16px 36px rgba(37, 211, 102, 0.3);
-        }
-        .floating-wa svg {
-            width: 38px;
-            height: 38px;
-            fill: white;
-        }
 
-        /* counter pill – white/royal */
-        .counter-pill {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 1100;
-            background: white;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-radius: 80px;
-            padding: 14px 26px;
-            border: 1px solid #d0ddee;
-            box-shadow: 0 12px 28px rgba(0, 40, 100, 0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-        .counter-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #0a2540;
-        }
-        .counter-badge {
-            background: #1a4b8c;
-            color: white;
-            font-weight: 800;
-            font-size: 1.3rem;
-            padding: 2px 18px;
-            border-radius: 40px;
-            letter-spacing: 0.3px;
-            box-shadow: 0 4px 12px rgba(26, 75, 140, 0.2);
-        }
-        .incident-label {
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #1a4b8c;
-            background: rgba(26, 75, 140, 0.06);
-            padding: 4px 18px;
-            border-radius: 40px;
-            border: 1px solid rgba(26, 75, 140, 0.1);
-        }
-        .incident-label i {
-            margin-right: 6px;
-            color: #1a4b8c;
-        }
+.card.clickable{cursor:pointer;transition:.15s}.card.clickable:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,25,45,.10);border-color:var(--brand)}
+.stat.critical{border-left:5px solid var(--bad)}.stat.ontime{border-left:5px solid var(--good)}.stat.late{border-left:5px solid var(--bad)}.stat.review{border-left:5px solid var(--brand)}
+.stat.critical .v,.stat.late .v{color:var(--bad)}.stat.ontime .v{color:var(--good)}
+.ticket-link{font-family:var(--mono);font-weight:700;color:var(--brand2);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.ticket-link:hover{color:var(--bad);background:#FFF1F1;border-radius:4px}
+.barrow.clickable{cursor:pointer;border-radius:8px;padding:3px}.barrow.clickable:hover{background:#F4FAFE}.barrow.good .fill{background:var(--good)}.barrow.bad .fill{background:var(--bad)}.barrow.warn .fill{background:var(--warn)}
+.filterTitle{font-family:var(--mono);font-size:11px;color:var(--brand2);margin:0 0 10px}.printOnly{display:none}.score-final-red{color:#D14343!important;font-weight:800}.score-final-green{color:#159766!important;font-weight:800}.score-final-blue{color:#0B79B0!important;font-weight:800}.score-final-black{color:#000!important;font-weight:800}@media print{header,.tabs,.toolbar,.btn,.actions,#syncbar,#scrim,#drawer{display:none!important}.section{display:block!important}.section:not(.printTarget){display:none!important}.panel{border:0}.printOnly{display:block}.wrap{max-width:none}.card{break-inside:avoid}}
 
-        /* main card – white / royal */
-        .report-card {
-            max-width: 820px;
-            width: 100%;
-            background: white;
-            border-radius: 48px;
-            padding: 2.2rem 2.2rem 2rem;
-            box-shadow: 0 30px 60px -20px rgba(0, 40, 80, 0.15), 0 8px 24px rgba(0, 40, 80, 0.04);
-            border: 1px solid #e9eff6;
-            position: relative;
-            z-index: 5;
-            transition: all 0.15s;
-        }
 
-        .logo-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 1rem;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .logo-image {
-            width: 64px;
-            height: 64px;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 20px rgba(0, 40, 80, 0.08);
-            border: 2px solid #1a4b8c;
-            overflow: hidden;
-        }
-        .logo-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-        .logo-text {
-            font-weight: 800;
-            font-size: 2rem;
-            letter-spacing: -0.02em;
-            color: #0a2540;
-            line-height: 1.1;
-        }
-        .logo-text small {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #4a6f9e;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        .address-badge {
-            background: #f0f4fc;
-            border-radius: 60px;
-            padding: 10px 22px;
-            font-weight: 600;
-            color: #0a2540;
-            border: 1px solid #d0ddee;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .address-badge i {
-            color: #1a4b8c;
-        }
+/* LIGHTWEIGHT HTML CHATBOT - answers from the loaded task data only */
+.chatbotFab{position:fixed;right:18px;bottom:74px;z-index:101;border:0;background:var(--brand);color:#fff;border-radius:999px;padding:12px 16px;font-weight:700;box-shadow:0 10px 26px rgba(15,25,45,.22);cursor:pointer}
+.chatbotBox{position:fixed;right:18px;bottom:126px;width:380px;max-width:calc(100vw - 36px);max-height:70vh;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 55px rgba(15,25,45,.22);z-index:101;display:none;overflow:hidden}
+.chatbotBox.open{display:flex;flex-direction:column}
+.chatbotHead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.chatbotHead b{font-family:var(--mono);font-size:12px;color:var(--brand2)}
+.chatbotHead button{margin-left:auto}
+.chatbotBody{padding:12px;overflow:auto;display:flex;flex-direction:column;gap:8px;min-height:220px}
+.chatMsg{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:13px;line-height:1.35}
+.chatMsg.bot{background:#F8FAFC}.chatMsg.user{background:var(--soft);border-color:#BFE6F8;align-self:flex-end}
+.chatbotInput{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.chatbotInput input{flex:1;border:1px solid #CDD6E0;border-radius:8px;padding:9px 10px}
+.chatHints{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.chatHints button{font-size:11px;padding:5px 7px}
 
-        .subhead {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 0 0 1.8rem 0;
-            padding: 12px 20px;
-            background: #f8faff;
-            border-radius: 60px;
-            border-left: 4px solid #1a4b8c;
-            color: #1a3a5c;
-            font-weight: 500;
-        }
-        .subhead i {
-            color: #1a4b8c;
-            margin-right: 6px;
-        }
-        .map-mini-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            border-radius: 40px;
-            padding: 6px 16px 6px 12px;
-            margin-left: auto;
-            border: 1px solid #d0ddee;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .map-mini-container a {
-            color: #1a4b8c;
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .map-mini-container i {
-            color: #1a4b8c;
-        }
-
-        /* no animations */
-        .live-characters {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-bottom: 16px;
-            height: 50px;
-        }
-        .character {
-            width: 50px;
-            height: 50px;
-            background: #d0ddee;
-            border-radius: 50% 50% 20px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 6px 0 #8aa3c4, 0 8px 16px rgba(0,0,0,0.04);
-            border: 2px solid white;
-            color: #0a2540;
-        }
-        .character:nth-child(2) { background: #b8cce6; box-shadow: 0 6px 0 #6f8db0; }
-        .character:nth-child(3) { background: #a7c957; box-shadow: 0 6px 0 #6b8e4c; color: white; }
-
-        /* app download row – royal */
-        .app-download-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            background: #f8faff;
-            border-radius: 60px;
-            padding: 12px 24px;
-            margin: 1rem 0 1.2rem;
-            border: 1px solid #d0ddee;
-        }
-        .qr-container {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        #qrCanvas {
-            width: 68px;
-            height: 68px;
-            border-radius: 20px;
-            background: white;
-            padding: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            border: 2px solid #1a4b8c;
-        }
-        .app-link {
-            background: #1a4b8c;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.15s;
-            border: 1px solid #2a5f9e;
-            box-shadow: 0 6px 16px rgba(26, 75, 140, 0.15);
-        }
-        .app-link:hover {
-            background: #0f3a6e;
-            transform: scale(1.01);
-        }
-        .scan-note {
-            color: #4a6f9e;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
-        /* action links – royal */
-        .action-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-        .action-card {
-            background: white;
-            border-radius: 40px;
-            padding: 14px 28px;
-            display: inline-flex;
-            align-items: center;
-            gap: 16px;
-            text-decoration: none;
-            color: #0a2540;
-            font-weight: 700;
-            border: 1px solid #d0ddee;
-            backdrop-filter: blur(4px);
-            transition: 0.15s;
-            flex: 1 1 auto;
-            box-shadow: 0 4px 12px rgba(0, 40, 80, 0.02);
-        }
-        .action-card i {
-            font-size: 1.8rem;
-            color: #1a4b8c;
-        }
-        .action-card:hover {
-            background: #f0f6ff;
-            border-color: #1a4b8c;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(26, 75, 140, 0.08);
-        }
-        .action-text small {
-            font-weight: 400;
-            font-size: 0.7rem;
-            color: #4a6f9e;
-        }
-
-        /* form */
-        .form-grid { display: flex; flex-direction: column; gap: 1.5rem; }
-        .two-cols { display: flex; flex-wrap: wrap; gap: 1rem; }
-        .two-cols > div { flex: 1 1 200px; }
-        .input-field { display: flex; flex-direction: column; gap: 6px; }
-        .input-field label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #1a3a5c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .input-field label i { color: #1a4b8c; width: 20px; }
-        .input-field input, .input-field select, .input-field textarea {
-            background: white;
-            border: 1.5px solid #d0ddee;
-            border-radius: 30px;
-            padding: 16px 22px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #0a2540;
-            outline: none;
-            transition: 0.15s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
-        }
-        .input-field input:focus, .input-field select:focus, .input-field textarea:focus {
-            border-color: #1a4b8c;
-            box-shadow: 0 0 0 4px rgba(26, 75, 140, 0.06);
-        }
-        .input-field input::placeholder, .input-field textarea::placeholder {
-            color: #8aa3c4;
-        }
-        .input-field select option { background: white; color: #0a2540; }
-
-        .yes-no-group {
-            display: flex;
-            gap: 28px;
-            align-items: center;
-            background: #f8faff;
-            border-radius: 40px;
-            padding: 10px 24px;
-            border: 1px solid #d0ddee;
-        }
-        .yes-no-group label {
-            color: #0a2540;
-            font-weight: 500;
-            text-transform: none;
-            font-size: 0.95rem;
-            gap: 6px;
-        }
-        .yes-no-group input[type="radio"] { accent-color: #1a4b8c; width: 18px; height: 18px; margin-right: 6px; }
-
-        .photo-upload-area {
-            background: #f8faff;
-            border-radius: 40px;
-            padding: 2rem 1.5rem;
-            border: 2px dashed #b8cce6;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.15s;
-            position: relative;
-        }
-        .photo-upload-area:hover { background: #f0f6ff; border-color: #1a4b8c; }
-        .photo-upload-area i { font-size: 3rem; color: #1a4b8c; opacity: 0.6; margin-bottom: 0.5rem; }
-        .photo-upload-area .upload-text { font-weight: 700; font-size: 1.1rem; color: #0a2540; }
-        .photo-upload-area .upload-hint { font-size: 0.8rem; color: #4a6f9e; margin-top: 6px; }
-        #fileInput { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-
-        .image-preview-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 16px;
-            align-items: center;
-        }
-        .preview-thumb { width: 80px; height: 80px; border-radius: 24px; object-fit: cover; border: 3px solid #1a4b8c; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-        .file-name-badge {
-            background: #f0f4fc;
-            border-radius: 40px;
-            padding: 8px 20px;
-            font-weight: 500;
-            color: #0a2540;
-            border: 1px solid #d0ddee;
-        }
-        .attachment-badge {
-            background: #f0f6ff;
-            border-radius: 40px;
-            padding: 8px 18px;
-            font-size: 0.8rem;
-            color: #1a4b8c;
-            border: 1px solid #b8cce6;
-        }
-
-        .other-input {
-            margin-top: 8px;
-            display: none;
-        }
-        .multi-preview-card {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: center;
-            max-width: 100px;
-        }
-        .multi-preview-card small {
-            color: #1a4b8c;
-            font-size: 0.68rem;
-            text-align: center;
-            word-break: break-word;
-        }
-
-        .add-save-btn {
-            margin-top: 6px;
-            border: 0;
-            border-radius: 40px;
-            background: #1a4b8c;
-            color: white;
-            font-weight: 700;
-            padding: 10px 18px;
-            cursor: pointer;
-            transition: 0.15s;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(26, 75, 140, 0.08);
-        }
-        .add-save-btn:hover { background: #0f3a6e; transform: translateY(-2px); }
-
-        .submit-btn {
-            background: #1a4b8c;
-            border: none;
-            border-radius: 60px;
-            padding: 1.3rem 1.8rem;
-            color: white;
-            font-weight: 800;
-            font-size: 1.2rem;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: 0.15s;
-            margin: 2rem 0 1rem;
-            border: 1px solid #2a5f9e;
-            box-shadow: 0 12px 32px rgba(26, 75, 140, 0.15);
-        }
-        .submit-btn:hover {
-            background: #0f3a6e;
-            transform: scale(1.01);
-            box-shadow: 0 16px 40px rgba(26, 75, 140, 0.2);
-        }
-        .submit-btn i { font-size: 1.6rem; }
-
-        .info-note {
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f8faff;
-            border-radius: 40px;
-            padding: 14px 22px;
-            color: #1a3a5c;
-            border: 1px solid #d0ddee;
-        }
-        .info-note i { color: #1a4b8c; }
-
-        hr { border: 1px solid #d0ddee; margin: 0.5rem 0 1rem; }
-
-        footer {
-            text-align: center;
-            margin-top: 24px;
-            color: #4a6f9e;
-            font-weight: 400;
-            font-size: 0.85rem;
-        }
-
-        .datetime-row { display: flex; flex-wrap: wrap; gap: 1rem; }
-        .datetime-row .input-field { flex: 1 1 160px; }
-
-        @media (max-width: 520px) {
-            .report-card { padding: 1.5rem 1.2rem; border-radius: 32px; }
-            .logo-text { font-size: 1.4rem; }
-            .counter-pill { top: 12px; right: 12px; padding: 10px 16px; }
-            .floating-wa { width: 56px; height: 56px; bottom: 20px; right: 20px; }
-            .app-download-row { flex-direction: column; align-items: flex-start; }
-            .action-links { flex-direction: column; }
-            .action-card { justify-content: center; }
-            .subhead { flex-direction: column; align-items: flex-start; }
-            .map-mini-container { margin-left: 0; width: 100%; justify-content: center; }
-        }
-    </style>
+</style>
 </head>
 <body>
+<div id="login" class="login">
+  <div class="loginbox">
+    <div class="logo">OB</div><br>
+    <h1>Onpoint-base Login</h1>
+    <p>Connected to Google Sheet: <b>Onpoint-base</b></p>
+    <div class="f"><label>Username / Email / UserID</label><input id="loginUser" placeholder="admin or your Users tab username"></div>
+    <div class="f"><label>Password</label><input id="loginPass" type="password" placeholder="Password value or admin123"></div>
+    <button class="btn primary" onclick="login()">Login</button><button class="btn" style="margin-left:8px" onclick="setupNow()">Repair / Setup Sheets</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+</div>
 
-    <!-- Floating WhatsApp -->
-    <a href="https://wa.me/27672557297" class="floating-wa" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 32 32"><path d="M16.04 3.2c-7.05 0-12.78 5.7-12.78 12.72 0 2.24.59 4.43 1.71 6.36L3.2 28.8l6.69-1.75a12.8 12.8 0 0 0 6.15 1.56h.01c7.04 0 12.77-5.7 12.77-12.72S23.09 3.2 16.04 3.2Zm0 23.25h-.01a10.6 10.6 0 0 1-5.39-1.47l-.39-.23-3.97 1.04 1.06-3.86-.25-.4a10.48 10.48 0 0 1-1.62-5.61c0-5.83 4.74-10.56 10.57-10.56 2.82 0 5.48 1.1 7.47 3.09a10.47 10.47 0 0 1 3.1 7.44c0 5.83-4.74 10.56-10.57 10.56Zm5.8-7.9c-.32-.16-1.88-.92-2.17-1.03-.29-.11-.5-.16-.72.16-.21.32-.82 1.03-1.01 1.24-.19.21-.37.24-.69.08-.32-.16-1.34-.49-2.55-1.56-.94-.84-1.58-1.88-1.76-2.2-.19-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.12 1.09-1.12 2.66s1.15 3.09 1.31 3.3c.16.21 2.26 3.45 5.48 4.84.77.33 1.37.53 1.84.68.77.24 1.47.21 2.03.13.62-.09 1.88-.77 2.14-1.51.27-.75.27-1.39.19-1.52-.08-.13-.29-.21-.61-.37Z"/></svg>
-    </a>
-
-    <!-- Counter -->
-    <div class="counter-pill">
-        <div class="counter-item">
-            <span class="counter-badge" id="localVisitCounter">0</span>
-        </div>
-        <div class="incident-label"><i class="fas fa-car-crash"></i> App Visit 2026</div>
+<div id="app" class="hide">
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><div class="logo">OB</div><div><div class="t"><b>OnpointBase</b> <span>· MIS Tickets</span></div><p id="navSub" class="asat">Live workflow dashboard</p></div></div>
+    <div class="sp"></div>
+    <div class="asat" id="asAt">Synchronised: —</div>
+    <div class="viewas">Logged in as <span id="userPill" class="role"></span></div>
+    <button class="btn" onclick="logout()">Logout</button>
+  </div>
+</header>
+<main class="wrap">
+  <div class="hero">
+    <div class="grid cards">
+      <div class="card stat clickable critical" onclick="openTicketWindow('critical')"><div class="l">Critical Tickets</div><div id="stCritical" class="v">0</div></div>
+      <div class="card stat clickable ontime" onclick="openTicketWindow('openOnTime')"><div class="l">Open &amp; Ontime</div><div id="stOpenOnTime" class="v">0</div></div>
+      <div class="card stat clickable review reviewOnly" onclick="openTicketWindow('review1')"><div class="l">Review Basket Executive1</div><div id="stE1" class="v">0</div></div>
+      <div class="card stat clickable review reviewOnly" onclick="openTicketWindow('review2')"><div class="l">Review Basket Executive2</div><div id="stE2" class="v">0</div></div>
+      <div class="card stat clickable late" onclick="openTicketWindow('openLate')"><div class="l">Open and Late Tickets</div><div id="stLate" class="v">0</div></div>
+      <div class="card stat clickable" onclick="openTicketWindow('closed')"><div class="l">Closed Tickets</div><div id="stClosed" class="v">0</div></div>
     </div>
-
-    <div class="report-card">
-
-        <!-- header -->
-        <div class="logo-header">
-            <div class="logo-area">
-                <div class="logo-image">
-                    <img src="images/logo.png" alt="OnPoint logo" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-truck\' style=\'font-size:2.5rem; color:#1a4b8c;\'></i>';">
-                </div>
-                <div class="logo-text">
-                    OnPoint onTime <small>fleet & logistics</small>
-                </div>
-            </div>
-            <div class="address-badge">
-                <i class="fas fa-map-marker-alt"></i> 71 Pretorius Rd, President Park, Midrand
-            </div>
-        </div>
-
-        <div class="live-characters">
-            <div class="character"><i class="fas fa-smile"></i></div>
-            <div class="character"><i class="fas fa-truck"></i></div>
-            <div class="character"><i class="fas fa-shield-alt"></i></div>
-        </div>
-
-        <div class="subhead">
-            <span><i class="fas fa-clipboard-list"></i> complete accident report (auto‑location + stamped photo)</span>
-            <div class="map-mini-container" id="liveMapLink">
-                <i class="fas fa-map-marked-alt"></i>
-                <a href="#" id="dynamicMapLink" target="_blank" title="open live map – auto updates">obtaining location...</a>
-                <i class="fas fa-external-link-alt" style="font-size:0.7rem; opacity:0.6;"></i>
-            </div>
-        </div>
-
-        <!-- app download -->
-        <div class="app-download-row" id="appQrRow">
-            <div class="qr-container">
-                <img id="qrCanvas" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcgAAAHIAQAAAADi2kdHAAAEWklEQVR4nO1ca4/bMAwjh/z/v8x9ECm7wLC73R61Z6f3aJoQjSBIpinZFL54fPsq8CIv8iI/eTwA650AEBAoioAogBCBegPUJ757LztPQT4oT4Kg2D4VQRBS+S+OpPruzew8Ckk66vofBShhCYASlPd194Z2HoZkHCradxQdms63/NPfeZF/Fvm8nCkBSbES7LggKtH6m995kX8P+QCIl8T6E79VRNYAWvQI09172XkKEhpu+twrsL3sPAXJKYOOwbMDksnBFEbg/uZ3XuTfQ0KSOkgr/uRP67J/65UA1Y3PhZECUQ6UfwgUxyUF0tS2RlUJuvPPRZFs7QdQKwrWDMxqZanBuZnA1YcWRlIiKEzyULQgVijGh2P2og3tPAUplsAX17EcWk6mR1RVBiai7O5n5xFIjtQ68u0suyOpGDO55c23ayIf1OBIiJbzBvXpVKsI8Ryywl52noTsuaUnoOU5p1uOU4ewxfv97DwGSapYLGpuAohy0n0RhTAl4w3tPABZ+m0VyDxCjjpoaipyidt8V2972ov86HBYZkKSJgQN185T0tAnXT60KDJ6QusKzXVLTYjUAKfhlNN2s/MgZNU5SaoL156flLRAZN7Zo+rV+5ZHplWoB9OQIEZQUISGuripnQcgJUqkUNI7IhNVGnbdLHNSELd/aF1kie1zNDqdJlwBpGkBL9L8XnaegmS0WkxsZ1KHMCjRJDi862kv8qOj+m/LZ/EcUD7NWY+gcGs1eOtlKyPTWeIusCpvoyPUp2mUt4M3tPMMpAadZXtwEKBSb5so1WzmfU97kT89st5hhOIYI9O+2W25bsq9+u3SyApKZQKqYrKEO8FMmVLcVj7fzs5jkHJRJYpBSQehuhk+mwN7XcR+dp6AzHqHKZ3O05V0gdEiIHtI3czOg5CpoDCNttbiXQ2Nl3tBodX77ew8AvlYEnJ9E3gpuYywtCdzw9WHFkXC7fFqnd3d8nK0pkM+Z3Vy16+si6SXM0TDDbctZlS+7S6wZrn72XkKssqeXQ7j+ASWAYEuans+c/ntosiRTqepJeY2sE65ybnOyXvZeRySvQC7F3pSTXZ7rYNYzHdbO/9/ZPeXyMqtKLbb8s+F7Orwu/OVVZGPlaGXrvgsVtHoA5tW9fJ9T3uRn0DKOdTdJk11rSJAobfpFrvrP9dFPo5Hz02mHoRBdWW5yPVuve9pL/LDQyavM43NJSjXB+GN6nD57ZLINLy7Fd5k9mXJoPu/RnvY7R9aFzntb9Krr13HdnZNW/xYGlrX9rLzFOS8v6Zl9yzJ7rWCvoPZJoOXDy2LnPbXHMXPSH5jIA1hGqshNrPzFOQDRJvNipWarEgc/k0TGNNT9KanvchfQfYGGOzmhGkHXJoHpxDz7qe9yA+QtJLA5rw9QxlR2U3z737ai/zhMe2vKS/FVkqiDJ+dnOxIvePnoshpf80k0t6mT5h6FEbN7NbLFkbO+2v+q++8yIu8yM8d3wFbfscIg4d5dQAAAABJRU5ErkJggg==" alt="QR code to download OnPoint driver app">
-                <div>
-                    <div style="font-weight:700; color:#1a4b8c;">📲 OnPoint driver app</div>
-                    <span class="scan-note"><i class="fas fa-camera"></i> scan QR to download APK</span>
-                </div>
-            </div>
-            <a href="https://drive.google.com/file/d/1myhSxGUZt5mQRdsH_yRk6duo-ejA3LdW/view?usp=drive_link" class="app-link" target="_blank" rel="noopener noreferrer">
-                <i class="fas fa-download"></i> Download App
-            </a>
-        </div>
-
-        <!-- action links -->
-        <div class="action-links">
-            <a href="details.html" class="action-card">
-                <i class="fas fa-gas-pump"></i>
-                <span class="action-text">
-                    <span>Fuel Log</span>
-                    <small>record fuel fill-ups</small>
-                </span>
-            </a>
-            <a href="contacts.html" class="action-card">
-                <i class="fas fa-truck-moving"></i>
-                <span class="action-text">
-                    <span>Vehicle Handover</span>
-                    <small>swap vehicles</small>
-                </span>
-            </a>
-            <a href="https://gurure11.github.io/distinct-maintenance-sheduler/" class="action-card" target="_blank" rel="noopener noreferrer">
-                <i class="fas fa-tools"></i>
-                <span class="action-text">
-                    <span>Maintenance Schedule</span>
-                    <small>vehicle maintenance planner</small>
-                </span>
-            </a>
-        </div>
-
-        <!-- form -->
-        <form id="accidentForm" class="form-grid">
-            <div class="datetime-row">
-                <div class="input-field">
-                    <label><i class="fas fa-calendar-alt"></i> Date</label>
-                    <input type="date" id="accidentDate" name="accidentDate" required>
-                </div>
-                <div class="input-field">
-                    <label><i class="fas fa-clock"></i> Time</label>
-                    <input type="time" id="accidentTime" name="accidentTime" value="14:30" required>
-                </div>
-            </div>
-
-            <div class="two-cols">
-                <div class="input-field">
-                    <label><i class="fas fa-car"></i> Vehicle reg.</label>
-                    <select id="vehicleReg" name="vehicleReg" required>
-                        <option value="" disabled selected>– select vehicle registration –</option>
-                        <option value="">Select Vehicle...</option>
-                        <option value="LH83NTGP">LH83NTGP</option>
-                        <option value="HZ00XWGP">HZ00XWGP</option>
-                        <option value="HK60TXGP">HK60TXGP</option>
-                        <option value="HK60TRGP">HK60TRGP</option>
-                        <option value="HN03JZGP">HN03JZGP</option>
-                        <option value="LD72VRGP">LD72VRGP</option>
-                        <option value="LD72VKGP">LD72VKGP</option>
-                        <option value="KZ14DYGP">KZ14DYGP</option>
-                        <option value="MJ53VVGP">MJ53VVGP</option>
-                        <option value="MF72JPGP">MF72JPGP</option>
-                        <option value="MH18HLGP">MH18HLGP</option>
-                        <option value="MH18HPGP">MH18HPGP</option>
-                        <option value="MJ22MJGP">MJ22MJGP</option>
-                        <option value="JD12LMGP">JD12LMGP</option>
-                        <option value="JV09TWGP">JV09TWGP</option>
-                        <option value="LD45TFGP">LD45TFGP</option>
-                        <option value="MG47YRGP">MG47YRGP</option>
-                        <option value="CW15XZGP">CW15XZGP</option>
-                        <option value="YBR245GP">YBR245GP</option>
-                        <option value="LN30PNGP">LN30PNGP</option>
-                        <option value="LX67YSGP">LX67YSGP</option>
-                        <option value="LD27RXGP">LD27RXGP</option>
-                        <option value="JN01DGGP">JN01DGGP</option>
-                        <option value="LW46XCGP">LW46XCGP</option>
-                        <option value="LP17TVGP">LP17TVGP</option>
-                        <option value="BZ89VHGP">BZ89VHGP</option>
-                        <option value="DZ53XBGP">DZ53XBGP</option>
-                        <option value="KP98PDGP">KP98PDGP</option>
-                        <option value="KL60NJGP">KL60NJGP</option>
-                        <option value="JP41CHGP">JP41CHGP</option>
-                        <option value="JB41MPGP">JB41MPGP</option>
-                        <option value="LS77SJGP">LS77SJGP</option>
-                        <option value="MH47SRGP">MH47SRGP</option>
-                        <option value="HX96RVGP">HX96RVGP</option>
-                        <option value="KK19DDGP">KK19DDGP</option>
-                        <option value="KR76PYGP">KR76PYGP</option>
-                        <option value="KT74WDGP">KT74WDGP</option>
-                        <option value="KP56BVGP">KP56BVGP</option>
-                        <option value="RTH651GP">RTH651GP</option>
-                        <option value="JX95DNGP">JX95DNGP</option>
-                        <option value="HN23FWGP">HN23FWGP</option>
-                        <option value="LP28LYGP">LP28LYGP</option>
-                        <option value="KJ96FZGP">KJ96FZGP</option>
-                        <option value="HV09VKGP">HV09VKGP</option>
-                        <option value="JD95XGGP">JD95XGGP</option>
-                        <option value="JT31YRGP">JT31YRGP</option>
-                        <option value="KP33HDGP">KP33HDGP</option>
-                        <option value="JF10CSGP">JF10CSGP</option>
-                        <option value="HP34WKGP">HP34WKGP</option>
-                        <option value="KN47CFGP">KN47CFGP</option>
-                        <option value="LS85RVGP">LS85RVGP</option>
-                        <option value="LP00HKGP">LP00HKGP</option>
-                        <option value="FY37DDGP">FY37DDGP</option>
-                        <option value="FW95WXGP">FW95WXGP</option>
-                        <option value="LM52NWGP">LM52NWGP</option>
-                        <option value="HM80WZGP">HM80WZGP</option>
-                        <option value="KK57HSGP">KK57HSGP</option>
-                        <option value="HG00HPGP">HG00HPGP</option>
-                        <option value="JJ42MZGP">JJ42MZGP</option>
-                        <option value="LN12MTGP">LN12MTGP</option>
-                        <option value="HG00JMGP">HG00JMGP</option>
-                        <option value="HM68TLGP">HM68TLGP</option>
-                        <option value="KP18GMGP">KP18GMGP</option>
-                        <option value="LF33HXGP">LF33HXGP</option>
-                        <option value="FN34BVGP">FN34BVGP</option>
-                        <option value="HK67KZGP">HK67KZGP</option>
-                        <option value="HK67LDGP">HK67LDGP</option>
-                        <option value="KK68RFGP">KK68RFGP</option>
-                        <option value="HH32LSGP">HH32LSGP</option>
-                        <option value="KD94SSGP">KD94SSGP</option>
-                        <option value="KF60VWGP">KF60VWGP</option>
-                        <option value="KT41KTGP">KT41KTGP</option>
-                        <option value="KT53WZGP">KT53WZGP</option>
-                        <option value="HG75GMGP">HG75GMGP</option>
-                        <option value="LK76BGGP">LK76BGGP</option>
-                        <option value="MK85PWGP">MK85PWGP</option>
-                        <option value="MY81TYGP">MY81TYGP</option>
-                        <option value="MV12KLGP">MV12KLGP</option>
-                        <option value="MV12KGGP">MV12KGGP</option>
-                        <option value="MS43DXGP">MS43DXGP</option>
-                        <option value="MS41ZHGP">MS41ZHGP</option>
-                        <option value="MY73KHGP">MY73KHGP</option>
-                        <option value="MY73JWGP">MY73JWGP</option>
-                        <option value="MY73JYGP">MY73JYGP</option>
-                        <option value="MT69BXGP">MT69BXGP</option>
-                        <option value="D20Sub">D20 Sub</option>
-                    </select>
-                    <button type="button" class="add-save-btn" onclick="addAndSaveOption('vehicleReg', 'Enter new vehicle registration:', true)">+ Add Vehicle Reg. & Save</button>
-                </div>
-                <div class="input-field">
-                    <label><i class="fas fa-map-pin"></i> Location / street</label>
-                    <input type="text" id="location" name="location" placeholder="Enter address or use GPS detect" value="" required>
-                    <button type="button" id="useLocationBtn" style="margin-top:8px;border:0;border-radius:40px;background:#1a4b8c;color:white;padding:12px 20px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(26,75,140,0.15);">Use current location</button>
-                </div>
-            </div>
-
-            <div class="two-cols">
-                <div class="input-field">
-                    <label><i class="fas fa-tag"></i> Accident type</label>
-                    <select id="accidentType" name="accidentType" required>
-                        <option value="" disabled>– select –</option>
-                        <option value="Rear-end" selected>Rear-end collision</option>
-                        <option value="Side-impact">Side-impact / T-bone</option>
-                        <option value="Rollover">Rollover / jackknife</option>
-                        <option value="Single-vehicle">Single vehicle</option>
-                        <option value="Other">Other / pedestrian</option>
-                    </select>
-                </div>
-                <div class="input-field">
-                    <label><i class="fas fa-users"></i> Department</label>
-                    <select id="department" name="department" required>
-                        <option value="" disabled>– select department –</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Business Development">Business Development</option>
-                        <option value="Finance & IT">Finance & IT</option>
-                        <option value="Fleet" selected>Fleet</option>
-                        <option value="Human Resource">Human Resource</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Procurements">Procurements</option>
-                        <option value="Sales">Sales</option>
-                        <option value="SHEQ">SHEQ</option>
-                        <option value="Tendering">Tendering</option>
-                        <option value="Warehouse">Warehouse</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-building"></i> Cost Center</label>
-                <select id="costCenter" name="costCenter" required>
-                    <option value="" disabled selected>– select cost center –</option>
-                    <option value="Onpoint Group HQ">Onpoint Group HQ</option>
-                    <option value="DI Solutions">DI Solutions</option>
-                    <option value="Aqua Telecoms">Aqua Telecoms</option>
-                    <option value="Nkanyezi Projects">Nkanyezi Projects</option>
-                    <option value="Onpoint Ontime Solutions">Onpoint Ontime Solutions</option>
-                </select>
-            </div>
-
-            <div class="two-cols">
-                <div class="input-field">
-                    <label><i class="fas fa-user"></i> Driver's name *</label>
-                    <select id="driverName" name="driverName" required>
-                        <option value="" disabled selected>– select driver –</option>
-                        <option value="Retselisitsoe Mohapi">Retselisitsoe Mohapi</option>
-                        <option value="George Rusere">George Rusere</option>
-                        <option value="Nyasha Marira">Nyasha Marira</option>
-                        <option value="Trymore Mtizwa">Trymore Mtizwa</option>
-                        <option value="Brian Mugiya">Brian Mugiya</option>
-                        <option value="Peter Nong">Peter Nong</option>
-                        <option value="Nicholas Dambiranwa">Nicholas Dambiranwa</option>
-                        <option value="Curious Sixpense">Curious Sixpense</option>
-                        <option value="Clifonce Matewe">Clifonce Matewe</option>
-                        <option value="Moeketsi Tshabalala">Moeketsi Tshabalala</option>
-                        <option value="Elias Mashiane">Elias Mashiane</option>
-                        <option value="Leah Phiri">Leah Phiri</option>
-                        <option value="Lungile Soni">Lungile Soni</option>
-                        <option value="Washington Musiiwa">Washington Musiiwa</option>
-                        <option value="Donald Tawengwa">Donald Tawengwa</option>
-                        <option value="Washington Madauka">Washington Madauka</option>
-                        <option value="Before Simonne">Before Simonne</option>
-                        <option value="Happison Mupanedengu">Happison Mupanedengu</option>
-                        <option value="William Mahlo">William Mahlo</option>
-                        <option value="Pride Nyoni">Pride Nyoni</option>
-                        <option value="Petros Mosekidi">Petros Mosekidi</option>
-                        <option value="Tonderai Matsikire">Tonderai Matsikire</option>
-                        <option value="Adelaide Dimingo">Adelaide Dimingo</option>
-                        <option value="Tumelo Mhlongo">Tumelo Mhlongo</option>
-                        <option value="Sabelo Zulu">Sabelo Zulu</option>
-                        <option value="Tsitsi Dube">Tsitsi Dube</option>
-                        <option value="Starnley Vaningwa">Starnley Vaningwa</option>
-                        <option value="Philip Shambare">Philip Shambare</option>
-                        <option value="Graham Tsuro">Graham Tsuro</option>
-                        <option value="Meshellum Mugabe">Meshellum Mugabe</option>
-                        <option value="Tafadzwa Magejo">Tafadzwa Magejo</option>
-                        <option value="Trust Bhila">Trust Bhila</option>
-                        <option value="Moses Magutse">Moses Magutse</option>
-                        <option value="Kudakwashe Madzikangava">Kudakwashe Madzikangava</option>
-                        <option value="Andrew Moloisane">Andrew Moloisane</option>
-                        <option value="Zivai Magwaza">Zivai Magwaza</option>
-                        <option value="Brian Nkomo">Brian Nkomo</option>
-                        <option value="Joshuwa Paradzai">Joshuwa Paradzai</option>
-                        <option value="Goodwill Rakgoko">Goodwill Rakgoko</option>
-                        <option value="Johanne Hendriks">Johanne Hendriks</option>
-                        <option value="Claudius Gomo">Claudius Gomo</option>
-                        <option value="Patience Chipundo">Patience Chipundo</option>
-                        <option value="Siyanda Dlamini">Siyanda Dlamini</option>
-                        <option value="Vusi Mabena">Vusi Mabena</option>
-                        <option value="Ronald Musengwa">Ronald Musengwa</option>
-                        <option value="Neo Mogatusi">Neo Mogatusi</option>
-                        <option value="Mqondisi Ndlovu">Mqondisi Ndlovu</option>
-                        <option value="Govern Paradzai">Govern Paradzai</option>
-                        <option value="Dickens Magwaza">Dickens Magwaza</option>
-                        <option value="Kgomotso Letsoalo">Kgomotso Letsoalo</option>
-                        <option value="Nametso Bokoane">Nametso Bokoane</option>
-                        <option value="Phumzile Cindi">Phumzile Cindi</option>
-                        <option value="Sydney Ngwenya">Sydney Ngwenya</option>
-                        <option value="Bheki Makhwanazi">Bheki Makhwanazi</option>
-                        <option value="Ntsako Mathe">Ntsako Mathe</option>
-                        <option value="Bongile Cuba">Bongile Cuba</option>
-                        <option value="Moses Mashatola">Moses Mashatola</option>
-                        <option value="Tony Takabvakure">Tony Takabvakure</option>
-                        <option value="Timothy Wadzema">Timothy Wadzema</option>
-                        <option value="Yvette van Rooyen">Yvette van Rooyen</option>
-                        <option value="Brighton Mhande">Brighton Mhande</option>
-                        <option value="Tafadzwa Magejo">Tafadzwa Magejo</option>
-                        <option value="Lameck Chindove">Lameck Chindove</option>
-                        <option value="Rayman Mugaramanja">Rayman Mugaramanja</option>
-                    </select>
-                    <button type="button" class="add-save-btn" onclick="addAndSaveOption('driverName', 'Enter new driver name:', false)">+ Add Driver & Save</button>
-                </div>
-                <div class="input-field">
-                    <label><i class="fas fa-phone-alt"></i> Driver phone</label>
-                    <input type="tel" id="driverPhone" name="driverPhone" placeholder="+27 72 555 7890" required>
-                </div>
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-file-signature"></i> Description</label>
-                <textarea id="description" name="description" required placeholder="Front bumper crushed, airbags deployed. Slight rain. Other driver exchanged info."></textarea>
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-car-crash"></i> Other parties involved</label>
-                <input type="text" id="otherParties" name="otherParties" placeholder="Honda CR-V, plate 7GHJ432">
-            </div>
-
-            <hr>
-            <div style="font-weight: 600; color: #1a4b8c; margin-bottom: 8px;"><i class="fas fa-gavel" style="margin-right: 8px;"></i>OFFICIAL / POLICE INFORMATION</div>
-
-            <div class="input-field">
-                <label><i class="fas fa-building"></i> Reported to Metro</label>
-                <div class="yes-no-group">
-                    <label><input type="radio" name="reportedMetro" value="Yes" checked> Yes</label>
-                    <label><input type="radio" name="reportedMetro" value="No"> No</label>
-                </div>
-            </div>
-
-            <div class="two-cols">
-                <div class="input-field">
-                    <label><i class="fas fa-user-shield"></i> Officer name</label>
-                    <input type="text" id="officerName" name="officerName" placeholder="Officer M. Davis">
-                </div>
-                <div class="input-field">
-                    <label><i class="fas fa-mobile-alt"></i> Officer cell</label>
-                    <input type="tel" id="officerPhone" name="officerPhone" placeholder="082 555 9876">
-                </div>
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-wine-bottle"></i> Drunken driving involved</label>
-                <div class="yes-no-group">
-                    <label><input type="radio" name="drunkenDriving" value="Yes"> Yes</label>
-                    <label><input type="radio" name="drunkenDriving" value="No" checked> No</label>
-                </div>
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-hashtag"></i> Incident police report #</label>
-                <input type="text" id="policeReportNo" name="policeReportNo" placeholder="PD-2309-452">
-            </div>
-
-            <div class="input-field">
-                <label><i class="fas fa-balance-scale"></i> Officer's judgement (are you at fault?)</label>
-                <div class="yes-no-group">
-                    <label><input type="radio" name="atFault" value="Yes"> Yes, at fault</label>
-                    <label><input type="radio" name="atFault" value="No" checked> No, not at fault</label>
-                </div>
-            </div>
-
-            <hr>
-            <div class="photo-upload-area" id="dropZone">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <div class="upload-text">attach accident image with GPS & date stamp</div>
-                <div class="upload-hint">tap to browse — select up to 5 images; overlay will be added automatically</div>
-                <input type="file" id="fileInput" accept="image/*" capture="environment" multiple>
-            </div>
-
-            <div id="previewContainer" class="image-preview-row" style="display: none;">
-                <div id="multiPreviewList" class="image-preview-row"></div>
-                <span id="fileNameDisplay" class="file-name-badge"><i class="far fa-images"></i> 0 photos selected</span>
-                <div class="attachment-badge">
-                    <i class="fas fa-map-marker-alt"></i> <span id="stampLocation">locating…</span>
-                </div>
-                <button type="button" id="clearImageBtn" style="background: none; border:none; color:#b00; font-size:1.8rem; cursor:pointer;"><i class="fas fa-times-circle"></i></button>
-            </div>
-
-            <input type="hidden" id="imageBase64" value="">
-            <input type="hidden" id="imageFileName" value="">
-            <input type="hidden" id="imageFileType" value="">
-            <input type="hidden" id="capturedLat" value="">
-            <input type="hidden" id="capturedLon" value="">
-            <input type="hidden" id="capturedGeoUrl" value="">
-
-            <button type="button" id="submitToGAS" class="submit-btn">
-                <i class="fas fa-cloud-upload-alt"></i> Submit to Google Sheets
-            </button>
-
-            <div class="info-note" style="margin-top: 10px;" id="attachmentStatus">
-                <i class="fas fa-info-circle"></i> No image — detecting address…
-            </div>
-            <div class="info-note" style="background: #f0f6ff; border-color: #b8cce6;">
-                <i class="fas fa-lightbulb" style="color: #1a4b8c;"></i>
-                <strong>Live map + address:</strong> street address can be typed or auto‑filled. <i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp button bottom right.
-            </div>
-        </form>
-        <footer>
-            <i class="fas fa-check-circle" style="color: #a7c957;"></i> OnPoint fleet – safety first · 71 Pretorius Rd, President Park, Midrand
-        </footer>
+    <div class="tabs" id="tabs">
+      <button class="tab tab-cta" data-tab="new" onclick="showTab('new')">+ Create ticket</button>
+      <button class="tab active on" data-tab="dashboard" onclick="showTab('dashboard')">Executive</button>
+      <button class="tab reviewOnly" data-tab="review1" onclick="showTab('review1')">Review</button>
+      <button class="tab reviewOnly" data-tab="review2" onclick="showTab('review2')">Approvals</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">My tickets</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Critical</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Assigned</button>
+      <button class="tab" data-tab="task" onclick="showTab('task')">Open &amp; late</button>
+      <button class="tab" data-tab="closed" onclick="showTab('closed')">Closed on time</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Scorecards</button>
+      <button class="tab" data-tab="performance" onclick="showTab('performance')">Performance</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Explore</button>
+      <button class="tab" data-tab="dashboard" onclick="showTab('dashboard')">Activity</button>
     </div>
+  </div>
 
-    <script>
-        (function() {
-            const GAS_URL = 'https://script.google.com/macros/s/AKfycbxBc3rYONKb2NUEu8yE0ZMcfbbsMBrbZdpyl8Diz9rpzofp7wPW1v50Qeh_KJhRF2Tw/exec';
-            const SHEET_ID = '1vhtaNNmY-YsyDiaA2IFodoBYdQsEcL09F7BgMJo4utI';
-            const DRIVE_FOLDER_ID = '1al8guXtgk-PJWwdNvd2umUXYv4AvwXSM';
+  <section id="dashboard" class="section on"><div class="panel"><h2>Workflow Dashboard</h2><div style="padding:16px"><p class="muted">Live overview from tickets visible to the logged-in user. Click any card, graph or bar to open the represented ticket data.</p><div id="dashBody" class="dashgrid"></div><div id="dashList" style="margin-top:14px"></div></div></div></section>
 
-            function getCurrentCounts() {
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                let monthly = parseInt(localStorage.getItem('onpoint_monthly') || '0');
-                let yearly = parseInt(localStorage.getItem('onpoint_yearly') || '0');
-                let storedMonth = parseInt(localStorage.getItem('onpoint_month') || currentMonth);
-                let storedYear = parseInt(localStorage.getItem('onpoint_year') || currentYear);
-                if (storedYear !== currentYear) return { monthly: 0, yearly: 0, shouldResetMonthly: true, shouldResetYearly: true, currentMonth, currentYear };
-                if (storedMonth !== currentMonth) return { monthly: 0, yearly, shouldResetMonthly: true, shouldResetYearly: false, currentMonth, currentYear };
-                return { monthly, yearly, shouldResetMonthly: false, shouldResetYearly: false, currentMonth, currentYear };
-            }
-            function incrementCounters() {
-                const counts = getCurrentCounts();
-                const now = new Date();
-                let monthly = counts.shouldResetMonthly ? 1 : counts.monthly + 1;
-                let yearly = counts.shouldResetYearly ? 1 : counts.yearly + 1;
-                localStorage.setItem('onpoint_monthly', monthly);
-                localStorage.setItem('onpoint_yearly', yearly);
-                localStorage.setItem('onpoint_month', now.getMonth());
-                localStorage.setItem('onpoint_year', now.getFullYear());
-            }
+  <section id="performance" class="section"><div class="panel"><h2>Performance</h2><div style="padding:16px"><div class="toolbar"><select id="perfMode" onchange="renderPerformance()"><option value="individual">Individual Performance</option><option value="department">Department Performance</option><option value="costcenter">Cost Center Performance</option></select><select id="perfValue" onchange="renderPerformance()"></select><button class="btn" onclick="printPerformance()">Print Report</button></div><p class="muted">Select an individual, department or cost center, then print the selected report.</p><div id="perfBody" class="dashgrid"></div><div id="perfList" style="margin-top:14px"></div></div></div></section>
 
-            const fileInput = document.getElementById('fileInput');
-            const dropZone = document.getElementById('dropZone');
-            const previewContainer = document.getElementById('previewContainer');
-            const multiPreviewList = document.getElementById('multiPreviewList');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            const stampLocationSpan = document.getElementById('stampLocation');
-            const clearImageBtn = document.getElementById('clearImageBtn');
-            const imageBase64Hidden = document.getElementById('imageBase64');
-            const imageFileNameHidden = document.getElementById('imageFileName');
-            const imageFileTypeHidden = document.getElementById('imageFileType');
-            const capturedLat = document.getElementById('capturedLat');
-            const capturedLon = document.getElementById('capturedLon');
-            const capturedGeoUrl = document.getElementById('capturedGeoUrl');
-            const attachmentStatus = document.getElementById('attachmentStatus');
-            const dynamicMapLink = document.getElementById('dynamicMapLink');
-            const locationInput = document.getElementById('location');
-            const submitBtn = document.getElementById('submitToGAS');
+  <section id="task" class="section"><div class="toolbar"><input id="searchTask" oninput="render()" placeholder="Search tickets"><button class="btn" onclick="refresh()">Refresh</button></div><div class="panel"><h2>Task Drawer</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Due</th><th>Timelapse</th><th>Status</th><th>Priority</th><th>Action</th></tr></thead><tbody id="taskRows"></tbody></table></div></div></section>
+  <section id="review1" class="section"><div class="panel"><h2>Executive1 Review Basket</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Submitted</th><th>System Score</th><th>Assignee</th><th>Action</th></tr></thead><tbody id="review1Rows"></tbody></table></div></div></section>
+  <section id="review2" class="section"><div class="panel"><h2>Executive2 Review Basket</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>System Score</th><th>Executive1 Score</th><th>Submission Timing</th><th>Action</th></tr></thead><tbody id="review2Rows"></tbody></table></div></div></section>
+  <section id="closed" class="section"><div class="panel"><h2>Closed Tickets</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Closed</th><th>Timing</th><th>System</th><th>Exec1</th><th>Exec2</th><th>Final %</th></tr></thead><tbody id="closedRows"></tbody></table></div></div></section>
 
-            let selectedFiles = [];
-            let stampedImages = [];
-            let gpsCoords = { lat: null, lon: null, accuracy: null };
+  <section id="new" class="section">
+    <div class="panel"><h2>Create New Ticket / Recurring Ticket</h2><div style="padding:16px">
+      <div class="toolbar"><label><input type="radio" name="mode" value="single" checked onchange="modeChange()"> Single Ticket</label><label><input type="radio" name="mode" value="recurring" onchange="modeChange()"> Recurring Ticket</label></div>
+      <div class="formgrid">
+        <div class="f wide"><label>Title *</label><input id="ntTitle"></div>
+        <div class="f wide"><label>Description</label><textarea id="ntDesc"></textarea></div>
+        <div class="f"><label>Assign To *</label><select id="ntAssignee" onchange="assigneeChanged()"></select></div>
+        <div class="f"><label>Assignee Email</label><input id="ntAssigneeEmail" class="ro" readonly></div>
+        <div class="f"><label>Assignee Phone</label><input id="ntAssigneePhone" class="ro" readonly></div>
+        <div class="f"><label>Assignee WhatsApp</label><input id="ntAssigneeWhatsApp" class="ro" readonly></div>
+        <div class="f"><label>Department</label><input id="ntDept" class="ro" readonly></div>
+        <div class="f"><label>Cost Center</label><input id="ntCostCenter" class="ro" readonly></div>
+        <div class="f"><label>Priority</label><select id="ntPriority"><option>Low</option><option selected>Normal</option><option>High</option><option>Critical</option></select></div>
+        <div class="f wide"><label>WhatsApp task copy</label><textarea id="ntWhatsAppCopy" class="ro" readonly></textarea><div class="copybar"><button type="button" class="btn" onclick="copyNewTaskWhatsApp()">Copy WhatsApp Message</button><button type="button" class="btn good" onclick="openNewTaskWhatsApp()">Open WhatsApp</button></div></div>
+        <div class="f singleOnly"><label>Issue Date</label><input id="ntIssue" type="date"></div>
+        <div class="f singleOnly"><label>Due Date *</label><input id="ntDue" type="date"></div>
+        <div class="f recOnly hide"><label>Start Date *</label><input id="rtStart" type="date"></div>
+        <div class="f recOnly hide"><label>Frequency</label><select id="rtFreq"><option>Daily</option><option selected>Weekly</option><option>Monthly</option></select></div>
+        <div class="f recOnly hide"><label>Due after days</label><input id="rtDueDays" type="number" value="1"></div>
+        <div class="f recOnly hide"><label>Occurrences</label><input id="rtOcc" type="number" value="4"></div>
+      </div>
+      <button class="btn primary" onclick="createTicket()">Create Ticket</button><span id="newMsg" class="ok"></span><div id="newErr" class="err"></div>
+    </div></div>
+  </section>
+</main>
+</div>
 
-            function getSavedOptions(key) {
-                try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-            }
-            function saveOptionValue(key, value) {
-                const clean = String(value || '').trim();
-                if (!clean) return;
-                const values = getSavedOptions(key);
-                if (!values.some(item => item.toUpperCase() === clean.toUpperCase())) {
-                    values.push(clean);
-                    localStorage.setItem(key, JSON.stringify(values));
-                }
-            }
-            function loadSavedOptions(selectId, storageKey) {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-                getSavedOptions(storageKey).forEach(value => {
-                    if (!Array.from(select.options).some(o => o.value.toUpperCase() === value.toUpperCase())) {
-                        const opt = document.createElement('option');
-                        opt.value = value;
-                        opt.text = value;
-                        select.appendChild(opt);
-                    }
-                });
-            }
-            window.addAndSaveOption = function(selectId, promptText, uppercase) {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-                const newValue = prompt(promptText);
-                if (!newValue || !newValue.trim()) return;
-                const cleanValue = uppercase ? newValue.trim().toUpperCase() : newValue.trim();
-                const storageKey = selectId === 'vehicleReg' ? 'onpoint_saved_vehicle_regs' : 'onpoint_saved_driver_names';
-                if (!Array.from(select.options).some(o => o.value.toUpperCase() === cleanValue.toUpperCase())) {
-                    const opt = document.createElement('option');
-                    opt.value = cleanValue;
-                    opt.text = cleanValue;
-                    select.appendChild(opt);
-                }
-                select.value = cleanValue;
-                saveOptionValue(storageKey, cleanValue);
-                alert('Saved: ' + cleanValue);
-            };
+<div id="scrim" class="scrim" onclick="closeDrawer()"></div>
+<aside id="drawer" class="drawer"><div class="dh"><b id="dRef"></b><span id="dStatus" class="status"></span><button class="btn" onclick="closeDrawer()">Close</button></div><div id="dBody" class="db"></div><div id="dActions" class="actions"></div></aside>
 
-            function applyFaintDefaults() {
-                const fields = [
-                    document.getElementById('location'),
-                    document.getElementById('driverPhone'),
-                    document.getElementById('description'),
-                    document.getElementById('otherParties'),
-                    document.getElementById('officerName'),
-                    document.getElementById('officerPhone'),
-                    document.getElementById('policeReportNo')
-                ].filter(Boolean);
-                fields.forEach(f => {
-                    if (f.value) f.classList.add('faint-default');
-                    f.addEventListener('focus', function() { this.classList.remove('faint-default'); });
-                    f.addEventListener('input', function() { this.classList.remove('faint-default'); });
-                });
-            }
+<button id="chatbotFab" class="chatbotFab" onclick="toggleChatbot()">Ask Bot</button>
+<div id="chatbotBox" class="chatbotBox">
+  <div class="chatbotHead"><b>Onpoint Task Chatbot</b><span class="muted">HTML helper</span><button class="btn" onclick="toggleChatbot()">Close</button></div>
+  <div id="chatbotBody" class="chatbotBody">
+    <div class="chatMsg bot">Ask me about tickets loaded in this dashboard, the workflow, Brighton submit access, Executive1/Executive2 baskets, late tickets, critical tickets, or performance.</div>
+    <div class="chatHints"><button class="btn" onclick="chatQuick('How many tickets are waiting for Executive1?')">Executive1 basket</button><button class="btn" onclick="chatQuick('Show Brighton tickets')">Brighton tickets</button><button class="btn" onclick="chatQuick('Explain submit workflow')">Submit workflow</button></div>
+  </div>
+  <div class="chatbotInput"><input id="chatbotQ" placeholder="Type a question about this dashboard" onkeydown="if(event.key==='Enter') askChatbot()"><button class="btn primary" onclick="askChatbot()">Ask</button></div>
+</div>
 
-            function clearDataEntryFields() {
-                const form = document.getElementById('accidentForm');
-                if (!form) return;
-                form.reset();
-                document.getElementById('accidentDate').value = new Date().toISOString().split('T')[0];
-                loadSavedOptions('vehicleReg', 'onpoint_saved_vehicle_regs');
-                loadSavedOptions('driverName', 'onpoint_saved_driver_names');
-                applyFaintDefaults();
-                const now = new Date();
-                document.getElementById('accidentTime').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                stampedImages = [];
-                selectedFiles = [];
-                if (fileInput) fileInput.value = '';
-                imageBase64Hidden.value = '';
-                imageFileNameHidden.value = '';
-                imageFileTypeHidden.value = '';
-                if (previewContainer) previewContainer.style.display = 'none';
-                if (multiPreviewList) multiPreviewList.innerHTML = '';
-                if (fileNameDisplay) fileNameDisplay.innerHTML = '<i class="far fa-images"></i> 0 photos selected';
-                if (stampLocationSpan) stampLocationSpan.innerText = 'locating…';
-                if (attachmentStatus) attachmentStatus.innerHTML = '<i class="fas fa-info-circle"></i> No image — detecting address…';
-                applyFaintDefaults();
-                requestDriverLocation();
-            }
+<div id="syncbar" class="syncbar hide"><b>Synchronising...</b> please wait</div>
 
-            document.getElementById('accidentDate').value = new Date().toISOString().split('T')[0];
+<script>
+// Replace this with your deployed Apps Script Web App URL.
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrSsVTtPI8IP1d4BWNcYEQLaizkxOsox0nfLMQ9DktNlIkEsfVi2gpuV_Wsjt2Gdf_/exec';
+let USER = JSON.parse(localStorage.getItem('ob_user') || 'null');
+let STATE = {tickets:[], globalTickets:[], dashboardTickets:[], users:[], referenceData:[], summary:{}};
+let LAST_GOOD_STATE = {tickets:[], globalTickets:[], dashboardTickets:[], users:[], referenceData:[], summary:{}};
+let CURRENT_FILTER = 'all';
+let REQUEST_SEQ = 0;
+let ACTIVE_DATA_VIEW = 'all';
+let AUTO_REFRESH_TIMER = null;
+let LAST_REFRESH_AT = 0;
+const REFRESH_INTERVAL_MS = 45000;
 
-            function updateMapLink() {
-                if (gpsCoords.lat && gpsCoords.lon) {
-                    const lat = gpsCoords.lat.toFixed(6);
-                    const lon = gpsCoords.lon.toFixed(6);
-                    const localGeoText = `${lat}, ${lon}`;
-                    capturedLat.value = lat;
-                    capturedLon.value = lon;
-                    capturedGeoUrl.value = localGeoText;
-                    dynamicMapLink.href = '#';
-                    dynamicMapLink.removeAttribute('target');
-                    dynamicMapLink.innerHTML = `${localGeoText} · GPS captured`;
-                    locationInput.value = `GPS ${localGeoText}`;
-                    attachmentStatus.innerHTML = `<i class="fas fa-check-circle"></i> Location captured: ${localGeoText}`;
-                } else {
-                    dynamicMapLink.href = '#';
-                    dynamicMapLink.innerHTML = 'waiting for GPS …';
-                }
-            }
+function hasUsableTicketList(data){return data && Array.isArray(data.tickets);}
+function keepLastGoodState(data, opts={}){
+  if(!data) return STATE;
+  const allowEmpty = !!opts.allowEmpty;
+  const next = {...STATE};
+  if(Array.isArray(data.users) && (data.users.length || !LAST_GOOD_STATE.users.length)) next.users = data.users;
+  if(Array.isArray(data.referenceData)) next.referenceData = data.referenceData;
+  if(data.summary && typeof data.summary === 'object') next.summary = data.summary;
+  const incomingGlobal = Array.isArray(data.globalTickets) ? data.globalTickets : (Array.isArray(data.dashboardTickets) ? data.dashboardTickets : null);
+  if(incomingGlobal){
+    if(incomingGlobal.length || allowEmpty || !(LAST_GOOD_STATE.globalTickets||[]).length){
+      next.globalTickets = incomingGlobal;
+      next.dashboardTickets = incomingGlobal;
+    }else{
+      next.globalTickets = LAST_GOOD_STATE.globalTickets || [];
+      next.dashboardTickets = LAST_GOOD_STATE.dashboardTickets || LAST_GOOD_STATE.globalTickets || [];
+    }
+  }
+  if(Array.isArray(data.tickets)){
+    if(data.tickets.length || allowEmpty || !LAST_GOOD_STATE.tickets.length){
+      next.tickets = data.tickets;
+    }else{
+      next.tickets = LAST_GOOD_STATE.tickets;
+    }
+  }
+  STATE = next;
+  if((STATE.tickets||[]).length || allowEmpty) LAST_GOOD_STATE = JSON.parse(JSON.stringify(STATE));
+  return STATE;
+}
+function updateTicketInCache(ticketId, patch){
+  if(!ticketId) return;
+  const apply = arr => (arr||[]).map(t => String(t.TicketID)===String(ticketId) ? {...t, ...patch} : t);
+  STATE.tickets = apply(STATE.tickets);
+  STATE.globalTickets = apply(STATE.globalTickets);
+  STATE.dashboardTickets = apply(STATE.dashboardTickets);
+  LAST_GOOD_STATE.tickets = apply(LAST_GOOD_STATE.tickets);
+  LAST_GOOD_STATE.globalTickets = apply(LAST_GOOD_STATE.globalTickets);
+  LAST_GOOD_STATE.dashboardTickets = apply(LAST_GOOD_STATE.dashboardTickets);
+  render();
+}
+function startAutoRefresh(){
+  if(AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);
+  AUTO_REFRESH_TIMER = setInterval(()=>{
+    if(!USER) return;
+    loadTicketsView(ACTIVE_DATA_VIEW || 'all', 500, {silent:true, background:true});
+  }, REFRESH_INTERVAL_MS);
+}
 
-            function requestDriverLocation() {
-                if (!navigator.geolocation) {
-                    gpsCoords.lat = -25.9989;
-                    gpsCoords.lon = 28.1213;
-                    updateMapLink();
-                    locationInput.value = 'GPS not supported - default Midrand location';
-                    attachmentStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> GPS not supported – using default';
-                    return;
-                }
-                attachmentStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> requesting driver location...';
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        gpsCoords.lat = pos.coords.latitude;
-                        gpsCoords.lon = pos.coords.longitude;
-                        gpsCoords.accuracy = pos.coords.accuracy;
-                        updateMapLink();
-                    },
-                    () => {
-                        gpsCoords.lat = -25.9989;
-                        gpsCoords.lon = 28.1213;
-                        updateMapLink();
-                        locationInput.value = '71 Pretorius Rd, President Park, Midrand (default)';
-                        attachmentStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> GPS denied – using default Midrand address';
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-                );
-            }
+function showSync(msg){const el=document.getElementById('syncbar'); if(el){el.classList.remove('hide'); el.innerHTML='<b>'+esc(msg||'Synchronising...')+'</b> please wait';}}
+function hideSync(){const el=document.getElementById('syncbar'); if(el) el.classList.add('hide');}
+function markSynced(){const el=document.getElementById('asAt'); if(el) el.textContent='Synchronised: '+new Date().toLocaleString();}
+function api(action, data={}){
+  if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) return Promise.reject(new Error('Replace SCRIPT_URL with your Apps Script Web App URL.'));
+  showSync('Synchronising '+action+'...');
+  const payload = encodeURIComponent(JSON.stringify({...data, action}));
+  const cb = 'cb_' + Math.random().toString(36).slice(2);
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    let finished=false;
+    const cleanup=()=>{try{delete window[cb];}catch(e){} try{s.remove();}catch(e){} hideSync(); markSynced();};
+    const timer=setTimeout(()=>{if(finished)return; finished=true; cleanup(); reject(new Error('Apps Script JSONP connection timed out. For uploads, use smaller files or redeploy the latest Apps Script as Web App: Execute as Me, Anyone with the link.'));}, 60000);
+    window[cb]=(res)=>{if(finished)return; finished=true; clearTimeout(timer); cleanup(); res && res.ok ? resolve(res.data) : reject(new Error((res && res.error) || 'Request failed'));};
+    s.onerror=()=>{if(finished)return; finished=true; clearTimeout(timer); cleanup(); reject(new Error('Apps Script JSONP connection failed. Check deployment permissions, SCRIPT_URL, and file chunk size.'));};
+    s.src = SCRIPT_URL + '?callback=' + cb + '&payload=' + payload;
+    document.body.appendChild(s);
+  });
+}
 
-            document.getElementById('useLocationBtn').addEventListener('click', requestDriverLocation);
-            requestDriverLocation();
+async function postApi(action, data={}){
+  if(!SCRIPT_URL || SCRIPT_URL.includes('PASTE_')) throw new Error('Replace SCRIPT_URL with your Apps Script Web App URL.');
+  showSync('Synchronising '+action+'...');
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 65000);
+  try{
+    const payload = JSON.stringify({...data, action});
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: payload,
+      redirect: 'follow',
+      signal: controller.signal
+    });
+    const txt = await res.text();
+    let json;
+    try{ json = JSON.parse(txt); }
+    catch(parseErr){ throw new Error('Upload response was not valid JSON. Make sure the Apps Script is deployed as Web App: Execute as Me, Anyone with the link, and deploy a New version. Response: '+txt.slice(0,180)); }
+    if(!json.ok) throw new Error(json.error || 'Upload failed.');
+    markSynced();
+    return json.data;
+  }catch(err){
+    if(err && err.name === 'AbortError') throw new Error(action+' timed out. Redeploy the fixed Apps Script as a New version and run Repair / Setup Sheets once.');
+    throw new Error(err.message || 'Request failed. Check Apps Script deployment permissions and Drive folder access.');
+  }finally{
+    clearTimeout(timer);
+    hideSync();
+  }
+}
 
-            function stampImageWithOverlay(file) {
-                return new Promise((resolve, reject) => {
-                    if (!file) return reject('no file');
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            const barHeight = 60;
-                            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-                            ctx.fillRect(0, canvas.height - barHeight, canvas.width, barHeight);
-                            ctx.font = 'bold 22px "Inter", Arial, sans-serif';
-                            ctx.fillStyle = '#ffffff';
-                            ctx.shadowColor = '#000';
-                            ctx.shadowBlur = 8;
-                            const now = new Date();
-                            const dateStr = now.toLocaleDateString('en-ZA') + ' ' + now.toLocaleTimeString('en-ZA', {hour12: false});
-                            const locationStr = (gpsCoords.lat && gpsCoords.lon) ? `${gpsCoords.lat.toFixed(5)}, ${gpsCoords.lon.toFixed(5)}` : 'location pending';
-                            ctx.fillText(`📅 ${dateStr}`, 20, canvas.height - 32);
-                            ctx.fillText(`📍 ${locationStr}`, 20, canvas.height - 8);
-                            const stampedBase64 = canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
-                            const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
-                            resolve({ stampedBase64, previewUrl, fileName: `stamped_${file.name.replace(/\.[^/.]+$/, '')}.jpg`, locationText: locationStr });
-                        };
-                        img.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
+function initDates(){const d=new Date(); const iso=d.toISOString().slice(0,10); ['ntIssue','ntDue','rtStart'].forEach(id=>{const el=document.getElementById(id); if(el) el.value=iso;});}
+function login(){document.getElementById('loginErr').textContent='Synchronising login...';postApi('login',{username:loginUser.value.trim(),password:loginPass.value.trim()}).then(u=>{USER=u;localStorage.setItem('ob_user',JSON.stringify(u));start();alert('Login successful.');}).catch(e=>loginErr.textContent=e.message);}
+function setupNow(){document.getElementById('loginErr').textContent='Repairing sheets...';postApi('setup',{}).then(()=>{loginErr.textContent='Sheets repaired. Try login again. This setup only fixes tabs/headings; heavy score repair is no longer run during setup/login.';}).catch(e=>loginErr.textContent=e.message);}
+function logout(){showSync('Synchronising logout...');if(AUTO_REFRESH_TIMER) clearInterval(AUTO_REFRESH_TIMER);localStorage.removeItem('ob_user');alert('Logout successful.');location.reload();}
+function start(){document.getElementById('login').classList.add('hide');document.getElementById('app').classList.remove('hide');userPill.textContent=USER.Name+' · '+USER.Role;initDates();applyRoleVisibility();refresh();}
+function refresh(){
+  const seq=++REQUEST_SEQ;
+  ACTIVE_DATA_VIEW='all';
+  postApi('bootstrap',{userId:USER.UserID,max:500}).then(data=>{
+    if(seq!==REQUEST_SEQ) return; // Prevent older responses from overwriting newer data.
+    keepLastGoodState(data,{allowEmpty:false});
+    fillLists();applyRoleVisibility();render();startAutoRefresh();LAST_REFRESH_AT=Date.now();
+  }).catch(e=>{
+    hideSync();
+    if((LAST_GOOD_STATE.tickets||[]).length){STATE=JSON.parse(JSON.stringify(LAST_GOOD_STATE));render();return alert('Temporary loading issue. The last stable dashboard data has been kept on screen. '+(e.message||e));}
+    alert('Bootstrap loading failed: '+(e.message||e)+'\n\nDeploy the matching FAST LAZY BULLETPROOF Apps Script as a NEW VERSION, then refresh. If it still fails, check the Apps Script error shown above.');
+  });
+}
+function loadTicketsView(view, max, opts={}){
+  if(!USER) return;
+  ACTIVE_DATA_VIEW=view||'all';
+  const seq=++REQUEST_SEQ;
+  const useBootstrap = !(STATE.users||[]).length && ACTIVE_DATA_VIEW==='all';
+  const action = useBootstrap ? 'bootstrap' : 'getTicketsByView';
+  const payload = useBootstrap ? {userId:USER.UserID,max:max||500} : {userId:USER.UserID,view:ACTIVE_DATA_VIEW,max:max||500};
+  return postApi(action,payload).then(data=>{
+    if(seq!==REQUEST_SEQ) return; // Ignore stale late responses.
+    keepLastGoodState(data,{allowEmpty:!!opts.allowEmpty});
+    if(useBootstrap || (data&&data.users)) fillLists();
+    applyRoleVisibility();render();LAST_REFRESH_AT=Date.now();startAutoRefresh();
+  }).catch(e=>{
+    hideSync();
+    if((LAST_GOOD_STATE.tickets||[]).length){STATE=JSON.parse(JSON.stringify(LAST_GOOD_STATE));render(); if(!opts.silent) alert('Temporary loading issue. The last stable dashboard data has been kept on screen. '+(e.message||e)); return;}
+    if(!opts.silent) alertErr(e);
+  });
+}
+function alertErr(e){alert(e.message||e);}
+function showTab(id){if((id==='review1'||id==='review2')&&!isReviewAllowed(id)){id='task';}showSync('Synchronising navigation...');document.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.tab===id;b.classList.toggle('on',on);b.classList.toggle('active',on);});document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on',s.id===id));setTimeout(hideSync,250);
+  // Use local cache for navigation so counters do not disappear during tab changes.
+  render();
+  const view = id==='review1'?'review1':id==='review2'?'review2':id==='closed'?'closed':id==='task'?'task':id==='performance'?'all':null;
+  if(view && (Date.now()-LAST_REFRESH_AT>REFRESH_INTERVAL_MS)) loadTicketsView(view, id==='performance'?500:300, {silent:true, background:true});
+}
+function modeChange(){const rec=document.querySelector('[name=mode]:checked').value==='recurring';document.querySelectorAll('.recOnly').forEach(e=>e.classList.toggle('hide',!rec));document.querySelectorAll('.singleOnly').forEach(e=>e.classList.toggle('hide',rec));}
+function activeUsers(){return (STATE.users||[]).filter(u=>String(u.IsActive).toUpperCase()!=='FALSE');}
+function selectedAssignee(){return activeUsers().find(u=>String(u.UserID)===String(ntAssignee.value))||{};}
+function fillLists(){
+  ntAssignee.innerHTML=activeUsers().map(u=>`<option value="${u.UserID}">${esc(u.Name)} — ${esc(u.Role||'User')}</option>`).join('');
+  assigneeChanged();
+}
+function assigneeChanged(){
+  const u=selectedAssignee();
+  if(!u.UserID) return;
+  ntAssigneeEmail.value=u.Email||'';
+  ntAssigneePhone.value=u.Phone||'';
+  ntAssigneeWhatsApp.value=u.WhatsApp||'';
+  ntDept.value=u.Department||'';
+  ntCostCenter.value=u.CostCenter||'';
+  buildNewTaskWhatsAppCopy();
+}
+['ntTitle','ntDesc','ntPriority','ntIssue','ntDue','rtStart','rtFreq','rtDueDays','rtOcc'].forEach(id=>setTimeout(()=>{const el=document.getElementById(id); if(el){el.addEventListener('input',buildNewTaskWhatsAppCopy);el.addEventListener('change',buildNewTaskWhatsAppCopy);}},0));
+function buildNewTaskWhatsAppCopy(ref){
+  const u=selectedAssignee();
+  const mode=document.querySelector('[name=mode]:checked')?.value||'single';
+  const due=mode==='recurring'?`${rtFreq?.value||'Recurring'} from ${rtStart?.value||''}, due after ${rtDueDays?.value||''} day(s), ${rtOcc?.value||''} occurrence(s)`:ntDue?.value;
+  const msg=`ONPOINT-BASE NEW TASK${ref?' - '+ref:''}\n\nAssigned to: ${u.Name||''}\nDepartment: ${u.Department||''}\nCost Center: ${u.CostCenter||''}\nTitle: ${ntTitle?.value||''}\nPriority: ${ntPriority?.value||''}\nIssue Date: ${ntIssue?.value||''}\nDue: ${due||''}\n\nDescription:\n${ntDesc?.value||''}`;
+  if(document.getElementById('ntWhatsAppCopy')) ntWhatsAppCopy.value=msg;
+  return msg;
+}
+function cleanPhone(p){return String(p||'').replace(/[^0-9]/g,'').replace(/^0/,'27');}
+async function copyText(txt){try{await navigator.clipboard.writeText(txt);alert('Task copied to clipboard.');}catch(e){prompt('Copy this message:',txt);}}
+function copyNewTaskWhatsApp(){copyText(buildNewTaskWhatsAppCopy());}
+function openNewTaskWhatsApp(){const u=selectedAssignee();const phone=cleanPhone(u.WhatsApp||u.Phone);if(!phone)return alert('No WhatsApp number found for selected assignee in Users tab.');window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(buildNewTaskWhatsAppCopy()),'_blank');}
+function openTicketWhatsApp(){const t=DETAIL.ticket;const phone=cleanPhone(t.AssignedToWhatsApp||t.AssignedToPhone);if(!phone)return alert('No WhatsApp number found for this assignee.');const msg=t.WhatsAppMessage||ticketWhatsAppText(t);window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');}
+function copyTicketWhatsApp(){copyText(DETAIL.ticket.WhatsAppMessage||ticketWhatsAppText(DETAIL.ticket));}
+function ticketWhatsAppText(t){return `ONPOINT-BASE TASK ${t.TicketID}\n\nAssigned to: ${t.AssignedToName}\nDepartment: ${t.Department||''}\nCost Center: ${t.CostCenter||''}\nTitle: ${t.Title}\nPriority: ${t.Priority}\nIssue Date: ${fmt(t.IssueDate)}\nDue: ${fmt(t.DueDate)}\nStatus: ${t.Status}\nTime lapse: ${t.TimeRemainingText||''}\n\nDescription:\n${t.Description||''}`;}
+function userRoleKey(){return String(USER?.Role||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function identityKey(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9@.]+/g,'');}
+function nameKey(v){return String(v||'').trim().toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9]+/g,'');}
+function emailKey(v){return String(v||'').trim().toLowerCase();}
+function userMatch(a,b){const aa=identityKey(a),bb=identityKey(b);return aa!==''&&bb!==''&&aa===bb;}
+function emailMatch(a,b){const aa=emailKey(a),bb=emailKey(b);return aa!==''&&bb!==''&&aa===bb;}
+function nameMatch(a,b){const aa=nameKey(a),bb=nameKey(b);return aa!==''&&bb!==''&&aa===bb;}
+function isMineAsCreator(t){return userMatch(t.CreatedByUserID,USER.UserID)||emailMatch(t.CreatedByEmail,USER.Email)||nameMatch(t.CreatedByName,USER.Name);}
+function isMineAsAssignee(t){return userMatch(t.AssignedToUserID,USER.UserID)||emailMatch(t.AssignedToEmail,USER.Email)||nameMatch(t.AssignedToName,USER.Name);}
+function isExecutiveUser(){const r=userRoleKey();return r==='admin'||r==='adminmanager'||r==='executive1'||r==='exec1'||r==='executive2'||r==='exec2';}
+function isReviewAllowed(kind){
+  const r=userRoleKey();
+  if(r==='admin'||r==='adminmanager') return true;
+  if(kind==='review1') return r==='executive1'||r==='exec1';
+  if(kind==='review2') return r==='executive2'||r==='exec2';
+  return true;
+}
+function applyRoleVisibility(){
+  const showReview=isExecutiveUser();
+  document.querySelectorAll('.reviewOnly').forEach(el=>el.classList.toggle('hide',!showReview));
+  if(!showReview && (document.getElementById('review1')?.classList.contains('on') || document.getElementById('review2')?.classList.contains('on'))){showTab('task');}
+}
 
-            async function handleFileSelect(files) {
-                const list = Array.from(files || []).slice(0, 5);
-                if (!list.length) return;
-                if ((files || []).length > 5) alert('Only the first 5 images will be uploaded.');
-                requestDriverLocation();
-                const invalid = list.find(file => !file.type.startsWith('image/'));
-                if (invalid) { alert('Please select images only'); return; }
-                try {
-                    attachmentStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> stamping images with location & time...';
-                    selectedFiles = list;
-                    stampedImages = [];
-                    if (multiPreviewList) multiPreviewList.innerHTML = '';
-                    for (let i = 0; i < list.length; i++) {
-                        const stamped = await stampImageWithOverlay(list[i]);
-                        stampedImages.push({
-                            index: i + 1,
-                            fileName: stamped.fileName,
-                            fileType: 'image/jpeg',
-                            base64: stamped.stampedBase64
-                        });
-                        if (multiPreviewList) {
-                            const card = document.createElement('div');
-                            card.className = 'multi-preview-card';
-                            card.innerHTML = `<img class="preview-thumb" src="${stamped.previewUrl}" alt="stamped preview ${i + 1}"><small>${stamped.fileName}</small>`;
-                            multiPreviewList.appendChild(card);
-                        }
-                    }
-                    const first = stampedImages[0] || {};
-                    imageBase64Hidden.value = first.base64 || '';
-                    imageFileNameHidden.value = first.fileName || '';
-                    imageFileTypeHidden.value = first.fileType || '';
-                    fileNameDisplay.innerHTML = `<i class="far fa-images"></i> ${stampedImages.length} photo${stampedImages.length === 1 ? '' : 's'} ready`;
-                    stampLocationSpan.innerText = (gpsCoords.lat && gpsCoords.lon) ? `${gpsCoords.lat.toFixed(5)}, ${gpsCoords.lon.toFixed(5)}` : 'location pending';
-                    previewContainer.style.display = 'flex';
-                    attachmentStatus.innerHTML = `<i class="fas fa-check-circle" style="color:#1a4b8c;"></i> ${stampedImages.length} stamped photo${stampedImages.length === 1 ? '' : 's'} ready`;
-                } catch (err) {
-                    alert('Error processing image');
-                    console.error(err);
-                }
-            }
+function executiveDashboardTickets(){
+  // Dashboard and Performance must use the server-supplied global list for Executive1/Executive2/Admin.
+  // My Tickets and drawer actions still use STATE.tickets so the approval workflow stays unchanged.
+  if(!isExecutiveUser()) return STATE.tickets || [];
+  const global = STATE.globalTickets || STATE.dashboardTickets || [];
+  return global.length ? global : (STATE.tickets || []);
+}
+function workflowTickets(){return STATE.tickets || [];}
+function myTickets(){
+  const tickets=workflowTickets();
+  if(isExecutiveUser()){
+    return tickets.filter(t=>(isMineAsCreator(t)||isMineAsAssignee(t)||t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2') && t.Status!=='Closed');
+  }
+  return tickets.filter(t=>(isMineAsAssignee(t)||isMineAsCreator(t)) && t.Status!=='Closed');
+}
+function isLate(t){return String(t.TimeRemainingText||'').toLowerCase().includes('late') || String(t.ClosedTiming||'').toLowerCase().includes('late');}
+function isOpenOnTime(t){return t.Status!=='Closed' && !isLate(t) && (t.CurrentBasket==='Assignee'||t.Status==='Open');}
+function filterTickets(kind){
+  const tickets=(kind==='all')?workflowTickets():(isExecutiveUser()?executiveDashboardTickets():workflowTickets());
+  if(kind==='critical') return tickets.filter(t=>String(t.Priority)==='Critical' && t.Status!=='Closed' && (isExecutiveUser() || isMineAsAssignee(t)));
+  if(kind==='openOnTime') return tickets.filter(t=>isOpenOnTime(t) && (isExecutiveUser() || isMineAsAssignee(t)));
+  if(kind==='openLate') return tickets.filter(t=>t.Status!=='Closed' && isLate(t) && (isExecutiveUser() || isMineAsAssignee(t)));
+  if(kind==='review1') return isReviewAllowed('review1') ? tickets.filter(t=>t.CurrentBasket==='Executive1') : [];
+  if(kind==='review2') return isReviewAllowed('review2') ? tickets.filter(t=>t.CurrentBasket==='Executive2') : [];
+  if(kind==='closed') return tickets.filter(t=>t.Status==='Closed' || t.CurrentBasket==='Closed');
+  if(kind==='assigned') return tickets.filter(t=>t.CurrentBasket==='Assignee' && t.Status!=='Closed' && (isExecutiveUser() || isMineAsAssignee(t)));
+  return myTickets();
+}
+function openTicketWindow(kind){
+  if((kind==='review1'||kind==='review2')&&!isReviewAllowed(kind)){kind='all';}
+  CURRENT_FILTER=kind;
+  if(kind==='review1') showTab('review1');
+  else if(kind==='review2') showTab('review2');
+  else if(kind==='closed') showTab('closed');
+  else showTab('task');
+  render();
+  if(Date.now()-LAST_REFRESH_AT>REFRESH_INTERVAL_MS) loadTicketsView(kind==='all'?'task':kind,300,{silent:true,background:true});
+  const el=document.getElementById('taskRows'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function render(){const s=(searchTask?.value||'').toLowerCase();const tickets=workflowTickets();const dashboardTickets=executiveDashboardTickets();const sum={critical:0,openOnTime:0,e1:0,e2:0,closed:0,late:0};dashboardTickets.forEach(t=>{if(String(t.Priority)==='Critical'&&t.Status!=='Closed')sum.critical++; if(isOpenOnTime(t))sum.openOnTime++; if(t.CurrentBasket==='Executive1')sum.e1++; if(t.CurrentBasket==='Executive2')sum.e2++; if(t.Status==='Closed'||t.CurrentBasket==='Closed')sum.closed++; if(t.Status!=='Closed'&&isLate(t))sum.late++;});// Dashboard counters are calculated from the global executive dashboard cache when available.
+  // This prevents flickering caused by a delayed or partial server summary.
+  if(document.getElementById('stCritical'))stCritical.textContent=sum.critical; if(document.getElementById('stOpenOnTime'))stOpenOnTime.textContent=sum.openOnTime; stE1.textContent=sum.e1;stE2.textContent=sum.e2;stClosed.textContent=sum.closed;stLate.textContent=sum.late; renderDashboard(dashboardTickets,sum); buildPerfOptions(); renderPerformance();
+  const filtered=filterTickets(CURRENT_FILTER).filter(t=>(t.Title+t.TicketID+t.AssignedToName+t.Department+t.CostCenter).toLowerCase().includes(s));
+  taskRows.innerHTML=(`<tr><td colspan="8" class="filterTitle">Showing: ${esc(filterLabel(CURRENT_FILTER))}</td></tr>`)+ (filtered.map(rowTask).join('')||empty(8));
+  review1Rows.innerHTML=isReviewAllowed('review1')?(dashboardTickets.filter(t=>t.CurrentBasket==='Executive1' && t.Status!=='Closed').map(rowReview1).join('')||empty(6)):empty(6);
+  review2Rows.innerHTML=isReviewAllowed('review2')?(dashboardTickets.filter(t=>t.CurrentBasket==='Executive2' && t.Status!=='Closed').map(rowReview2).join('')||empty(6)):empty(6);
+  closedRows.innerHTML=dashboardTickets.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(rowClosed).join('')||empty(8);
+}
+function filterLabel(k){return ({critical:'Critical Tickets',openOnTime:'Open & Ontime Tickets',openLate:'Open and Late Tickets',review1:'Executive1 Review Basket',review2:'Executive2 Review Basket',closed:'Closed Tickets',assigned:'Assigned Tickets',all:isExecutiveUser()?'Tickets I Assigned':'My Assigned Tickets'})[k]||k;}
+function computedFinalNumber(t){const stored=Number(t.FinalScore);return (t.FinalScore===''||t.FinalScore==null||isNaN(stored))?null:stored;}
+function avgComputedFinal(rows){const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed').map(computedFinalNumber).filter(n=>n!==null&&!isNaN(n));return closed.length?Math.round(closed.reduce((a,b)=>a+b,0)/closed.length):0;}
+function renderDashboard(tickets,sum){
+  const byDept={}; const byCC={}; let totalScore=0, scoreCount=0;
+  tickets.forEach(t=>{byDept[t.Department||'Unassigned']=(byDept[t.Department||'Unassigned']||0)+1;byCC[t.CostCenter||'Unassigned']=(byCC[t.CostCenter||'Unassigned']||0)+1;const cf=computedFinalNumber(t);if((t.Status==='Closed'||t.CurrentBasket==='Closed')&&cf!==null){totalScore+=cf;scoreCount++;}});
+  const avg=scoreCount?Math.round(totalScore/scoreCount):0;
+  const split={'Critical Tickets':sum.critical,'Open & Ontime':sum.openOnTime,'Executive1 Review':sum.e1,'Executive2 Review':sum.e2,'Open & Late':sum.late,'Closed':sum.closed};
+  dashBody.innerHTML=`<div class="card"><h3>Workflow Split</h3>${dashBars(split,'workflow')}</div><div class="card clickable" onclick="showDashboardList('score','Average Final Score')"><h3>Performance</h3><div class="stat"><div class="l">Average final score</div><div class="v">${avg}%</div></div><p class="muted">Click to show closed ticket score data.</p></div><div class="card"><h3>By Department</h3>${dashBars(byDept,'Department')}</div><div class="card"><h3>By Cost Center</h3>${dashBars(byCC,'CostCenter')}</div>`;
+}
+function dashBars(obj,type){const max=Math.max(1,...Object.values(obj).map(Number));return Object.keys(obj).map(k=>{let kind= type==='workflow'?({'Critical Tickets':'critical','Open & Ontime':'openOnTime','Executive1 Review':'review1','Executive2 Review':'review2','Open & Late':'openLate','Closed':'closed'}[k]||'all') : type+':'+k; let click=type.startsWith('perfGroup:')?`showPerformanceGroup('${esc(type.split(':')[1])}','${esc(k)}')`:`showDashboardList('${esc(kind)}','${esc(k)}')`; let cls=(k.includes('Critical')||k.includes('Late'))?'bad':(k.includes('Ontime')?'good':'');return `<div class="barrow clickable ${cls}" onclick="${click}"><div class="lbl">${esc(k)}</div><div class="track"><div class="fill" style="width:${Math.round(Number(obj[k])/max*100)}%"></div></div><div class="num">${obj[k]}${type.startsWith('perfGroup:')?'%':''}</div></div>`}).join('')||'<p class="muted">No data.</p>';}
+function showDashboardList(kind,title){const source=executiveDashboardTickets();let rows=[]; if(kind==='score') rows=source.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); else if(kind.includes(':')){const [field,val]=kind.split(':'); rows=source.filter(t=>String(t[field]||'Unassigned')===val);} else rows=filterTickets(kind); dashList.innerHTML=miniTicketTable(title,rows);}
+function miniTicketTable(title,rows){return `<div class="panel"><h2>${esc(title)} Data</h2><div class="scroll"><table><thead><tr><th>Ref</th><th>Title</th><th>Assignee</th><th>Department</th><th>Cost Center</th><th>Status</th><th>Priority</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th></tr></thead><tbody>${rows.map(t=>`<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${esc(t.TicketID)}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${esc(t.Department)}</td><td>${esc(t.CostCenter)}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`).join('')||empty(11)}</tbody></table></div></div>`}
+function buildPerfOptions(){
+  const mode=document.getElementById('perfMode')?.value||'individual';
+  const sel=document.getElementById('perfValue'); if(!sel)return;
+  const users=activeUsers();
+  let vals=[];
+  if(mode==='individual') vals=users.map(u=>u.Name).filter(Boolean);
+  if(mode==='department') vals=users.map(u=>u.Department||'Unassigned').filter(Boolean);
+  if(mode==='costcenter') vals=users.map(u=>u.CostCenter||'Unassigned').filter(Boolean);
+  vals=[...new Set(vals)].sort();
+  const old=sel.value;
+  if(mode==='individual') sel.innerHTML='<option value="__ALL__">All Users</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  else if(mode==='department' || mode==='costcenter') sel.innerHTML='<option value="__ALL__">All '+(mode==='department'?'Departments':'Cost Centers')+'</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  else sel.innerHTML=vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  if(vals.includes(old) || old==='__ALL__') sel.value=old; else sel.value='__ALL__';
+}
+function avgScore(rows){return avgComputedFinal(rows);}
+function groupPerformanceRows(field, sourceValues){const tickets=executiveDashboardTickets(); const names=[...new Set([...(sourceValues||[]),...tickets.map(t=>t[field]||'Unassigned')].filter(Boolean))].sort();return names.map(name=>{const rows=tickets.filter(t=>String(t[field]||'Unassigned')===String(name));const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed');const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t));return {name,rows,total:rows.length,closed:closed.length,late:late.length,avg:avgScore(rows)};});}
+function avgField(rows, field){const vals=rows.map(t=>Number(t[field])).filter(n=>!isNaN(n));return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):'';}
+function performanceSummaryTable(title, groups, field){return `<div class="panel"><h2>${esc(title)}</h2><div class="scroll"><table><thead><tr><th>Name</th><th>Total Tickets</th><th>Closed</th><th>Open Late</th><th>System %</th><th>Exec1 %</th><th>Exec2 %</th><th>Final %</th><th>Action</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.name)}</td><td>${g.total}</td><td>${g.closed}</td><td>${g.late}</td><td>${score(avgField(g.rows,'SystemScore'))}</td><td>${score(avgField(g.rows,'Executive1Score'))}</td><td>${score(avgField(g.rows,'Executive2Score'))}</td><td>${finalScore(avgComputedFinal(g.rows))}</td><td><button class="btn" onclick="showPerformanceGroup('${esc(field)}','${esc(g.name)}')">Open Data</button></td></tr>`).join('')||empty(9)}</tbody></table></div></div>`;}
+function showPerformanceGroup(field,name){const rows=executiveDashboardTickets().filter(t=>String(t[field]||'Unassigned')===String(name));perfList.innerHTML=miniTicketTable('Performance Report - '+name, rows);}
+function renderPerformance(){const mode=document.getElementById('perfMode')?.value||'individual'; const val=document.getElementById('perfValue')?.value||''; const users=activeUsers(); const tickets=executiveDashboardTickets(); const field=mode==='individual'?'AssignedToName':mode==='department'?'Department':'CostCenter'; if(!document.getElementById('perfBody'))return;
+  if(mode==='department' || mode==='costcenter'){
+    const sourceValues=users.map(u=>mode==='department'?(u.Department||'Unassigned'):(u.CostCenter||'Unassigned'));
+    const groups=groupPerformanceRows(field, sourceValues);
+    const selected=val && val!=='__ALL__'?groups.find(g=>String(g.name)===String(val)):null;
+    const overall=selected?selected.avg:avgComputedFinal(tickets);
+    const chartObj={}; groups.forEach(g=>chartObj[g.name]=g.avg);
+    perfBody.innerHTML=`<div class="card"><h3>${esc(selected?selected.name:(mode==='department'?'All Departments':'All Cost Centers'))}</h3><div class="stat"><div class="l">Average performance</div><div class="v">${overall}%</div></div><p class="muted">Scores are averaged from closed ticket final scores stored in the Scores tab.</p></div><div class="card"><h3>${esc(mode==='department'?'Department Scores':'Cost Center Scores')}</h3>${dashBars(chartObj,'perfGroup:'+field)}</div>`;
+    perfList.innerHTML=performanceSummaryTable(mode==='department'?'All Department Scores':'All Cost Center Scores',groups,field)+(selected?miniTicketTable('Selected Data - '+selected.name, selected.rows):'');
+    return;
+  }
+  const rows=val==='__ALL__'?tickets:tickets.filter(t=>String(t[field]||'Unassigned')===String(val)); const title=val==='__ALL__'?'All Users':(val||'No Selection'); const closed=rows.filter(t=>t.Status==='Closed'||t.CurrentBasket==='Closed'); const late=rows.filter(t=>t.Status!=='Closed'&&isLate(t)); const critical=rows.filter(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed'); const avg=avgScore(rows); const sysAvg=avgField(rows,'SystemScore'); const e1Avg=avgField(rows,'Executive1Score'); const e2Avg=avgField(rows,'Executive2Score'); perfBody.innerHTML=`<div class="card"><h3>${esc(title)}</h3><div class="stat"><div class="l">${esc(mode)} report</div><div class="v">${rows.length}</div></div><p class="muted">Total tickets included in the executive performance view.</p></div><div class="card"><h3>Scores</h3><p><b>System:</b> ${score(sysAvg)} &nbsp; <b>Exec1:</b> ${score(e1Avg)} &nbsp; <b>Exec2:</b> ${score(e2Avg)} &nbsp; <b>Final:</b> ${finalScore(avg)}</p></div><div class="card"><h3>Open Exceptions</h3>${dashBars({'Critical':critical.length,'Open Late':late.length,'Closed':closed.length},'perf')}</div>`; perfList.innerHTML=miniTicketTable('Performance Report - '+title, rows);}
+function printPerformance(){document.querySelectorAll('.section').forEach(s=>s.classList.remove('printTarget'));document.getElementById('performance').classList.add('printTarget');window.print();}
+function empty(n){return `<tr><td colspan="${n}" class="muted" style="text-align:center;padding:28px">No tickets found.</td></tr>`}
+function lateText(t){if(Number(t.LateDays||0)>0)return Number(t.LateDays)+' day(s) late';return t.TimeRemainingText||'0 days late';}
+function rowTask(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${esc(t.AssignedToName)}</td><td>${fmt(t.DueDate)}</td><td>${esc(lateText(t))}</td><td>${status(t)}</td><td class="priority-${t.Priority}">${esc(t.Priority)}</td><td><button class="btn good" onclick="openTicket('${t.TicketID}')">Open</button></td></tr>`}
+function rowReview1(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.SubmittedAt)}</td><td>${score(t.SystemScore)}</td><td>${esc(t.AssignedToName)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
+function rowReview2(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${esc(t.TimeRemainingText)}</td><td><button class="btn primary" onclick="openTicket('${t.TicketID}')">Review</button></td></tr>`}
+function rowClosed(t){return `<tr><td><a class="ticket-link" onclick="openTicket('${t.TicketID}')">${t.TicketID}</a></td><td>${esc(t.Title)}</td><td>${fmt(t.ClosedAt)}</td><td>${esc(t.ClosedTiming)}</td><td>${score(t.SystemScore)}</td><td>${score(t.Executive1Score)}</td><td>${score(t.Executive2Score)}</td><td>${finalScore(computedFinalNumber(t))}</td></tr>`}
+function status(t){const cls=t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'?'s-review':String(t.TimeRemainingText).includes('late')?'s-late':'s-open';return `<span class="status ${cls}">${esc(t.Status)}</span>`}
+function score(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`${Math.round(n)}%`}
+function finalScoreClass(v){const n=Number(v); if(isNaN(n))return ''; if(n<50)return 'score-final-red'; if(n>=90)return 'score-final-black'; if(n>=75)return 'score-final-blue'; return 'score-final-green';}
+function finalScore(v){const n=Number(v);return (v===''||v==null||isNaN(n))?'—':`<span class="${finalScoreClass(n)}">${Math.round(n)}%</span>`}
+function linkListFromUploadAttachment(v){return String(v||'').split(/\s+/).filter(x=>/^https?:\/\//i.test(x)).map((url,i)=>`<div class="fileline"><a target="_blank" href="${esc(url)}">Ticket upload link ${i+1}</a></div>`).join('');}
+function fmt(v){return v?String(v).replace('T',' ').slice(0,16):'—'}
+function esc(v){return String(v??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-            fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFileSelect(e.target.files); });
-            dropZone.addEventListener('dragover', (e) => e.preventDefault());
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                if (e.dataTransfer.files.length > 0) handleFileSelect(e.dataTransfer.files);
-            });
-            clearImageBtn.addEventListener('click', () => {
-                selectedFiles = [];
-                stampedImages = [];
-                fileInput.value = '';
-                imageBase64Hidden.value = '';
-                imageFileNameHidden.value = '';
-                imageFileTypeHidden.value = '';
-                if (multiPreviewList) multiPreviewList.innerHTML = '';
-                if (fileNameDisplay) fileNameDisplay.innerHTML = '<i class="far fa-images"></i> 0 photos selected';
-                previewContainer.style.display = 'none';
-                attachmentStatus.innerHTML = 'No image — GPS will be fetched live';
-                stampLocationSpan.innerText = 'locating…';
-            });
+function createTicket(){newErr.textContent='';newMsg.textContent='';const mode=document.querySelector('[name=mode]:checked').value;const base={userId:USER.UserID,assignedToUserId:ntAssignee.value,title:ntTitle.value,description:ntDesc.value,priority:ntPriority.value,department:ntDept.value,costCenter:ntCostCenter.value};const action=mode==='recurring'?'createRecurringTicket':'createTicket';const data=mode==='recurring'?{...base,startDate:rtStart.value,frequency:rtFreq.value,dueDays:rtDueDays.value,occurrences:rtOcc.value}:{...base,issueDate:ntIssue.value,dueDate:ntDue.value};postApi(action,data).then((res)=>{const first=(res.ticket||((res.tickets||[])[0])||{}); const msg=buildNewTaskWhatsAppCopy(first.TicketID); newMsg.textContent=' Ticket created. WhatsApp message copied/opened for assignee.'; copyText(msg); const u=selectedAssignee(); const phone=cleanPhone(u.WhatsApp||u.Phone); if(phone) window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank'); ntTitle.value='';ntDesc.value='';refresh();}).catch(e=>newErr.textContent=e.message);}
 
-            function getFormData() {
-                const reported = document.querySelector('input[name="reportedMetro"]:checked');
-                const drunken = document.querySelector('input[name="drunkenDriving"]:checked');
-                const atFault = document.querySelector('input[name="atFault"]:checked');
-                return {
-                    action: 'submitAccident',
-                    timestamp: new Date().toISOString(),
-                    date: document.getElementById('accidentDate').value,
-                    time: document.getElementById('accidentTime').value,
-                    vehicleReg: document.getElementById('vehicleReg').value,
-                    location: document.getElementById('location').value,
-                    accidentType: document.getElementById('accidentType').value,
-                    department: document.getElementById('department').value,
-                    costCenter: document.getElementById('costCenter').value,
-                    driverName: document.getElementById('driverName').value,
-                    driverPhone: document.getElementById('driverPhone').value,
-                    description: document.getElementById('description').value,
-                    otherParties: document.getElementById('otherParties').value,
-                    reportedMetro: reported ? reported.value : 'Not specified',
-                    officerName: document.getElementById('officerName').value || 'N/A',
-                    officerPhone: document.getElementById('officerPhone').value || 'N/A',
-                    drunkenDriving: drunken ? drunken.value : 'Not specified',
-                    policeReportNo: document.getElementById('policeReportNo').value || 'N/A',
-                    atFault: atFault ? atFault.value : 'Not specified',
-                    lat: capturedLat.value || 'unknown',
-                    lon: capturedLon.value || 'unknown',
-                    geoUrl: capturedGeoUrl.value || '',
-                    imageFileName: imageFileNameHidden.value || '',
-                    imageBase64: imageBase64Hidden.value || '',
-                    photosJson: JSON.stringify(stampedImages || []),
-                    sheetId: SHEET_ID,
-                    driveFolderId: DRIVE_FOLDER_ID
-                };
-            }
+let DETAIL=null;
+function openTicket(id){postApi('getTicketDetail',{userId:USER.UserID,ticketId:id}).then(d=>{DETAIL=d;drawDrawer();drawer.classList.add('open');scrim.classList.add('open');}).catch(e=>{
+  const cached=(STATE.tickets||[]).find(t=>String(t.TicketID)===String(id));
+  if(cached && (cached.CurrentBasket==='Executive2'||cached.CurrentBasket==='Executive1'||isMineAsCreator(cached)||isMineAsAssignee(cached)||isExecutiveUser())){
+    DETAIL={ticket:cached,attachments:[],comments:[{UserName:'System',Role:'Notice',CreatedAt:new Date().toISOString(),Comment:'Ticket detail could not be loaded from Apps Script, but the cached ticket is available. You can still attempt the authorised workflow action.'}],timeRequests:[]};
+    drawDrawer();drawer.classList.add('open');scrim.classList.add('open');
+    return;
+  }
+  alertErr(e);
+});}
+function closeDrawer(){drawer.classList.remove('open');scrim.classList.remove('open');}
+function drawDrawer(){const t=DETAIL.ticket;dRef.textContent=t.TicketID;dStatus.outerHTML=`<span id="dStatus" class="status ${t.Status==='Closed'?'s-closed':t.CurrentBasket==='Executive1'||t.CurrentBasket==='Executive2'?'s-review':'s-open'}">${esc(t.Status)}</span>`;dBody.innerHTML=`<h2>${esc(t.Title)}</h2><p class="muted">${esc(t.Description||'No description')}</p><div class="kv"><div><small>Created by</small><b>${esc(t.CreatedByName)}</b></div><div><small>Assigned to</small><b>${esc(t.AssignedToName)}</b></div><div><small>Assignee Email</small><b>${esc(t.AssignedToEmail||'')}</b></div><div><small>Assignee WhatsApp</small><b>${esc(t.AssignedToWhatsApp||'')}</b></div><div><small>Department</small><b>${esc(t.Department||'')}</b></div><div><small>Cost Center</small><b>${esc(t.CostCenter||'')}</b></div><div><small>Due Date</small><b>${fmt(t.DueDate)}</b></div><div><small>Submission Date</small><b>${fmt(t.SubmittedAt)}</b></div><div><small>Time lapse</small><b>${esc(t.TimeRemainingText)}</b></div><div><small>System Score</small><b>${score(t.SystemScore)}</b></div><div><small>Final Score</small><b>${finalScore(computedFinalNumber(t))}</b></div><div><small>Executive1</small><b>${score(t.Executive1Score)} ${esc(t.Executive1Name||'')}</b></div><div><small>Executive2</small><b>${score(t.Executive2Score)} ${esc(t.Executive2Name||'')}</b></div></div><div class="copybar"><button class="btn" onclick="copyTicketWhatsApp()">Copy Task to WhatsApp</button><button class="btn good" onclick="openTicketWhatsApp()">Open WhatsApp to Assignee</button></div><h3>Attachments</h3>${(DETAIL.attachments.map(a=>`<div class="fileline"><a target="_blank" href="${a.DriveUrl}">${esc(a.FileName)}</a></div>`).join('') + linkListFromUploadAttachment(t.UploadAttachment)) || '<p class="muted">No attachments.</p>'}<div class="f"><label>Upload Attachment / File</label><input type="file" id="fileUp"><button class="btn" onclick="uploadFile()">Upload File</button></div><h3>Comments</h3><div class="comments">${DETAIL.comments.map(c=>`<div class="comment"><div class="meta">${esc(c.UserName)} · ${esc(c.Role)} · ${fmt(c.CreatedAt)}</div>${esc(c.Comment)}${c.DriveUrl?`<div class="fileline"><a target="_blank" href="${c.DriveUrl}">${esc(c.FileName||'View upload')}</a></div>`:''}</div>`).join('')||'<p class="muted">No comments.</p>'}</div><div class="f"><label>Add Comment</label><textarea id="commentTxt"></textarea><button class="btn" onclick="addComment()">Post Comment</button></div><h3>More Time Requests</h3><div class="comments">${(DETAIL.timeRequests||[]).map(r=>`<div class="comment"><div class="meta">${esc(r.RequestedByName)} · ${fmt(r.CreatedAt)} · ${esc(r.Status)}</div>Requested date: <b>${esc(r.RequestedDueDate)}</b><br>${esc(r.Reason||'')}</div>`).join('')||'<p class="muted">No time extension requests.</p>'}</div>`;drawActions(t);}
+function hasPendingTimeRequest(){return (DETAIL.timeRequests||[]).some(r=>String(r.Status||'').indexOf('Approved')<0 && String(r.Status||'').indexOf('Rejected')<0);}
+function drawActions(t){
+  let html='';
+  const role=userRoleKey();
+  const isAdmin=(role==='admin'||role==='adminmanager');
+  const basket=String(t.CurrentBasket||'').trim();
+  const status=String(t.Status||'').trim();
+  // USER SUBMIT BUTTON FIX ONLY:
+  // Normal assigned users such as Brighton must always see Submit Ticket / Request More Time
+  // while the ticket is still with the assignee. Ticket creators who are not assigned do not get submit rights.
+  const isAssigneeStage = basket==='' || basket==='Assignee' || status==='Open' || status==='Time Extension Approved' || status==='Returned' || status==='Re-opened';
+  const canSubmit=isAssigneeStage && status!=='Closed' && basket!=='Closed' && basket!=='Executive1' && basket!=='Executive2' && (isMineAsAssignee(t)||isAdmin);
+  if(canSubmit) html+=`<button class="btn primary" onclick="submitTicket()">Submit Ticket</button><div class="scorebox"><label>Request more time</label><input id="moreTimeDate" type="date"><input id="moreTimeReason" placeholder="Reason for more time"><button class="btn" onclick="requestMoreTime()">Send Request</button></div>`;
+  if(hasPendingTimeRequest()&&(isMineAsCreator(t)||role==='executive1'||role==='exec1'||isAdmin)) html+=`<button class="btn good" onclick="approveMoreTime()">Approve More Time Request</button>`;
+  if(t.CurrentBasket==='Executive1'&&(role==='executive1'||role==='exec1'||isAdmin)) html+=`<div class="scorebox"><label>Executive1 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Approval / return comment"><button class="btn primary" onclick="approve1()">Approve</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;
+  if((t.CurrentBasket==='Executive2')&&(role==='executive2'||role==='exec2'||isAdmin)) html+=`<div class="scorebox"><span class="pill">System Score: ${score(t.SystemScore)}</span><label>Executive2 Score %</label><input id="scoreIn" type="number" min="0" max="100" value="100"><input id="scoreComment" placeholder="Closing / return comment"><button class="btn primary" onclick="approve2()">Approve & Close</button><input id="returnDue" type="date" title="New due date"><button class="btn bad" onclick="returnTicket()">Return / Re-open</button></div>`;
+  dActions.innerHTML=html||'<span class="muted">No action available for your role on this ticket.</span>';
+  const rd=document.getElementById('returnDue');if(rd){const d=new Date();d.setDate(d.getDate()+1);rd.value=d.toISOString().slice(0,10);}const md=document.getElementById('moreTimeDate');if(md){const d=new Date();d.setDate(d.getDate()+2);md.value=d.toISOString().slice(0,10);}
+}
+function requestMoreTime(){const d=document.getElementById('moreTimeDate')?.value; if(!d)return alert('Select the new requested submission date.');postApi('requestMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,requestedDueDate:d,reason:document.getElementById('moreTimeReason')?.value||''}).then(()=>{alert('More time request sent to Executive1 and ticket creator for approval.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
+function approveMoreTime(){postApi('approveMoreTime',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('More time approval captured. If both required approvals are complete, the new submission date has been applied.');refresh();openTicket(DETAIL.ticket.TicketID);}).catch(alertErr)}
+function returnTicket(){const due=document.getElementById('returnDue')?.value; if(!due)return alert('Select a new due date before returning this ticket.');postApi('returnTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,newDueDate:due,comment:scoreComment?.value||commentTxt?.value||''}).then(()=>{alert('Ticket returned and re-opened with a new due date.');refresh();openTicket(DETAIL.ticket.TicketID)}).catch(alertErr)}
+function addComment(){postApi('addComment',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt.value}).then(()=>openTicket(DETAIL.ticket.TicketID)).catch(alertErr)}
 
-            function validateForm(data) {
-                const required = [
-                    data.date, data.time, data.vehicleReg, data.location,
-                    data.accidentType, data.department, data.costCenter,
-                    data.driverName, data.driverPhone, data.description
-                ];
-                if (required.some(f => !f)) {
-                    alert('Please fill all required fields including Cost Center and Driver Name');
-                    return false;
-                }
-                return true;
-            }
+function readFileAsBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(String(r.result).split(',')[1]||'');
+    r.onerror=()=>reject(new Error('Could not read the selected attachment.'));
+    r.readAsDataURL(file);
+  });
+}
+async function uploadFileChunked(file, ticketId, comment){
+  // Attachments now use POST instead of JSONP. This avoids URL-length failures
+  // and is the recommended method for images, PDFs, Word/Excel files and other documents.
+  const maxBytes = 18 * 1024 * 1024;
+  if(file.size > maxBytes){
+    throw new Error('File is too large. Please upload a file smaller than 18MB, or compress/split it.');
+  }
+  const base64 = await readFileAsBase64(file);
+  return postApi('uploadAttachmentPost', {
+    userId: USER.UserID,
+    ticketId: ticketId,
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    base64: base64,
+    comment: comment || ''
+  });
+}
 
-            async function submitToGoogleAppsScript() {
-                const data = getFormData();
-                if (!validateForm(data)) return;
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Submitting...';
-                submitBtn.disabled = true;
-                attachmentStatus.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending to Google Sheets...';
-                try {
-                    await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: new URLSearchParams(data)
-                    });
-                    incrementCounters();
-                    attachmentStatus.innerHTML = '<i class="fas fa-check-circle" style="color:#1a4b8c;"></i> Report submitted successfully to Google Sheets!';
-                    alert('✅ Accident report submitted successfully!\n\nData saved to Google Sheets.\nImage uploaded to Google Drive (if attached).');
-                    clearDataEntryFields();
-                } catch (error) {
-                    console.error('Submission error:', error);
-                    attachmentStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#b00;"></i> Error submitting report. Please try again.';
-                    alert('❌ Error submitting report. Please check your connection and try again.');
-                } finally {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
-            }
+async function submitTicket(){
+  const f=document.getElementById('fileUp')?.files?.[0];
+  try{
+    if(f) await uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'');
+    await postApi('submitTicket',{userId:USER.UserID,ticketId:DETAIL.ticket.TicketID,comment:commentTxt?.value||''});
+    updateTicketInCache(DETAIL.ticket.TicketID,{CurrentBasket:'Executive1',Status:'Submitted',SubmittedAt:new Date().toISOString()});
+    alert('Ticket submitted successfully. It has moved to Executive1 Review and disappeared from the assignee open basket.');
+    closeDrawer();
+    loadTicketsView('all',500,{silent:true,background:true});
+  }catch(e){alertErr(e);}
+}
+function approve1(){const ticketId=DETAIL.ticket.TicketID;postApi('executive1Approve',{userId:USER.UserID,ticketId:ticketId,score:scoreIn.value,comment:scoreComment.value}).then(()=>{updateTicketInCache(ticketId,{CurrentBasket:'Executive2',Executive1Score:scoreIn.value,Executive1Name:USER.Name,Status:'Submitted'});alert('Executive1 approval successful. Ticket moved to Executive2 and disappeared from Executive1 Review.');closeDrawer();loadTicketsView('all',500,{silent:true,background:true});}).catch(alertErr)}
+function approve2(){const ticketId=DETAIL.ticket.TicketID;postApi('executive2Approve',{userId:USER.UserID,ticketId:ticketId,score:scoreIn.value,comment:scoreComment.value}).then(()=>{updateTicketInCache(ticketId,{CurrentBasket:'Closed',Status:'Closed',Executive2Score:scoreIn.value,Executive2Name:USER.Name,ClosedAt:new Date().toISOString(),ClosedTiming:DETAIL.ticket.ClosedTiming||DETAIL.ticket.TimeRemainingText||''});alert('Executive2 approval successful. Ticket is permanently closed and removed from Executive2 Review.');closeDrawer();CURRENT_FILTER='closed';showTab('closed');loadTicketsView('all',500,{silent:true,background:true});}).catch(alertErr)}
+function uploadFile(){
+  const f=fileUp.files[0];
+  if(!f) return alert('Choose a file first.');
+  uploadFileChunked(f, DETAIL.ticket.TicketID, commentTxt?.value||'')
+    .then(()=>{alert('Attachment uploaded successfully. The Drive link has been posted to Tickets.UploadAttachment and Updates.');refresh();openTicket(DETAIL.ticket.TicketID);})
+    .catch(alertErr);
+}
 
 
-            function setupOtherDropdowns() {
-                document.querySelectorAll('select').forEach(select => {
-                    if (!Array.from(select.options).some(o => String(o.value).toLowerCase() === 'other')) {
-                        const opt = document.createElement('option');
-                        opt.value = 'Other';
-                        opt.text = 'Other';
-                        select.appendChild(opt);
-                    }
-                    select.addEventListener('change', function() {
-                        if (this.value !== 'Other') return;
-                        const label = (this.closest('.input-field')?.querySelector('label')?.innerText || 'value').replace('*','').trim();
-                        const custom = prompt('Enter other ' + label + ':');
-                        if (!custom || !custom.trim()) {
-                            this.value = '';
-                            return;
-                        }
-                        const clean = custom.trim();
-                        let existing = Array.from(this.options).find(o => o.value.toLowerCase() === clean.toLowerCase());
-                        if (!existing) {
-                            existing = document.createElement('option');
-                            existing.value = clean;
-                            existing.text = clean;
-                            this.insertBefore(existing, this.querySelector('option[value="Other"]'));
-                        }
-                        this.value = clean;
-                        if (this.id === 'vehicleReg') saveOptionValue('onpoint_saved_vehicle_regs', clean.toUpperCase());
-                        if (this.id === 'driverName') saveOptionValue('onpoint_saved_driver_names', clean);
-                    });
-                });
-            }
+function toggleChatbot(){const box=document.getElementById('chatbotBox'); if(box) box.classList.toggle('open');}
+function chatQuick(q){const el=document.getElementById('chatbotQ'); if(el) el.value=q; askChatbot();}
+function appendChatMsg(kind, text){const body=document.getElementById('chatbotBody'); if(!body)return; const div=document.createElement('div'); div.className='chatMsg '+kind; div.innerHTML=esc(text).replace(/\n/g,'<br>'); body.appendChild(div); body.scrollTop=body.scrollHeight;}
+function askChatbot(){const input=document.getElementById('chatbotQ'); const q=(input?.value||'').trim(); if(!q)return; appendChatMsg('user',q); input.value=''; appendChatMsg('bot',answerChatbot(q));}
+function ticketLine(t){return `${t.TicketID} · ${t.Title||'Untitled'} · ${t.AssignedToName||'Unassigned'} · ${t.Status||''} · ${t.CurrentBasket||''} · due ${fmt(t.DueDate)}`;}
+function answerChatbot(question){
+  const q=String(question||'').toLowerCase();
+  const tickets=executiveDashboardTickets().length?executiveDashboardTickets():workflowTickets();
+  const mine=myTickets();
+  const count=(fn)=>tickets.filter(fn).length;
+  if(!tickets.length) return 'No ticket data is loaded yet. Login, click Refresh, then ask again.';
+  if(q.includes('workflow')||q.includes('submit')||q.includes('executive1')&&q.includes('executive2')){
+    return 'Workflow: assigned user opens the task drawer and clicks Submit Ticket. The Apps Script saves Status = Submitted and CurrentBasket = Executive1. Executive1 approves and scores, then CurrentBasket becomes Executive2. Executive2 approves and scores, then Status = Closed and CurrentBasket = Closed.';
+  }
+  if(q.includes('brighton')){
+    const rows=tickets.filter(t=>String(t.AssignedToName+' '+t.CreatedByName+' '+t.AssignedToEmail+' '+t.CreatedByEmail).toLowerCase().includes('brighton'));
+    return rows.length?('Brighton related tickets loaded:\n'+rows.slice(0,8).map(ticketLine).join('\n')):'No Brighton tickets are currently loaded in this dashboard cache.';
+  }
+  if(q.includes('executive1')||q.includes('review 1')||q.includes('exec1')) return 'Executive1 basket has '+count(t=>t.CurrentBasket==='Executive1'&&t.Status!=='Closed')+' loaded ticket(s).';
+  if(q.includes('executive2')||q.includes('review 2')||q.includes('exec2')) return 'Executive2 basket has '+count(t=>t.CurrentBasket==='Executive2'&&t.Status!=='Closed')+' loaded ticket(s).';
+  if(q.includes('critical')) return 'Critical open tickets loaded: '+count(t=>String(t.Priority)==='Critical'&&t.Status!=='Closed')+'.';
+  if(q.includes('late')) return 'Open late tickets loaded: '+count(t=>t.Status!=='Closed'&&isLate(t))+'.';
+  if(q.includes('closed')) return 'Closed tickets loaded: '+count(t=>t.Status==='Closed'||t.CurrentBasket==='Closed')+'.';
+  if(q.includes('my ticket')||q.includes('assigned to me')) return 'Your visible open ticket count is '+mine.length+'.\n'+mine.slice(0,8).map(ticketLine).join('\n');
+  const id=(question.match(/TKT[-_A-Z0-9]+/i)||[])[0];
+  if(id){const t=tickets.find(x=>String(x.TicketID).toLowerCase()===id.toLowerCase()); return t?ticketLine(t):'I cannot find '+id+' in the loaded ticket cache.';}
+  const nameSearch=question.trim().toLowerCase();
+  if(nameSearch.length>2){const rows=tickets.filter(t=>String(t.Title+' '+t.Description+' '+t.AssignedToName+' '+t.CreatedByName+' '+t.Department+' '+t.CostCenter).toLowerCase().includes(nameSearch)); if(rows.length) return 'I found '+rows.length+' matching loaded ticket(s):\n'+rows.slice(0,8).map(ticketLine).join('\n');}
+  return 'I can answer from the currently loaded HTML dashboard data. Try: “Show Brighton tickets”, “How many Executive1 tickets?”, “Critical tickets”, “Open late tickets”, or paste a ticket reference.';
+}
 
-            submitBtn.addEventListener('click', submitToGoogleAppsScript);
-
-            const counterEl = document.getElementById('localVisitCounter');
-            if (counterEl) {
-                const visits = Number(localStorage.getItem('onpoint_app_visits') || '0') + 1;
-                localStorage.setItem('onpoint_app_visits', String(visits));
-                counterEl.textContent = String(visits);
-            }
-
-            loadSavedOptions('vehicleReg', 'onpoint_saved_vehicle_regs');
-            loadSavedOptions('driverName', 'onpoint_saved_driver_names');
-            setupOtherDropdowns();
-            applyFaintDefaults();
-        })();
-    </script>
+if(USER) start();
+</script>
 </body>
 </html>
