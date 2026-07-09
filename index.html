@@ -1,1094 +1,748 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Licence Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OnPoint Fuel Reconciliation System</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .header {
-      background: #111827;
-      color: white;
-      padding: 20px;
-      border-radius: 14px;
-      margin-bottom: 18px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 26px;
-    }
-
-    .header p {
-      margin-bottom: 0;
-    }
-
-    .status-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .status-card {
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-
-    .status-title {
-      padding: 14px 16px;
-      font-weight: bold;
-      color: white;
-    }
-
-    .orange { background: #f97316; }
-    .red { background: #dc2626; }
-
-    .status-body {
-      padding: 14px 16px;
-      min-height: 80px;
-    }
-
-    .person {
-      padding: 10px 0;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .person:last-child {
-      border-bottom: none;
-    }
-
-    .empty {
-      color: #6b7280;
-      font-style: italic;
-    }
-
-    .form-card {
-      background: white;
-      border-radius: 14px;
-      padding: 22px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-
-    .form-card h2 {
-      margin-top: 0;
-    }
-
-    .search-card {
-      margin-bottom: 20px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-    }
-
-    label {
-      font-size: 13px;
-      font-weight: bold;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    input, select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 11px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-
-    button {
-      margin-top: 18px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 10px;
-      display: none;
-    }
-
-    .success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      background: #fff;
-      min-height: 42px;
-    }
-
-    .checkbox-row input[type="checkbox"] {
-      width: auto;
-      margin: 0;
-    }
-
-    .file-note {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 5px;
-    }
-
-    .action-btn {
-      margin: 0 2px 2px 0;
-      padding: 4px 8px;
-      font-size: 11px;
-      border-radius: 6px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      color: white;
-    }
-
-    .edit-btn {
-      background: #2563eb;
-    }
-    .edit-btn:hover {
-      background: #1d4ed8;
-    }
-
-    .delete-btn {
-      background: #dc2626;
-    }
-
-    .delete-btn:hover {
-      background: #b91c1c;
-    }
-
-    .cancel-btn {
-      background: #6b7280;
-      margin-left: 8px;
-    }
-
-    .cancel-btn:hover {
-      background: #4b5563;
-    }
-
-
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .summary-card {
-      background: white;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      border-left: 5px solid #2563eb;
-    }
-
-    .summary-card h3 {
-      margin: 0;
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .summary-card p {
-      margin: 8px 0 0;
-      font-size: 28px;
-      font-weight: bold;
-      color: #111827;
-    }
-
-    .summary-card.red-card { border-left-color: #dc2626; }
-    .summary-card.orange-card { border-left-color: #f97316; }
-    .summary-card.green-card { border-left-color: #16a34a; }
-
-    .view-link {
-      color: #2563eb;
-      font-weight: bold;
-      text-decoration: underline;
-      display: inline-block;
-      margin-right: 6px;
-      margin-bottom: 4px;
-    }
-
-    .transactions-scroll {
-      overflow-x: auto;
-      max-height: 560px;
-    }
-
-    .transactions-scroll table th {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    /* table action cell: right-aligned, compact */
-    .action-cell {
-      text-align: right;
-      white-space: nowrap;
-      padding: 6px 8px;
-    }
-    .action-cell .action-btn {
-      margin: 0 0 0 4px;
-    }
-
-    /* search result action row */
-    .person-actions {
-      margin-top: 6px;
-      text-align: right;
-    }
-    .person-actions .action-btn {
-      margin: 0 0 0 4px;
-    }
-
+    :root{--blue:#0b2b4a;--soft:#eef4fa;--line:#d7e1eb;--good:#dff5e3;--bad:#fce3e3;--warn:#fff0d8;--text:#13293d;}
+    body{font-family:Segoe UI,Arial,sans-serif;background:var(--soft);padding:20px;color:var(--text)}
+    .container{max-width:1500px;margin:auto;background:#fff;padding:22px;border-radius:18px;box-shadow:0 10px 30px rgba(11,43,74,.08)}
+    h2,h3{color:var(--blue);margin:.2rem 0 1rem}.muted{color:#617287;font-size:13px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0}.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.kpi .label{font-size:12px;text-transform:uppercase;color:#65758a}.kpi .value{font-size:24px;font-weight:800;color:var(--blue)}
+    label{font-size:13px;font-weight:700;color:#334155}input,select{padding:10px;margin:5px 0;width:100%;border:1px solid var(--line);border-radius:10px;background:#fff}button{padding:10px 15px;border:none;background:var(--blue);color:#fff;border-radius:999px;cursor:pointer;font-weight:700}button.secondary{background:#64748b}button.light{background:#e2e8f0;color:#0f172a}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff}th,td{padding:8px;border-bottom:1px solid #e5edf5;font-size:12px;text-align:left;vertical-align:top}th{background:var(--blue);color:#fff;position:sticky;top:0;z-index:1}.scroll{max-height:430px;overflow:auto;border:1px solid var(--line);border-radius:14px}.match{background:var(--good)}.mismatch{background:var(--bad)}.missing{background:var(--warn)}.pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}.ok{background:var(--good);color:#166534}.err{background:var(--bad);color:#991b1b}.warn{background:var(--warn);color:#92400e}canvas{max-height:300px!important}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tab{background:#e2e8f0;color:#0f172a}.tab.active{background:var(--blue);color:#fff}.panel{display:none}.panel.active{display:block}.login-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center}.login-card{width:100%;max-width:430px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 14px 38px rgba(11,43,74,.13)}.login-card h2{text-align:center;margin-bottom:6px}.login-card .muted{text-align:center;margin-bottom:16px}.login-error{display:none;background:var(--bad);color:#991b1b;border-radius:12px;padding:10px;margin-top:10px;font-size:13px;font-weight:700}.login-success{display:none;background:var(--good);color:#166534;border-radius:12px;padding:10px;margin-top:10px;font-size:13px;font-weight:700}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.user-chip{background:#eef4fa;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;color:var(--blue)}@media(max-width:1000px){.grid,.grid4{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Licence Dashboard</h1>
-      <p>Distinct licence data entry and expiry monitoring</p>
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <h2>OnPoint Fuel Reconciliation System</h2>
+    <div class="muted">Login with your username and password from the <strong>Users</strong> sheet.</div>
+    <label>Username</label>
+    <input type="text" id="loginUsername" autocomplete="username" placeholder="Enter username" />
+    <label>Password</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter password" />
+    <div class="actions">
+      <button id="loginBtn" type="button">Login</button>
     </div>
+    <div id="loginError" class="login-error"></div>
+    <div id="loginSuccess" class="login-success"></div>
+    <div class="muted" style="margin-top:12px;text-align:left">Sheet ID: <strong>1SnhLTWgzJfkKNmIvtj8uwa-8x7TsnRtqkfX3deEuHIQ</strong><br>Users tab: <strong>Users</strong></div>
+  </div>
+</div>
 
-
-
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h3>Total No of Drivers</h3>
-        <p id="totalDriversBox">0</p>
-      </div>
-      <div class="summary-card green-card">
-        <h3>Total Other Licence</h3>
-        <p id="totalOtherLicenceBox">0</p>
-      </div>
-      <div class="summary-card red-card">
-        <h3>Total Expired</h3>
-        <p id="totalExpiredBox">0</p>
-      </div>
-      <div class="summary-card">
-        <h3>Total Aqua Drivers</h3>
-        <p id="totalAquaDriversBox">0</p>
-      </div>
-      <div class="summary-card orange-card">
-        <h3>Total Distinct</h3>
-        <p id="totalDistinctBox">0</p>
-      </div>
-      <div class="summary-card">
-        <h3>Total Onpoint</h3>
-        <p id="totalOnpointBox">0</p>
-      </div>
+<div class="container" id="appContainer" style="display:none">
+  <div class="topbar">
+    <div>
+      <h2>OnPoint Fuel Reconciliation System</h2>
+      <div class="muted">Upload Bank file, upload Zoho document, pull Driver Fuel Log from Google Sheets, reconcile by Report_number / ER number, and export the variance report.</div>
     </div>
-
-    <div class="status-grid">
-      <div class="status-card">
-        <div class="status-title orange">Licence About To Expire</div>
-        <div class="status-body" id="aboutToExpireBox">Loading...</div>
-      </div>
-
-      <div class="status-card">
-        <div class="status-title red">Licence Expired</div>
-        <div class="status-body" id="expiredBox">Loading...</div>
-      </div>
+    <div class="actions" style="margin-top:0">
+      <span id="currentUserChip" class="user-chip">Logged in</span>
+      <button id="logoutBtn" class="light" type="button">Logout</button>
     </div>
-
-
-    <div class="form-card search-card">
-      <h2>Search Licence Details</h2>
-      <div class="form-grid">
-        <div>
-          <label>Search by Name or Surname</label>
-          <input id="searchInput" placeholder="Enter name or surname">
-        </div>
-      </div>
-      <button id="searchBtn" type="button">Search</button>
-      <div class="status-body" id="searchResultsBox"><div class="empty">Search for an individual to view their details.</div></div>
-    </div>
-
-    <div class="form-card">
-      <h2>Enter Licence Details</h2>
-      <form id="licenceForm">
-        <div class="form-grid">
-          <div>
-            <label>Name</label>
-            <input name="name" required>
-          </div>
-
-          <div>
-            <label>Surname</label>
-            <input name="surname" required>
-          </div>
-
-          <div>
-            <label>Licence Number</label>
-            <input name="licenceNumber" required>
-          </div>
-
-          <div>
-            <label>Country of Issue</label>
-            <select name="countryOfIssue" required>
-              <option>Zimbabwe</option>
-              <option selected>South Africa</option>
-              <option>Malawi</option>
-              <option>Mozambique</option>
-              <option>Swaziland</option>
-              <option>Lesotho</option>
-              <option>Zambia</option>
-              <option>DRC</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Company</label>
-            <select name="company" required>
-              <option selected>Distinct</option>
-              <option>Onpoing Group</option>
-              <option>Nkanyezi</option>
-              <option>Aqua Telecoms</option>
-              <option>Onpoint Ontime</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Department</label>
-            <select name="department" required>
-              <option value="" selected disabled>Select department</option>
-              <option>Admin</option>
-              <option>Business Development</option>
-              <option>Finance &amp; IT</option>
-              <option>Fleet</option>
-              <option>HR</option>
-              <option>Operations</option>
-              <option>Procurement</option>
-              <option>Sales</option>
-              <option>SHEQ</option>
-              <option>Tendering</option>
-              <option>Warehouse</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Licence Type</label>
-            <select name="licenceType" required>
-              <option value="" selected disabled>Select licence type</option>
-              <option>C</option>
-              <option>C1</option>
-              <option>A1</option>
-              <option>A2</option>
-              <option>EC</option>
-              <option>EC1</option>
-              <option>PrDp</option>
-              <option>B</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Validity</label>
-            <input name="validity" type="date" required>
-          </div>
-
-          <div>
-            <label>First Issue</label>
-            <input name="firstIssue" type="date" required>
-          </div>
-
-          <div>
-            <label>Vehicle Restrictions</label>
-            <input name="vehicleRestrictions" required>
-          </div>
-
-          <div>
-            <label>Other Licence</label>
-            <select name="otherLicence">
-              <option value="" selected>Select other licence</option>
-              <option>Operator</option>
-              <option>FE Loader OP Licence</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Upload Licence</label>
-            <input id="licenceUpload" name="licenceUpload" type="file" accept="image/*,.pdf" capture="environment">
-            <div class="file-note">Uploads to Google Drive and saves a clickable link in the Licence sheet tab.</div>
-            <div id="currentLicenceFileBox" class="file-note" style="display:none; margin-top:8px;"></div>
-          </div>
-
-          <div>
-            <label>Fleet Card Policy</label>
-            <div class="checkbox-row">
-              <input id="fleetCardPolicyIssuedSigned" name="fleetCardPolicyIssuedSigned" type="checkbox" value="Issued / Signed">
-              <span>Issued or Signed</span>
-            </div>
-          </div>
-
-          <div>
-            <label>Fleet Policy</label>
-            <div class="checkbox-row">
-              <input id="fleetPolicyIssuedSigned" name="fleetPolicyIssuedSigned" type="checkbox" value="Issued / Signed">
-              <span>Issued or Signed</span>
-            </div>
-          </div>
-        </div>
-
-        <button id="submitBtn" type="submit">Save Licence</button>
-        <button id="cancelEditBtn" class="cancel-btn" type="button" style="display:none;">Cancel Edit</button>
-        <div id="message" class="message"></div>
-      </form>
-    
-    <div class="form-card" style="margin-top:20px;">
-      <h2>All Licence Transactions</h2>
-      <div class="transactions-scroll">
-        <table style="width:100%; border-collapse:collapse; font-size:14px;">
-          <thead>
-            <tr style="background:#111827; color:white;">
-              <th style="padding:10px; border:1px solid #e5e7eb;">Name</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Surname</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Licence Number</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Country of Issue</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Company</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Department</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Licence Type</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Validity</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">First Issue</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Vehicle Restrictions</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Other Licence</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Licence Link</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Fleet Card Policy</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Fleet Policy</th>
-              <th style="padding:10px; border:1px solid #e5e7eb;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="transactionsBody">
-            <tr><td colspan="15" style="padding:12px; text-align:center;">Loading transactions...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </div>
 
-  <script>
-    /*
-      Replace this with your deployed Apps Script Web App URL after pasting the fixed Apps Script code.
-      Example: https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
-    */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzCi7QqdEh3-Owdfvzb8I6xzJvzFl_eLWX9goEjYxU7h44w1V7RCKhFVFVPikE74T4bOg/exec';
-    let editingRowNumber = null;
-    let editingExistingLicenceFileLink = '';
-    let transactionLicenceRecords = [];
-    let searchLicenceRecords = [];
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label>Upload Bank Statement (.xlsx, .xls, .csv)</label>
+        <input type="file" id="bankFile" accept=".xlsx,.xls,.csv" />
+        <div id="bankStatus" class="muted">No bank file loaded.</div>
+      </div>
+      <div>
+        <label>Upload Zoho Document (.xlsx, .xls, .csv)</label>
+        <input type="file" id="zohoFile" accept=".xlsx,.xls,.csv" />
+        <div id="zohoStatus" class="muted">No Zoho file loaded.</div>
+        <div class="muted">Zoho mapping: Vehicle Reg No. · report_number / Reference · Amount</div>
+      </div>
+      <div>
+        <label>Summary View</label>
+        <select id="groupBy">
+          <option value="costCenter">Cost Center</option>
+          <option value="vehicle" selected>Vehicle Registration</option>
+          <option value="driver">Driver Name</option>
+          <option value="department">Department</option>
+        </select>
+        <label>Period</label>
+        <select id="periodMode">
+          <option value="all">All</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="loadFuelLogBtn">Reload Driver Fuel Log</button>
+      <button id="reconcileBtn">Run Reconciliation</button>
+      <button class="secondary" id="exportExcelBtn">Export Excel</button>
+      <button class="secondary" id="exportCsvBtn">Export CSV</button>
+      <button class="light" id="downloadPdfBtn">Download PDF Report</button>
+    </div>
+    <div style="margin-top:10px"><span id="sheetStatus" class="pill warn">Fuel Log not loaded yet</span></div>
+    <div class="muted" style="margin-top:8px">Google Sheet ID: <strong>1SnhLTWgzJfkKNmIvtj8uwa-8x7TsnRtqkfX3deEuHIQ</strong> · Driver tab: <strong>Fuel Log</strong> · Recon output tab expected: <strong>Fuel Recon</strong></div>
+  </div>
 
-    document.addEventListener('DOMContentLoaded', function() {
-      loadDashboard();
+  <div class="grid4">
+    <div class="kpi"><div class="label">Bank Total</div><div class="value" id="kpiBank">R0.00</div></div>
+    <div class="kpi"><div class="label">Zoho Total</div><div class="value" id="kpiZoho">R0.00</div></div>
+    <div class="kpi"><div class="label">Driver Log Total</div><div class="value" id="kpiDriver">R0.00</div></div>
+    <div class="kpi"><div class="label">Exceptions</div><div class="value" id="kpiExceptions">0</div></div>
+    <div class="kpi"><div class="label">Missing in Zoho</div><div class="value" id="kpiMissingZoho">0</div></div>
+    <div class="kpi"><div class="label">Missing in Driver Log</div><div class="value" id="kpiMissingDriver">0</div></div>
+    <div class="kpi"><div class="label">Duplicate ER Numbers</div><div class="value" id="kpiDuplicateEr">0</div></div>
+  </div>
 
-      document.getElementById('searchBtn').addEventListener('click', searchPerson);
-      document.getElementById('searchInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') searchPerson();
-      });
-      document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+  <div class="grid" id="varianceKpiGrid">
+    <div class="kpi"><div class="label">Total Bank-Zoho Variance %</div><div class="value" id="kpiVarianceBZ">0.00%</div></div>
+    <div class="kpi"><div class="label">Total Zoho-Driver Variance %</div><div class="value" id="kpiVarianceZD">0.00%</div></div>
+    <div class="kpi"><div class="label">Total Bank-Driver Variance %</div><div class="value" id="kpiVarianceBD">0.00%</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="reconPanel">Reconciliation</button>
+    <button class="tab" data-panel="zohoPanel">Zoho Uploaded</button>
+    <button class="tab" data-panel="fuelLogPanel">Driver Fuel Log</button>
+    <button class="tab" data-panel="summaryPanel">Summary & Charts</button>
+    <button class="tab" data-panel="rawPanel">Uploaded Raw Data</button>
+  </div>
+
+  <section id="reconPanel" class="panel active">
+    <h3>Reconciliation Detail</h3>
+    <div class="scroll"><table id="reconTable"><thead><tr><th>Date</th><th>Report_number / ER No</th><th>Vehicle</th><th>Driver</th><th>Cost Center</th><th>Department</th><th>Bank Amount</th><th>Zoho Amount</th><th>Driver Log Amount</th><th>Bank-Zoho</th><th>Zoho-Driver</th><th>Bank-Driver</th><th>Bank-Zoho %</th><th>Zoho-Driver %</th><th>Bank-Driver %</th><th>Status</th><th>Issue</th></tr></thead><tbody><tr><td colspan="17">Upload Bank and Zoho files, load Fuel Log, then click Run Reconciliation.</td></tr></tbody></table></div>
+  </section>
+
+  <section id="zohoPanel" class="panel">
+    <h3>Zoho Uploaded Document</h3>
+    <div class="muted">This section maps Zoho columns: <strong>Vehicle Reg No.</strong>, <strong>report_number / Reference</strong>, and <strong>amount</strong>.</div>
+    <div class="scroll"><table id="zohoTable"><thead><tr><th>Date</th><th>Report_number / Reference</th><th>Vehicle Reg No.</th><th>Amount</th><th>Status</th></tr></thead><tbody><tr><td colspan="5">Zoho file not loaded yet.</td></tr></tbody></table></div>
+  </section>
+
+  <section id="fuelLogPanel" class="panel">
+    <h3>Driver Fuel Log from Google Sheets</h3>
+    <div class="muted">This section should show transactions pulled from tab <strong>Fuel Log</strong>.</div>
+    <div class="scroll"><table id="fuelLogTable"><thead><tr><th>Date</th><th>ER Number</th><th>Driver</th><th>Vehicle</th><th>Merchant</th><th>Fuel Total</th><th>Grand Total</th><th>Litres</th><th>Cost Center</th><th>Department</th><th>KM</th><th>Status</th></tr></thead><tbody><tr><td colspan="12">Fuel Log not loaded yet.</td></tr></tbody></table></div>
+  </section>
+
+  <section id="summaryPanel" class="panel">
+    <div class="grid">
+      <div class="card" style="grid-column:span 2"><h3 id="pieChartTitle">Pie Chart by Vehicle Registration</h3><canvas id="pieChart"></canvas></div>
+      <div class="card"><h3>Summary Table</h3><div class="scroll"><table id="summaryTable"><thead><tr><th>Group</th><th>Bank</th><th>Zoho</th><th>Driver Log</th><th>Bank-Zoho</th><th>Zoho-Driver</th><th>Bank-Driver</th><th>% Bank-Zoho</th><th>% Zoho-Driver</th><th>% Bank-Driver</th><th>Records</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section id="rawPanel" class="panel">
+    <div class="grid">
+      <div><h3>Bank Uploaded Rows</h3><div class="scroll"><table id="bankPreview"></table></div></div>
+      <div><h3>Zoho Uploaded Rows</h3><div class="scroll"><table id="zohoPreview"></table></div></div>
+      <div><h3>Mapped Fields</h3><div id="mappingInfo" class="muted">No data mapped yet.</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const SHEET_ID = '1SnhLTWgzJfkKNmIvtj8uwa-8x7TsnRtqkfX3deEuHIQ';
+const USERS_TAB = 'Users';
+const FUEL_LOG_TAB = 'Fuel Log';
+const FUEL_RECON_TAB = 'Fuel Recon';
+
+// Optional: paste a deployed Apps Script web app URL here to write results back to Fuel Recon.
+// Without Apps Script, browser-only HTML can read public sheets but cannot securely write to Google Sheets.
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMdKd7b5d6z-bJrNOFhdPbUVwuravhaMIwX0I12ehIHcXJDjKF6nDx2BgLGqGOYbs8Xw/exec';
+
+let rawBank = [], rawZoho = [], rawDriver = [];
+let rawUsers = [], currentUser = null;
+let bankRows = [], zohoRows = [], driverRows = [], reconRows = [];
+let pieChart = null;
+
+const aliases = {
+  er: ['er no','erno','er number','ernumber','auth no','authno','authorisation no','authorization no','authorisation number','authorization number','approval code','reference','tracking number','trackingnumber','report number','report no','reportnumber','report_number','reportnumberreference'],
+  date: ['date','transaction date','swipe date','fuel date','doc date','timestamp','created time','created date'],
+  amount: ['amount','transaction amount','swiped amount','rand value','value','fuel total','grand total','total','debit','paid amount'],
+  fuelTotal: ['fuel total','fuel amount','fuel cost','grand total','amount','total'],
+  litres: ['litres','liters','fuel litres','fuel liters','qty','quantity'],
+  vehicle: ['vehicle','vehicle reg','vehicle registration','vehicle reg no','vehicle reg no.','vehicle registration no','vehicle number','reg no','registration','regnumber','fleet number'],
+  driver: ['driver','driver name','employee name','staff name','name'],
+  costCenter: ['cost center','cost centre','costcenter','costcentre','business unit','project','site'],
+  department: ['department','dept','division','branch'],
+  merchant: ['merchant','service station','supplier','vendor','garage'],
+  km: ['km traveled','km travelled','distance','distance covered','km','kilometers','kilometres'],
+  status: ['status','approval status']
+};
+
+
+function userField(row, names){
+  const keys = Object.keys(row || {});
+  const wanted = names.map(norm);
+  for (const key of keys) if (wanted.includes(norm(key))) return row[key];
+  for (const key of keys) if (wanted.some(w => norm(key).includes(w) || w.includes(norm(key)))) return row[key];
+  return '';
+}
+function showLoginMessage(type, msg){
+  const err = document.getElementById('loginError');
+  const ok = document.getElementById('loginSuccess');
+  if (!err || !ok) return;
+  err.style.display = 'none'; ok.style.display = 'none';
+  if (type === 'error') { err.textContent = msg; err.style.display = 'block'; }
+  if (type === 'success') { ok.textContent = msg; ok.style.display = 'block'; }
+}
+async function apiPost(payload){
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('/exec') === -1) {
+    throw new Error('APPS_SCRIPT_URL must be the deployed Apps Script Web App URL ending in /exec.');
+  }
+  const res = await fetch(APPS_SCRIPT_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload || {})
+  });
+  if (!res.ok) throw new Error(`Apps Script HTTP ${res.status}`);
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e) { throw new Error('Apps Script did not return valid JSON. Deploy Web App as Execute as Me, Anyone with the link, New version.'); }
+}
+async function apiGet(action, params){
+  params = params || {};
+  const url = APPS_SCRIPT_URL + '?action=' + encodeURIComponent(action) + '&cacheBust=' + Date.now() + Object.keys(params).map(k => '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('');
+  const res = await fetch(url,{cache:'no-store'});
+  if (!res.ok) throw new Error(`Apps Script HTTP ${res.status}`);
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e) { throw new Error('Apps Script did not return valid JSON. Check deployment URL.'); }
+}
+async function fetchUsers(){
+  const result = await apiGet('getUsers', {sheetId:SHEET_ID, sheetTab:USERS_TAB});
+  if (!result || result.status === 'error' || result.success === false) throw new Error((result && result.message) || 'Could not load Users tab');
+  rawUsers = Array.isArray(result.users) ? result.users : [];
+  return rawUsers;
+}
+function isActiveUser(row){
+  const active = cleanText(userField(row,['IsActive','Active','Status','User Status'])).toLowerCase();
+  if (!active) return true;
+  return ['true','yes','y','active','1','enabled'].includes(active);
+}
+function buildUserSession(row){
+  return {
+    userId: cleanText(row.UserID || row.userId || row.ID || userField(row,['UserID','User Id','ID'])),
+    name: cleanText(row.Name || row.name || userField(row,['Name','Full Name','Employee Name'])) || cleanText(row.Username || row.username || userField(row,['Username','User Name'])),
+    email: cleanText(row.Email || row.email || userField(row,['Email','Email Address'])),
+    username: cleanText(row.Username || row.username || userField(row,['Username','User Name','Login','Login Name'])),
+    role: cleanText(row.Role || row.role || userField(row,['Role','User Role'])),
+    department: cleanText(row.Department || row.department || userField(row,['Department','Dept'])),
+    costCenter: cleanText(row.CostCenter || row['Cost Center'] || row.costCenter || userField(row,['Cost Center','Cost Centre','CostCenter','CostCentre']))
+  };
+}
+async function postLoginToSheet(user){
+  // Login is now handled directly by Apps Script, which updates LastLogin on the Users tab.
+  return Promise.resolve(user);
+}
+function openApp(user){
+  currentUser = user;
+  sessionStorage.setItem('fuelReconUser', JSON.stringify(user));
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  const chip = document.getElementById('currentUserChip');
+  if (chip) chip.textContent = `${user.name || user.username || 'User'}${user.role ? ' · ' + user.role : ''}`;
+  loadDriverLog();
+  updateKpis();
+  updateMappingInfo();
+}
+async function handleLogin(){
+  const username = cleanText(document.getElementById('loginUsername').value);
+  const password = cleanText(document.getElementById('loginPassword').value);
+  if (!username || !password) { showLoginMessage('error','Enter username and password.'); return; }
+  showLoginMessage('success','Checking Apps Script connection...');
+  try{
+    const result = await apiPost({action:'login', username, password, sheetId:SHEET_ID, sheetTab:USERS_TAB});
+    if (!result || result.status === 'error' || result.success === false) {
+      showLoginMessage('error',(result && result.message) || 'Invalid login or inactive user.');
+      return;
+    }
+    const user = buildUserSession(result.user || {});
+    showLoginMessage('success', result.message || 'Login successful.');
+    openApp(user);
+  }catch(err){
+    showLoginMessage('error',`Could not connect to Apps Script login. ${err.message || err}`);
+  }
+}
+function logout(){
+  sessionStorage.removeItem('fuelReconUser');
+  currentUser = null;
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('loginPassword').value = '';
+}
+function initAuth(){
+  const saved = sessionStorage.getItem('fuelReconUser');
+  if (saved) {
+    try { openApp(JSON.parse(saved)); return; } catch(e) { sessionStorage.removeItem('fuelReconUser'); }
+  }
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+}
+
+function norm(s){ return String(s ?? '').trim().toLowerCase().replace(/[^a-z0-9]/g,''); }
+function cleanText(v){ return String(v ?? '').trim(); }
+function money(n){ return 'R' + Number(n || 0).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function percent(value, base){ return base ? (Number(value || 0) / Number(base || 0) * 100) : 0; }
+function percentText(value, base){ return percent(value, base).toFixed(2) + '%'; }
+function varianceClass(value, base){ return Math.abs(percent(value, base)) > 5 ? 'mismatch' : ''; }
+function num(v){
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  return Number(String(v ?? '').replace(/,/g,'.').replace(/[^0-9.-]/g,'')) || 0;
+}
+function excelDate(v){
+  if (v === null || v === undefined || v === '') return '';
+  if (typeof v === 'number') {
+    const d = XLSX.SSF.parse_date_code(v);
+    if (d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+  }
+  const s = cleanText(v);
+  const iso = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (iso) return `${iso[1]}-${String(iso[2]).padStart(2,'0')}-${String(iso[3]).padStart(2,'0')}`;
+  const dmy = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+  if (dmy) return `${dmy[3].length===2?'20'+dmy[3]:dmy[3]}-${String(dmy[2]).padStart(2,'0')}-${String(dmy[1]).padStart(2,'0')}`;
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return s;
+}
+function getField(row, group){
+  const keys = Object.keys(row || {});
+  const wanted = aliases[group].map(norm);
+  for (const key of keys) if (wanted.includes(norm(key))) return row[key];
+  for (const key of keys) if (wanted.some(w => norm(key).includes(w) || w.includes(norm(key)))) return row[key];
+  return '';
+}
+function erKey(row){ return norm(getField(row,'er')); }
+function regKeyValue(v){ return norm(String(v || '').toUpperCase().replace(/\s+/g,'')); }
+function regKey(row){ return regKeyValue(getField(row,'vehicle')); }
+function makeMatchKey(row, source){
+  const er = erKey(row);
+  const reg = regKey(row);
+  if (er && reg) return `${er}|${reg}`;
+  if (er) return `er:${er}`;
+  if (reg) return `reg:${reg}`;
+  return '';
+}
+
+function mapRow(row, source){
+  const amountGroup = source === 'driver' ? 'fuelTotal' : 'amount';
+  return {
+    source,
+    er: cleanText(getField(row,'er')),
+    key: makeMatchKey(row, source),
+    vehicleKey: regKey(row),
+    date: excelDate(getField(row,'date')),
+    amount: num(getField(row, amountGroup)),
+    litres: num(getField(row,'litres')),
+    vehicle: cleanText(getField(row,'vehicle')).toUpperCase(),
+    driver: cleanText(getField(row,'driver')),
+    costCenter: cleanText(getField(row,'costCenter')),
+    department: cleanText(getField(row,'department')),
+    merchant: cleanText(getField(row,'merchant')),
+    km: num(getField(row,'km')),
+    status: cleanText(getField(row,'status')),
+    raw: row
+  };
+}
+
+async function readUploadedFile(file){
+  const data = await file.arrayBuffer();
+  const wb = XLSX.read(data,{type:'array'});
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(sheet,{defval:''});
+}
+
+function previewTable(id, rows){
+  const el = document.getElementById(id);
+  if (!rows.length) { el.innerHTML = '<tbody><tr><td>No rows loaded.</td></tr></tbody>'; return; }
+  const headers = Object.keys(rows[0]).slice(0,10);
+  let html = '<thead><tr>' + headers.map(h=>`<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+  rows.slice(0,50).forEach(r=>{ html += '<tr>' + headers.map(h=>`<td>${cleanText(r[h])}</td>`).join('') + '</tr>'; });
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+function updateMappingInfo(){
+  document.getElementById('mappingInfo').innerHTML = `
+    <strong>Bank mapped rows:</strong> ${bankRows.length}<br>
+    <strong>Zoho mapped rows:</strong> ${zohoRows.length}<br>
+    <strong>Driver Fuel Log mapped rows:</strong> ${driverRows.length}<br><br>
+    Matching key used: <strong>Report_number / ER number</strong> first, then Vehicle Registration where available.<br>
+    Zoho expected columns include <strong>Vehicle Reg No.</strong>, <strong>report_number</strong> or <strong>Reference</strong>, and <strong>amount</strong>.<br>
+    The variance report compares Bank vs Zoho, Zoho vs Driver Fuel Log, and Bank vs Driver Fuel Log.`;
+}
+
+async function handleBankUpload(e){
+  rawBank = await readUploadedFile(e.target.files[0]);
+  bankRows = rawBank.map(r=>mapRow(r,'bank')).filter(r=>r.key || r.amount || r.vehicle || r.driver);
+  document.getElementById('bankStatus').textContent = `Loaded ${rawBank.length} bank rows. Mapped ${bankRows.length}.`;
+  previewTable('bankPreview', rawBank);
+  updateKpis(); updateMappingInfo();
+}
+
+async function handleZohoUpload(e){
+  rawZoho = await readUploadedFile(e.target.files[0]);
+  zohoRows = rawZoho.map(r=>mapRow(r,'zoho')).filter(r=>r.key || r.amount || r.vehicle);
+  document.getElementById('zohoStatus').textContent = `Loaded ${rawZoho.length} Zoho rows. Mapped ${zohoRows.length}.`;
+  previewTable('zohoPreview', rawZoho);
+  renderZoho();
+  updateKpis(); updateMappingInfo();
+}
+
+async function loadDriverLog(){
+  const status = document.getElementById('sheetStatus');
+  status.className = 'pill warn'; status.textContent = 'Loading Driver Fuel Log...';
+  const encodedTab = encodeURIComponent(FUEL_LOG_TAB);
+  const urls = [
+    `https://opensheet.elk.sh/${SHEET_ID}/${encodedTab}`,
+    `https://opensheet.vercel.app/${SHEET_ID}/${encodedTab}`
+  ];
+  let lastErr = null;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url,{cache:'no-store'});
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('Fuel Log response was not a row array');
+      rawDriver = data;
+      driverRows = rawDriver.map(r=>mapRow(r,'driver')).filter(r=>r.key || r.amount || r.vehicle || r.driver);
+      status.className = 'pill ok'; status.textContent = `Fuel Log loaded: ${driverRows.length} rows`;
+      renderFuelLog(); updateKpis(); updateMappingInfo();
+      return;
+    } catch (err) { lastErr = err; }
+  }
+  rawDriver = []; driverRows = [];
+  status.className = 'pill err';
+  status.textContent = 'Fuel Log failed to load. Make the Google Sheet public or use Apps Script.';
+  document.querySelector('#fuelLogTable tbody').innerHTML = `<tr><td colspan="12">Could not load Fuel Log. Error: ${lastErr ? lastErr.message : 'Unknown error'}. The sheet must be public for browser-only access.</td></tr>`;
+  updateMappingInfo();
+}
+
+function aggregate(rows){
+  const map = new Map();
+  rows.forEach((r,i)=>{
+    const k = r.key || `missing_${r.source}_${i}`;
+    if (!map.has(k)) map.set(k,{key:k,er:r.er,date:r.date,amount:0,litres:0,vehicle:'',vehicleKey:'',driver:'',costCenter:'',department:'',merchant:'',km:0,count:0});
+    const x = map.get(k);
+    x.amount += r.amount; x.litres += r.litres; x.km += r.km; x.count++;
+    x.er = x.er || r.er; x.date = x.date || r.date; x.vehicle = x.vehicle || r.vehicle; x.vehicleKey = x.vehicleKey || r.vehicleKey; x.driver = x.driver || r.driver; x.costCenter = x.costCenter || r.costCenter; x.department = x.department || r.department; x.merchant = x.merchant || r.merchant;
+  });
+  return map;
+}
+
+function dayDiff(a,b){
+  if (!a || !b) return 0;
+  const da = new Date(a), db = new Date(b);
+  if (isNaN(da.getTime()) || isNaN(db.getTime())) return 0;
+  return Math.abs((da - db) / 86400000);
+}
+function erValue(r){ return norm(r?.er || ''); }
+function sameVehicle(a,b){ return !a?.vehicleKey || !b?.vehicleKey || a.vehicleKey === b.vehicleKey; }
+function sameErWhenPresent(a,b){ return !erValue(a) || !erValue(b) || erValue(a) === erValue(b); }
+function isGoodMatch(a,b){
+  if (!a || !b) return false;
+  if (!sameVehicle(a,b)) return false;
+  if (!sameErWhenPresent(a,b)) return false;
+  return dayDiff(a.date,b.date) <= 2;
+}
+function findBestMatch(base, candidates, usedSet){
+  let bestIndex = -1, bestScore = -1;
+  candidates.forEach((c,i)=>{
+    if (usedSet.has(i) || !isGoodMatch(base,c)) return;
+    let score = 0;
+    if (erValue(base) && erValue(c) && erValue(base) === erValue(c)) score += 100;
+    if (base.vehicleKey && c.vehicleKey && base.vehicleKey === c.vehicleKey) score += 50;
+    score += Math.max(0, 10 - dayDiff(base.date,c.date));
+    if (Math.abs((base.amount||0) - (c.amount||0)) <= 1) score += 25;
+    if (score > bestScore) { bestScore = score; bestIndex = i; }
+  });
+  return bestIndex;
+}
+function findDuplicateErFlags(){
+  const counts = new Map();
+  bankRows.concat(zohoRows, driverRows).forEach(r=>{
+    const er = erValue(r);
+    if (!er) return;
+    counts.set(er, (counts.get(er) || 0) + 1);
+  });
+  return counts;
+}
+
+function findByErOrBest(base, candidates, usedSet){
+  if (!base) return -1;
+  const baseEr = erValue(base);
+  let exact = -1;
+  if (baseEr) {
+    candidates.forEach((c,i)=>{
+      if (exact >= 0 || usedSet.has(i)) return;
+      if (erValue(c) === baseEr && sameVehicle(base,c)) exact = i;
     });
+  }
+  if (exact >= 0) return exact;
+  return findBestMatch(base, candidates, usedSet);
+}
 
-    document.getElementById('licenceForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+function makeReconRow(b,z,d,duplicateCounts){
+  const bankAmount = b?.amount || 0, zohoAmount = z?.amount || 0, driverAmount = d?.amount || 0;
+  const varianceBZ = bankAmount - zohoAmount;
+  const varianceZD = zohoAmount - driverAmount;
+  const varianceBD = bankAmount - driverAmount;
+  const er = b?.er || z?.er || d?.er || '';
+  const isDuplicateEr = er && (duplicateCounts?.get(norm(er)) || 0) > 3;
+  let status = 'Matched', issue = 'Matched';
+  const missing = [];
+  if (!b) missing.push('Bank');
+  if (!z) missing.push('Zoho');
+  if (!d) missing.push('Driver Log');
+  const variances = [];
+  if (b && z && Math.abs(varianceBZ) > 1) variances.push('Bank-Zoho variance');
+  if (z && d && Math.abs(varianceZD) > 1) variances.push('Zoho-Driver variance');
+  if (b && d && Math.abs(varianceBD) > 1) variances.push('Bank-Driver variance');
+  if (missing.length) { status = 'Missing'; issue = 'Missing in ' + missing.join(', '); }
+  if (variances.length) { status = status === 'Matched' ? 'Mismatch' : status; issue = issue === 'Matched' ? variances.join(', ') : issue + ', ' + variances.join(', '); }
+  if (isDuplicateEr) {
+    status = status === 'Matched' ? 'Duplicate ER' : status;
+    issue = issue === 'Matched' ? 'Duplicate ER number' : issue + ', Duplicate ER number';
+  }
+  return {
+    date: b?.date || z?.date || d?.date || '', er,
+    vehicle: b?.vehicle || z?.vehicle || d?.vehicle || '', driver: b?.driver || d?.driver || '',
+    costCenter: b?.costCenter || d?.costCenter || '', department: b?.department || d?.department || '',
+    driverCostCenter: d?.costCenter || '', driverDepartment: d?.department || '', driverVehicle: d?.vehicle || '',
+    bankAmount, zohoAmount, driverAmount,
+    varianceBZ, varianceZD, varianceBD,
+    varianceBZPct: percent(varianceBZ, bankAmount),
+    varianceZDPct: percent(varianceZD, zohoAmount),
+    varianceBDPct: percent(varianceBD, bankAmount),
+    isDuplicateEr, status, issue
+  };
+}
+function runReconciliation(){
+  const usedZoho = new Set();
+  const usedDriver = new Set();
+  const duplicateCounts = findDuplicateErFlags();
+  const rows = [];
 
-      const submitBtn = document.getElementById('submitBtn');
-      const rawFormData = new FormData(e.target);
-      const formData = Object.fromEntries(rawFormData.entries());
-      delete formData.licenceUpload;
-      formData.fleetCardPolicyIssuedSigned = document.getElementById('fleetCardPolicyIssuedSigned').checked ? 'Issued / Signed' : '';
-      formData.fleetPolicyIssuedSigned = document.getElementById('fleetPolicyIssuedSigned').checked ? 'Issued / Signed' : '';
+  bankRows.forEach(b=>{
+    const zi = findByErOrBest(b, zohoRows, usedZoho);
+    const z = zi >= 0 ? zohoRows[zi] : null;
+    if (zi >= 0) usedZoho.add(zi);
+    const baseForDriver = z || b;
+    const di = findByErOrBest(baseForDriver, driverRows, usedDriver);
+    const d = di >= 0 ? driverRows[di] : null;
+    if (di >= 0) usedDriver.add(di);
+    rows.push(makeReconRow(b,z,d,duplicateCounts));
+  });
 
-      // Always save to the Licence sheet tab only. Do not send anything to a Distinct sheet tab.
+  zohoRows.forEach((z,zi)=>{
+    if (usedZoho.has(zi)) return;
+    const di = findByErOrBest(z, driverRows, usedDriver);
+    const d = di >= 0 ? driverRows[di] : null;
+    if (di >= 0) usedDriver.add(di);
+    rows.push(makeReconRow(null,z,d,duplicateCounts));
+  });
 
-      const licenceFile = document.getElementById('licenceUpload').files[0];
+  driverRows.forEach((d,di)=>{
+    if (usedDriver.has(di)) return;
+    rows.push(makeReconRow(null,null,d,duplicateCounts));
+  });
+  reconRows = rows.sort((a,b)=>(a.date||'').localeCompare(b.date||'') || String(a.vehicle).localeCompare(String(b.vehicle)) || String(a.er).localeCompare(String(b.er)));
+  renderRecon(); renderSummary(); updateKpis();
+  if (APPS_SCRIPT_URL) uploadReconToSheet();
+}
+function renderRecon(){
+  const tbody = document.querySelector('#reconTable tbody');
+  if (!reconRows.length) { tbody.innerHTML = '<tr><td colspan="17">No reconciliation records yet.</td></tr>'; return; }
+  tbody.innerHTML = reconRows.map(r=>{
+    const cls = r.status === 'Matched' ? 'match' : r.status === 'Mismatch' || r.status === 'Duplicate ER' ? 'mismatch' : 'missing';
+    return `<tr class="${cls}"><td>${r.date}</td><td>${r.er}</td><td>${r.vehicle}</td><td>${r.driver}</td><td>${r.costCenter}</td><td>${r.department}</td><td>${money(r.bankAmount)}</td><td>${money(r.zohoAmount)}</td><td>${money(r.driverAmount)}</td><td>${money(r.varianceBZ)}</td><td>${money(r.varianceZD)}</td><td>${money(r.varianceBD)}</td><td class="${varianceClass(r.varianceBZ, r.bankAmount)}">${percentText(r.varianceBZ, r.bankAmount)}</td><td class="${varianceClass(r.varianceZD, r.zohoAmount)}">${percentText(r.varianceZD, r.zohoAmount)}</td><td class="${varianceClass(r.varianceBD, r.bankAmount)}">${percentText(r.varianceBD, r.bankAmount)}</td><td>${r.status}</td><td>${r.issue}</td></tr>`;
+  }).join('');
+}
 
-      if (editingRowNumber && !licenceFile) {
-        formData.licenceFileLink = editingExistingLicenceFileLink || '';
-      }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = licenceFile ? 'Uploading licence...' : 'Saving...';
+function renderZoho(){
+  const tbody = document.querySelector('#zohoTable tbody');
+  if (!zohoRows.length) { tbody.innerHTML = '<tr><td colspan="5">No Zoho rows loaded.</td></tr>'; return; }
+  tbody.innerHTML = zohoRows.map(r=>`<tr><td>${r.date}</td><td>${r.er}</td><td>${r.vehicle}</td><td>${money(r.amount)}</td><td>${r.status}</td></tr>`).join('');
+}
 
-      readLicenceFile(licenceFile)
-        .then(function(filePayload) {
-          if (filePayload) {
-            formData.licenceFile = filePayload;
-          }
-          submitBtn.textContent = editingRowNumber ? 'Updating...' : 'Saving...';
-          if (editingRowNumber) {
-            formData.rowNumber = editingRowNumber;
-            return callServer('updateLicence', formData);
-          }
-          return callServer('submitLicence', formData);
-        })
-        .then(function(result) {
-          if (!result || !result.success) {
-            showMessage((result && result.message) || 'Could not save record.', 'error');
-          } else {
-            showMessage(result.message || (editingRowNumber ? 'Updated successfully.' : 'Saved successfully.'), 'success');
-            cancelEdit(false);
-            e.target.reset();
-            e.target.countryOfIssue.value = 'South Africa';
-            e.target.company.value = 'Distinct';
-            const currentBox = document.getElementById('currentLicenceFileBox');
-            if (currentBox) { currentBox.style.display = 'none'; currentBox.innerHTML = ''; }
-            loadDashboard();
-          }
-        })
-        .catch(function(error) {
-          showMessage((error && error.message) || 'Could not save record.', 'error');
-        })
-        .finally(function() {
-          submitBtn.disabled = false;
-          submitBtn.textContent = editingRowNumber ? 'Update Licence' : 'Save Licence';
-        });
+function renderFuelLog(){
+  const tbody = document.querySelector('#fuelLogTable tbody');
+  if (!driverRows.length) { tbody.innerHTML = '<tr><td colspan="12">No Driver Fuel Log rows loaded.</td></tr>'; return; }
+  tbody.innerHTML = driverRows.map(r=>`<tr><td>${r.date}</td><td>${r.er}</td><td>${r.driver}</td><td>${r.vehicle}</td><td>${r.merchant}</td><td>${money(r.amount)}</td><td>${money(num(r.raw['Grand Total']))}</td><td>${r.litres.toFixed(2)}</td><td>${r.costCenter}</td><td>${r.department}</td><td>${r.km.toFixed(2)}</td><td>${r.status}</td></tr>`).join('');
+}
+
+function periodKey(dateStr){
+  if (document.getElementById('periodMode').value === 'all') return '';
+  const d = new Date(dateStr); if (isNaN(d.getTime())) return 'Unknown date';
+  const mode = document.getElementById('periodMode').value;
+  const y = d.getFullYear(); const m = d.getMonth()+1;
+  if (mode === 'daily') return dateStr;
+  if (mode === 'monthly') return `${y}-${String(m).padStart(2,'0')}`;
+  if (mode === 'quarterly') return `${y} Q${Math.floor((m-1)/3)+1}`;
+  const onejan = new Date(y,0,1); const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay()+1)/7);
+  return `${y} W${String(week).padStart(2,'0')}`;
+}
+
+function summaryGroupLabel(r){
+  const groupBy = document.getElementById('groupBy').value;
+
+  // Cost Center view uses Driver Fuel Log fields as the source of truth, then splits further by Department and Vehicle Registration.
+  if (groupBy === 'costCenter') {
+    const costCenter = r.driverCostCenter || r.costCenter || 'Unknown Cost Center';
+    const department = r.driverDepartment || r.department || 'Unknown Department';
+    const vehicle = r.driverVehicle || r.vehicle || 'Unknown Vehicle';
+    return `${costCenter} · ${department} · ${vehicle}`;
+  }
+  if (groupBy === 'department') return r.department || 'Unknown Department';
+  if (groupBy === 'driver') return r.driver || 'Unknown Driver';
+  return r.vehicle || 'Unknown Vehicle';
+}
+
+function renderSummary(){
+  const periodMode = document.getElementById('periodMode').value;
+  const groupBy = document.getElementById('groupBy').value;
+  const summary = new Map();
+
+  // When Cost Center is selected, keep only rows carrying Driver Fuel Log context and group them by Cost Center -> Department -> Vehicle.
+  const sourceRows = groupBy === 'costCenter' ? reconRows.filter(r => r.driverAmount || r.driverCostCenter || r.driverDepartment || r.driverVehicle) : reconRows;
+
+  sourceRows.forEach(r=>{
+    let key = summaryGroupLabel(r);
+    const pk = periodKey(r.date);
+    if (periodMode !== 'all') key = `${pk} · ${key}`;
+    if (!summary.has(key)) summary.set(key,{group:key,bank:0,zoho:0,driver:0,varianceBZ:0,varianceZD:0,varianceBD:0,count:0,costCenter:r.driverCostCenter || r.costCenter || 'Unknown Cost Center',department:r.driverDepartment || r.department || 'Unknown Department',vehicle:r.driverVehicle || r.vehicle || 'Unknown Vehicle'});
+    const x = summary.get(key);
+    x.bank += r.bankAmount;
+    x.zoho += r.zohoAmount;
+    x.driver += r.driverAmount;
+    x.varianceBZ += r.varianceBZ;
+    x.varianceZD += r.varianceZD;
+    x.varianceBD += r.varianceBD;
+    x.count++;
+  });
+
+  const arr = Array.from(summary.values()).sort((a,b)=>{
+    if (groupBy === 'costCenter') {
+      return String(a.costCenter).localeCompare(String(b.costCenter)) || String(a.department).localeCompare(String(b.department)) || String(a.vehicle).localeCompare(String(b.vehicle));
+    }
+    return Math.abs(b.varianceBD)-Math.abs(a.varianceBD) || b.bank-a.bank;
+  });
+
+  const totals = arr.reduce((t,x)=>{
+    t.bank += x.bank;
+    t.zoho += x.zoho;
+    t.driver += x.driver;
+    t.varianceBZ += x.varianceBZ;
+    t.varianceZD += x.varianceZD;
+    t.varianceBD += x.varianceBD;
+    t.count += x.count;
+    return t;
+  }, {bank:0, zoho:0, driver:0, varianceBZ:0, varianceZD:0, varianceBD:0, count:0});
+
+  const rowsHtml = arr.map(x=>`<tr><td>${x.group}</td><td>${money(x.bank)}</td><td>${money(x.zoho)}</td><td>${money(x.driver)}</td><td>${money(x.varianceBZ)}</td><td>${money(x.varianceZD)}</td><td>${money(x.varianceBD)}</td><td class="${varianceClass(x.varianceBZ, x.bank)}">${percentText(x.varianceBZ, x.bank)}</td><td class="${varianceClass(x.varianceZD, x.zoho)}">${percentText(x.varianceZD, x.zoho)}</td><td class="${varianceClass(x.varianceBD, x.bank)}">${percentText(x.varianceBD, x.bank)}</td><td>${x.count}</td></tr>`).join('');
+
+  const totalRow = `<tr style="font-weight:bold; background:#eef4fa;"><td>TOTAL</td><td>${money(totals.bank)}</td><td>${money(totals.zoho)}</td><td>${money(totals.driver)}</td><td>${money(totals.varianceBZ)}</td><td>${money(totals.varianceZD)}</td><td>${money(totals.varianceBD)}</td><td class="${varianceClass(totals.varianceBZ, totals.bank)}">${percentText(totals.varianceBZ, totals.bank)}</td><td class="${varianceClass(totals.varianceZD, totals.zoho)}">${percentText(totals.varianceZD, totals.zoho)}</td><td class="${varianceClass(totals.varianceBD, totals.bank)}">${percentText(totals.varianceBD, totals.bank)}</td><td>${totals.count}</td></tr>`;
+
+  document.querySelector('#summaryTable tbody').innerHTML = arr.length ? rowsHtml + totalRow : '<tr><td colspan="11">No summary yet.</td></tr>';
+  updateVarianceKpis(totals);
+  renderChart(arr);
+}
+
+function renderChart(arr){
+  const ctx = document.getElementById('pieChart');
+  const groupBy = document.getElementById('groupBy').value;
+  const chartTitle = document.getElementById('pieChartTitle');
+  if (chartTitle) chartTitle.textContent = groupBy === 'costCenter' ? 'Pie Chart by Cost Center' : groupBy === 'department' ? 'Pie Chart by Department' : groupBy === 'driver' ? 'Pie Chart by Driver Name' : 'Pie Chart by Vehicle Registration';
+  if (pieChart) pieChart.destroy();
+
+  let chartRows = arr;
+  if (groupBy === 'costCenter') {
+    const costCenterTotals = new Map();
+    arr.forEach(x=>{
+      const key = x.costCenter || 'Unknown Cost Center';
+      costCenterTotals.set(key, (costCenterTotals.get(key) || 0) + x.driver);
     });
-
-    function loadDashboard() {
-      jsonpGet('dashboard', { cacheBust: Date.now() })
-        .then(function(response) {
-          if (!response || response.success === false) {
-            throw new Error((response && response.message) || 'Could not load dashboard.');
-          }
-
-          renderCounts(response.counts || {});
-          renderStatus(normalizeStatusResponse(response.status || response));
-          renderLicenceTransactions(normalizeLicenceList(response.records || response.data || response.transactions || []));
-        })
-        .catch(function(error) {
-          document.getElementById('aboutToExpireBox').innerHTML = '<div class="empty">Could not load status.</div>';
-          document.getElementById('expiredBox').innerHTML = '<div class="empty">Could not load status.</div>';
-          document.getElementById('transactionsBody').innerHTML =
-            '<tr><td colspan="15" style="padding:12px; text-align:center;">Could not load dashboard: ' + escapeHtml((error && error.message) || 'Server error') + '<br>Open the Apps Script URL directly with ?action=health to test deployment.</td></tr>';
-        });
-    }
-
-    function renderCounts(counts) {
-      counts = counts || {};
-      document.getElementById('totalDriversBox').textContent = Number(counts.totalDrivers || 0);
-      document.getElementById('totalOtherLicenceBox').textContent = Number(counts.totalOtherLicence || 0);
-      document.getElementById('totalExpiredBox').textContent = Number(counts.totalExpired || 0);
-      document.getElementById('totalAquaDriversBox').textContent = Number(counts.totalAquaDrivers || 0);
-      document.getElementById('totalDistinctBox').textContent = Number(counts.totalDistinct || 0);
-      document.getElementById('totalOnpointBox').textContent = Number(counts.totalOnpoint || 0);
-    }
-
-    function loadTransactions() {
-      callServer('searchLicences', '')
-        .then(function(response) {
-          renderLicenceTransactions(normalizeLicenceList(response));
-        })
-        .catch(function(error) {
-          document.getElementById('transactionsBody').innerHTML =
-            '<tr><td colspan="15" style="padding:12px; text-align:center;">Could not load transactions: ' + escapeHtml((error && error.message) || 'Server error') + '</td></tr>';
-        });
-    }
-
-    function renderLicenceTransactions(results) {
-      const body = document.getElementById('transactionsBody');
-
-      if (!results || results.length === 0) {
-        transactionLicenceRecords = [];
-        body.innerHTML = '<tr><td colspan="15" style="padding:12px; text-align:center;">No transactions found on the Licence tab.</td></tr>';
-        return;
-      }
-
-      transactionLicenceRecords = results;
-      body.innerHTML = results.map(function(p, index) {
-        const licenceLink = makeLicenceLinks(p);
-        const actions = getRecordKey(p)
-          ? '<button class="action-btn edit-btn" type="button" onclick="startEdit(\'transactions\', ' + index + ')">Edit</button>' +
-            '<button class="action-btn delete-btn" type="button" onclick="deleteLicenceRecord(\'transactions\', ' + index + ')">Delete</button>'
-          : '<span class="empty">No row ID</span>';
-
-        return '<tr>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.name) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.surname) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.licenceNumber) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.countryOfIssue) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.company) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.department) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.licenceType) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.validity) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.firstIssue) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.vehicleRestrictions) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.otherLicence) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + licenceLink + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.fleetCardPolicyIssuedSigned) + '</td>' +
-          '<td style="padding:10px; border:1px solid #e5e7eb;">' + escapeHtml(p.fleetPolicyIssuedSigned) + '</td>' +
-          '<td class="action-cell">' + actions + '</td>' +
-        '</tr>';
-      }).join('');
-    }
-
-
-    function loadStatus() {
-      callServer('getLicenceStatus')
-        .then(function(response) {
-          renderStatus(normalizeStatusResponse(response));
-        })
-        .catch(function() {
-          document.getElementById('aboutToExpireBox').innerHTML = '<div class="empty">Could not load status.</div>';
-          document.getElementById('expiredBox').innerHTML = '<div class="empty">Could not load status.</div>';
-        });
-    }
-
-    function searchPerson() {
-      const query = document.getElementById('searchInput').value.trim();
-      const box = document.getElementById('searchResultsBox');
-
-      if (!query) {
-        box.innerHTML = '<div class="empty">Enter a name or surname to search.</div>';
-        return;
-      }
-
-      box.innerHTML = 'Searching...';
-
-      callServer('searchLicences', query)
-        .then(function(response) {
-          renderSearchResults(normalizeLicenceList(response));
-        })
-        .catch(function(error) {
-          box.innerHTML = '<div class="empty">' + escapeHtml((error && error.message) || 'Could not search records.') + '</div>';
-        });
-    }
-
-    function jsonpGet(action, params) {
-      params = params || {};
-      return new Promise(function(resolve, reject) {
-        if (!SCRIPT_URL || SCRIPT_URL.indexOf('/exec') === -1) {
-          reject(new Error('SCRIPT_URL must be the deployed Apps Script Web App URL ending in /exec.'));
-          return;
-        }
-
-        const callbackName = 'licenceDashCb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        const script = document.createElement('script');
-        const query = Object.keys(params).map(function(key) {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
-        }).join('&');
-        const url = SCRIPT_URL + '?action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(callbackName) + (query ? '&' + query : '');
-
-        const timer = setTimeout(function() {
-          cleanup();
-          reject(new Error('Apps Script JSONP connection timed out. Check Web App access: Execute as Me, Anyone with the link, and deploy a New version.'));
-        }, 30000);
-
-        function cleanup() {
-          clearTimeout(timer);
-          try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
-          try { script.remove(); } catch (e) {}
-        }
-
-        window[callbackName] = function(response) {
-          cleanup();
-          resolve(response);
-        };
-
-        script.onerror = function() {
-          cleanup();
-          reject(new Error('Could not connect to Apps Script. Confirm the deployment URL and access permissions.'));
-        };
-
-        script.src = url;
-        document.body.appendChild(script);
-      });
-    }
-
-    function callServer(functionName, payload) {
-      if (window.google && google.script && google.script.run) {
-        return new Promise(function(resolve, reject) {
-          let runner = google.script.run
-            .withSuccessHandler(resolve)
-            .withFailureHandler(reject);
-
-          if (typeof payload === 'undefined') {
-            runner[functionName]();
-          } else {
-            runner[functionName](payload);
-          }
-        });
-      }
-
-      if (functionName === 'getLicenceStatus') {
-        return jsonpGet('status', { cacheBust: Date.now() });
-      }
-
-      if (functionName === 'searchLicences') {
-        return jsonpGet('search', { query: payload || '', cacheBust: Date.now() });
-      }
-
-      if (functionName === 'submitLicence' || functionName === 'updateLicence' || functionName === 'deleteLicence') {
-        const bodyPayload = Object.assign({}, payload || {});
-        if (functionName === 'updateLicence') bodyPayload.action = 'update';
-        if (functionName === 'deleteLicence') bodyPayload.action = 'delete';
-
-        return fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(bodyPayload),
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          }
-        }).then(parseJsonResponse);
-      }
-
-      return Promise.reject(new Error('Unknown server function.'));
-    }
-
-    function parseJsonResponse(response) {
-      if (!response.ok) {
-        throw new Error('Server error: ' + response.status);
-      }
-      return response.json();
-    }
-
-    function normalizeLicenceList(response) {
-      if (Array.isArray(response)) {
-        return response;
-      }
-
-      if (response && Array.isArray(response.records)) {
-        return response.records;
-      }
-
-      if (response && Array.isArray(response.data)) {
-        return response.data;
-      }
-
-      if (response && Array.isArray(response.results)) {
-        return response.results;
-      }
-
-      if (response && response.success === false) {
-        throw new Error(response.message || 'Server returned an error.');
-      }
-
-      return [];
-    }
-
-    function normalizeStatusResponse(response) {
-      if (!response) {
-        return { aboutToExpire: [], expired: [] };
-      }
-
-      if (response.success === false) {
-        throw new Error(response.message || 'Could not load status.');
-      }
-
-      if (response.data) {
-        return response.data;
-      }
-
-      return response;
-    }
-
-    function renderStatus(data) {
-      data = data || { aboutToExpire: [], expired: [] };
-
-      // Safety filter: the backend already filters this, but this keeps the dashboard correct
-      // even if an older Apps Script deployment returns all records.
-      const aboutToExpireOnly = normalizeLicenceList(data.aboutToExpire || []).filter(function(p) {
-        const days = Number(p.daysRemaining);
-        return Number.isFinite(days) && days >= 0 && days <= 14;
-      });
-      const expiredOnly = normalizeLicenceList(data.expired || []).filter(function(p) {
-        const days = Number(p.daysRemaining);
-        return Number.isFinite(days) && days < 0;
-      });
-
-      renderPeople('aboutToExpireBox', aboutToExpireOnly, 'No licences about to expire.', true);
-      renderPeople('expiredBox', expiredOnly, 'No expired licences.', false);
-    }
-
-    function renderPeople(elementId, people, emptyText, limitAboutToExpire) {
-      const box = document.getElementById(elementId);
-
-      if (!people || people.length === 0) {
-        box.innerHTML = '<div class="empty">' + emptyText + '</div>';
-        return;
-      }
-
-      const list = limitAboutToExpire ? people.slice(0, 5) : people;
-      const extraCount = limitAboutToExpire && people.length > 5 ? people.length - 5 : 0;
-
-      box.innerHTML = list.map(function(p) {
-        return '<div class="person">' +
-          '<strong>' + escapeHtml(p.name) + ' ' + escapeHtml(p.surname) + '</strong><br>' +
-          'Licence: ' + escapeHtml(p.licenceNumber) + '<br>' +
-          'Company: ' + escapeHtml(p.company) + '<br>' +
-          'Department: ' + escapeHtml(p.department) + '<br>' +
-          'Type: ' + escapeHtml(p.licenceType) + '<br>' +
-          'Validity: ' + escapeHtml(p.validity) + '<br>' +
-          'Days remaining: ' + escapeHtml(String(p.daysRemaining)) +
-        '</div>';
-      }).join('') +
-      (extraCount ? '<button type="button" style="width:auto; margin-top:10px;" onclick="showAllAboutToExpire()">View more (' + extraCount + ' more)</button>' : '');
-    }
-
-    function showAllAboutToExpire() {
-      callServer('getLicenceStatus')
-        .then(function(response) {
-          const data = normalizeStatusResponse(response);
-          const aboutToExpireOnly = normalizeLicenceList(data.aboutToExpire || []).filter(function(p) {
-            const days = Number(p.daysRemaining);
-            return Number.isFinite(days) && days >= 0 && days <= 14;
-          });
-          renderPeople('aboutToExpireBox', aboutToExpireOnly, 'No licences about to expire.', false);
-        })
-        .catch(function() {
-          document.getElementById('aboutToExpireBox').innerHTML = '<div class="empty">Could not open full about-to-expire list.</div>';
-        });
-    }
-
-    function getRecordKey(record) {
-      return record && (record.rowNumber || record.rowIndex || record.id);
-    }
-
-    function getRecordFromSource(source, index) {
-      return source === 'search' ? searchLicenceRecords[index] : transactionLicenceRecords[index];
-    }
-
-    function startEdit(source, index) {
-      const record = getRecordFromSource(source, index);
-      const rowNumber = getRecordKey(record);
-      const form = document.getElementById('licenceForm');
-
-      if (!record || !rowNumber) {
-        showMessage('This record cannot be edited because no row identifier was returned from the sheet.', 'error');
-        return;
-      }
-
-      editingRowNumber = rowNumber;
-      editingExistingLicenceFileLink = record.licenceFileLink || '';
-      const currentBox = document.getElementById('currentLicenceFileBox');
-      if (currentBox) {
-        if (editingExistingLicenceFileLink) {
-          currentBox.innerHTML = 'Current licence file: <a href="' + escapeAttr(editingExistingLicenceFileLink) + '" target="_blank">View current file</a><br>Leave upload blank to keep this file, or choose a new file to replace it.';
-          currentBox.style.display = 'block';
-        } else {
-          currentBox.innerHTML = 'No current licence file saved. Choose a file to upload one.';
-          currentBox.style.display = 'block';
-        }
-      }
-      form.name.value = record.name || '';
-      form.surname.value = record.surname || '';
-      form.licenceNumber.value = record.licenceNumber || '';
-      form.countryOfIssue.value = record.countryOfIssue || 'South Africa';
-      form.company.value = record.company || 'Distinct';
-      form.department.value = record.department || '';
-      form.licenceType.value = record.licenceType || '';
-      form.validity.value = toDateInputValue(record.validity);
-      form.firstIssue.value = toDateInputValue(record.firstIssue);
-      form.vehicleRestrictions.value = record.vehicleRestrictions || '';
-      form.otherLicence.value = record.otherLicence || '';
-      document.getElementById('fleetCardPolicyIssuedSigned').checked = String(record.fleetCardPolicyIssuedSigned || '').trim() !== '';
-      document.getElementById('fleetPolicyIssuedSigned').checked = String(record.fleetPolicyIssuedSigned || '').trim() !== '';
-      document.getElementById('licenceUpload').value = '';
-      document.getElementById('submitBtn').textContent = 'Update Licence';
-      document.getElementById('cancelEditBtn').style.display = 'inline-block';
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      showMessage('Edit mode enabled. Update the details, then click Update Licence.', 'success');
-    }
-
-    function cancelEdit(showNotice) {
-      editingRowNumber = null;
-      editingExistingLicenceFileLink = '';
-      document.getElementById('submitBtn').textContent = 'Save Licence';
-      document.getElementById('cancelEditBtn').style.display = 'none';
-      const currentBox = document.getElementById('currentLicenceFileBox');
-      if (currentBox) { currentBox.style.display = 'none'; currentBox.innerHTML = ''; }
-      if (showNotice !== false) {
-        document.getElementById('licenceForm').reset();
-        document.getElementById('licenceForm').countryOfIssue.value = 'South Africa';
-        document.getElementById('licenceForm').company.value = 'Distinct';
-      }
-    }
-
-    function deleteLicenceRecord(source, index) {
-      const record = getRecordFromSource(source, index);
-      const rowNumber = getRecordKey(record);
-
-      if (!record || !rowNumber) {
-        showMessage('This record cannot be deleted because no row identifier was returned from the sheet.', 'error');
-        return;
-      }
-
-      if (!confirm('Delete licence record for ' + (record.name || '') + ' ' + (record.surname || '') + '?')) {
-        return;
-      }
-
-      callServer('deleteLicence', { rowNumber: rowNumber })
-        .then(function(result) {
-          if (!result || !result.success) {
-            showMessage((result && result.message) || 'Could not delete record.', 'error');
-            return;
-          }
-          showMessage(result.message || 'Deleted successfully.', 'success');
-          cancelEdit(false);
-          loadDashboard();
-        })
-        .catch(function(error) {
-          showMessage((error && error.message) || 'Could not delete record.', 'error');
-        });
-    }
-
-    function toDateInputValue(value) {
-      if (!value) return '';
-      const text = String(value);
-      const isoMatch = text.match(/^\d{4}-\d{2}-\d{2}/);
-      if (isoMatch) return isoMatch[0];
-      const date = new Date(text);
-      if (isNaN(date.getTime())) return '';
-      return date.toISOString().slice(0, 10);
-    }
-
-
-    function makeLicenceLinks(record) {
-      const links = [];
-      if (record && Array.isArray(record.licenceLinks)) {
-        record.licenceLinks.forEach(function(link) { if (link) links.push(link); });
-      }
-      if (record && record.licenceFileLink) {
-        String(record.licenceFileLink).split(/[\n,; ]+/).forEach(function(link) {
-          if (link && link.indexOf('http') === 0) links.push(link);
-        });
-      }
-      const unique = links.filter(function(link, index, arr) { return arr.indexOf(link) === index; });
-      if (!unique.length) return '';
-      return unique.map(function(link, index) {
-        return '<a class="view-link" href="' + escapeAttr(link) + '" target="_blank">View Licence ' + (index + 1) + '</a>';
-      }).join('');
-    }
-
-    function renderSearchResults(results) {
-      const box = document.getElementById('searchResultsBox');
-      results = normalizeLicenceList(results);
-
-      if (!results || results.length === 0) {
-        box.innerHTML = '<div class="empty">No matching licence details found.</div>';
-        return;
-      }
-
-      searchLicenceRecords = results;
-      box.innerHTML = results.map(function(p, index) {
-        const actions = getRecordKey(p)
-          ? '<div class="person-actions">' +
-            '<button class="action-btn edit-btn" type="button" onclick="startEdit(\'search\', ' + index + ')">Edit</button>' +
-            '<button class="action-btn delete-btn" type="button" onclick="deleteLicenceRecord(\'search\', ' + index + ')">Delete</button>' +
-            '</div>'
-          : '<span class="empty">No row ID</span>';
-
-        return '<div class="person">' +
-          '<strong>' + escapeHtml(p.name) + ' ' + escapeHtml(p.surname) + '</strong><br>' +
-          'Licence Number: ' + escapeHtml(p.licenceNumber) + '<br>' +
-          'Country of Issue: ' + escapeHtml(p.countryOfIssue) + '<br>' +
-          'Company: ' + escapeHtml(p.company) + '<br>' +
-          'Department: ' + escapeHtml(p.department) + '<br>' +
-          'Licence Type: ' + escapeHtml(p.licenceType) + '<br>' +
-          'Validity: ' + escapeHtml(p.validity) + '<br>' +
-          'First Issue: ' + escapeHtml(p.firstIssue) + '<br>' +
-          'Vehicle Restrictions: ' + escapeHtml(p.vehicleRestrictions) + '<br>' +
-          'Other Licence: ' + escapeHtml(p.otherLicence) + '<br>' +
-          'Licence Link: ' + makeLicenceLinks(p) + '<br>' +
-          'Fleet Card Policy: ' + escapeHtml(p.fleetCardPolicyIssuedSigned) + '<br>' +
-          'Fleet Policy: ' + escapeHtml(p.fleetPolicyIssuedSigned) + '<br>' +
-          actions +
-        '</div>';
-      }).join('');
-    }
-
-    function readLicenceFile(file) {
-      if (!file) {
-        return Promise.resolve(null);
-      }
-
-      return new Promise(function(resolve, reject) {
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-          const result = String(event.target.result || '');
-          const parts = result.split(',');
-
-          resolve({
-            name: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            data: parts.length > 1 ? parts[1] : result
-          });
-        };
-
-        reader.onerror = function() {
-          reject(new Error('Could not read uploaded licence file.'));
-        };
-
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function showMessage(text, type) {
-      const msg = document.getElementById('message');
-      msg.textContent = text;
-      msg.className = 'message ' + type;
-      msg.style.display = 'block';
-
-      setTimeout(function() {
-        msg.style.display = 'none';
-      }, 4000);
-    }
-
-    function escapeHtml(value) {
-      return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function escapeAttr(value) {
-      return escapeHtml(value);
-    }
-  </script>
+    chartRows = Array.from(costCenterTotals.entries()).map(([group, driver])=>({group, bank:driver, driver}));
+  }
+
+  pieChart = new Chart(ctx,{type:'pie',data:{labels:chartRows.map(x=>`${x.group} - ${money(groupBy === 'costCenter' ? x.driver : x.bank)}`),datasets:[{data:chartRows.map(x=>groupBy === 'costCenter' ? x.driver : x.bank)}]},options:{plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(context){return `${context.label}`;}}}}}});
+}
+
+function updateVarianceKpis(totals){
+  const safeTotals = totals || reconRows.reduce((t,r)=>{
+    t.bank += r.bankAmount;
+    t.zoho += r.zohoAmount;
+    t.driver += r.driverAmount;
+    t.varianceBZ += r.varianceBZ;
+    t.varianceZD += r.varianceZD;
+    t.varianceBD += r.varianceBD;
+    return t;
+  }, {bank:0, zoho:0, driver:0, varianceBZ:0, varianceZD:0, varianceBD:0});
+  document.getElementById('kpiVarianceBZ').textContent = percentText(safeTotals.varianceBZ, safeTotals.bank);
+  document.getElementById('kpiVarianceZD').textContent = percentText(safeTotals.varianceZD, safeTotals.zoho);
+  document.getElementById('kpiVarianceBD').textContent = percentText(safeTotals.varianceBD, safeTotals.bank);
+  document.getElementById('kpiVarianceBZ').className = Math.abs(percent(safeTotals.varianceBZ, safeTotals.bank)) > 5 ? 'value err' : 'value';
+  document.getElementById('kpiVarianceZD').className = Math.abs(percent(safeTotals.varianceZD, safeTotals.zoho)) > 5 ? 'value err' : 'value';
+  document.getElementById('kpiVarianceBD').className = Math.abs(percent(safeTotals.varianceBD, safeTotals.bank)) > 5 ? 'value err' : 'value';
+}
+
+
+function updateKpis(){
+  const bankTotal = bankRows.reduce((s,r)=>s+r.amount,0);
+  const zohoTotal = zohoRows.reduce((s,r)=>s+r.amount,0);
+  const driverTotal = driverRows.reduce((s,r)=>s+r.amount,0);
+  document.getElementById('kpiBank').textContent = money(bankTotal);
+  document.getElementById('kpiZoho').textContent = money(zohoTotal);
+  document.getElementById('kpiDriver').textContent = money(driverTotal);
+  document.getElementById('kpiExceptions').textContent = reconRows.filter(r=>r.status!=='Matched').length;
+  document.getElementById('kpiMissingZoho').textContent = reconRows.filter(r=>r.bankAmount && !r.zohoAmount).length;
+  document.getElementById('kpiMissingDriver').textContent = reconRows.filter(r=>(r.bankAmount || r.zohoAmount) && !r.driverAmount).length;
+  document.getElementById('kpiDuplicateEr').textContent = reconRows.filter(r=>r.isDuplicateEr).length;
+  updateVarianceKpis();
+}
+
+
+function exportWorkbook(type){
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(reconRows), 'Fuel Recon');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(zohoRows), 'Zoho Mapped');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(driverRows), 'Driver Fuel Log');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bankRows), 'Bank Mapped');
+  if (type === 'csv') XLSX.writeFile(wb, 'fuel_recon.csv');
+  else XLSX.writeFile(wb, 'fuel_recon.xlsx');
+}
+
+async function uploadReconToSheet(){
+  try{
+    await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'uploadFuelRecon',sheetId:SHEET_ID,sheetTab:FUEL_RECON_TAB,rows:reconRows})});
+  }catch(e){ console.warn('Could not upload to Fuel Recon tab', e); }
+}
+
+function downloadPdfReport(){
+  window.print();
+}
+
+document.getElementById('bankFile').addEventListener('change',handleBankUpload);
+document.getElementById('zohoFile').addEventListener('change',handleZohoUpload);
+document.getElementById('loadFuelLogBtn').addEventListener('click',loadDriverLog);
+document.getElementById('reconcileBtn').addEventListener('click',runReconciliation);
+document.getElementById('exportExcelBtn').addEventListener('click',()=>exportWorkbook('xlsx'));
+document.getElementById('exportCsvBtn').addEventListener('click',()=>exportWorkbook('csv'));
+document.getElementById('downloadPdfBtn').addEventListener('click',downloadPdfReport);
+document.getElementById('groupBy').addEventListener('change',renderSummary);
+document.getElementById('periodMode').addEventListener('change',renderSummary);
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById(btn.dataset.panel).classList.add('active');}));
+document.getElementById('loginBtn').addEventListener('click',handleLogin);
+document.getElementById('logoutBtn').addEventListener('click',logout);
+document.getElementById('loginUsername').addEventListener('keydown',e=>{ if(e.key === 'Enter') handleLogin(); });
+document.getElementById('loginPassword').addEventListener('keydown',e=>{ if(e.key === 'Enter') handleLogin(); });
+
+initAuth();
+</script>
 </body>
 </html>
